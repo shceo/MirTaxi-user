@@ -1,6 +1,6 @@
 import UIKit
 import Flutter
-import GoogleMaps
+import YandexMapsMobile
 import Firebase
 
 @UIApplicationMain
@@ -10,7 +10,8 @@ import Firebase
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     FirebaseApp.configure()
-    GMSServices.provideAPIKey("map key")
+    YMKMapKit.setApiKey("d91bb4f0-deaa-4b35-8764-1e08e6b8a38b")
+    YMKMapKit.sharedInstance()
     GeneratedPluginRegistrant.register(with: self)
  UIApplication.shared.beginReceivingRemoteControlEvents()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

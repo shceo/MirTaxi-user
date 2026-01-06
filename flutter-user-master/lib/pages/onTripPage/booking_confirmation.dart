@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
+import 'dart:math' as math;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/screens/booking/address_widget.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/screens/booking/select_taxi_widget.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/booking/address_view_widget.dart';
@@ -62,15 +62,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   TextEditingController promoKey = TextEditingController();
   final Map minutes = {};
-  List myMarker = [];
+  List<PlacemarkMapObject> myMarker = [];
   Map myBearings = {};
   String _cancelReason = '';
-  dynamic _controller;
+  YandexMapController? _controller;
   late PermissionStatus permission;
   Location location = Location();
   bool _locationDenied = false;
   bool _isLoading = false;
-  LatLng _center = const LatLng(41.4219057, -102.0840772);
+  Point _center = const Point(latitude: 41.4219057, longitude: -102.0840772);
   dynamic pinLocationIcon;
   dynamic pinLocationIcon2;
   dynamic animationController;
@@ -90,11 +90,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   dynamic _dist;
   String _cancellingError = '';
 
-  final _mapMarkerSC = StreamController<List<Marker>>();
+  final _mapMarkerSC = StreamController<List<PlacemarkMapObject>>();
 
-  StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
+  StreamSink<List<PlacemarkMapObject>> get _mapMarkerSink =>
+      _mapMarkerSC.sink;
 
-  Stream<List<Marker>> get mapMarkerStream => _mapMarkerSC.stream;
+  Stream<List<PlacemarkMapObject>> get mapMarkerStream =>
+      _mapMarkerSC.stream;
 
   // final _distSC = StreamController();
   // // StreamSink get _distSCSink => _distSC.sink;
@@ -119,7 +121,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if (_controller != null) {
+      if (_controller != null && mapStyle.isNotEmpty) {
         _controller?.setMapStyle(mapStyle);
       }
       getUserDetails();
@@ -198,155 +200,77 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   addDropMarker() async {
     var testIcon = await _capturePng(iconDropKey);
     if (testIcon != null) {
+      final point = (userRequestData.isEmpty)
+          ? addressList.firstWhere((element) => element.id == 'drop').latlng
+          : Point(
+              latitude: userRequestData['drop_lat'],
+              longitude: userRequestData['drop_lng'],
+            );
       setState(() {
-        myMarker.add(Marker(
-            markerId: const MarkerId('pointdrop'),
+        myMarker.add(
+          _buildPlacemark(
+            markerId: 'pointdrop',
+            point: point,
             icon: testIcon,
-            position: (userRequestData.isEmpty)
-                ? addressList
-                    .firstWhere((element) => element.id == 'drop')
-                    .latlng
-                : LatLng(
-                    userRequestData['drop_lat'], userRequestData['drop_lng'])));
+          ),
+        );
       });
     }
 
     if (widget.type != 1) {
-      LatLngBounds bound;
+      Point pickPoint;
+      Point dropPoint;
       if (userRequestData.isNotEmpty) {
-        if (userRequestData['pick_lat'] > userRequestData['drop_lat'] &&
-            userRequestData['pick_lng'] > userRequestData['drop_lng']) {
-          bound = LatLngBounds(
-              southwest: LatLng(
-                  userRequestData['drop_lat'], userRequestData['drop_lng']),
-              northeast: LatLng(
-                  userRequestData['pick_lat'], userRequestData['pick_lng']));
-        } else if (userRequestData['pick_lng'] > userRequestData['drop_lng']) {
-          bound = LatLngBounds(
-              southwest: LatLng(
-                  userRequestData['pick_lat'], userRequestData['drop_lng']),
-              northeast: LatLng(
-                  userRequestData['drop_lat'], userRequestData['pick_lng']));
-        } else if (userRequestData['pick_lat'] > userRequestData['drop_lat']) {
-          bound = LatLngBounds(
-              southwest: LatLng(
-                  userRequestData['drop_lat'], userRequestData['pick_lng']),
-              northeast: LatLng(
-                  userRequestData['pick_lat'], userRequestData['drop_lng']));
-        } else {
-          bound = LatLngBounds(
-              southwest: LatLng(
-                  userRequestData['pick_lat'], userRequestData['pick_lng']),
-              northeast: LatLng(
-                  userRequestData['drop_lat'], userRequestData['drop_lng']));
-        }
+        pickPoint = Point(
+          latitude: userRequestData['pick_lat'],
+          longitude: userRequestData['pick_lng'],
+        );
+        dropPoint = Point(
+          latitude: userRequestData['drop_lat'],
+          longitude: userRequestData['drop_lng'],
+        );
       } else {
-        if (addressList
-                    .firstWhere((element) => element.id == 'pickup')
-                    .latlng
-                    .latitude >
-                addressList
-                    .firstWhere((element) => element.id == 'drop')
-                    .latlng
-                    .latitude &&
-            addressList
-                    .firstWhere((element) => element.id == 'pickup')
-                    .latlng
-                    .longitude >
-                addressList
-                    .firstWhere((element) => element.id == 'drop')
-                    .latlng
-                    .longitude) {
-          bound = LatLngBounds(
-              southwest: addressList
-                  .firstWhere((element) => element.id == 'drop')
-                  .latlng,
-              northeast: addressList
-                  .firstWhere((element) => element.id == 'pickup')
-                  .latlng);
-        } else if (addressList
-                .firstWhere((element) => element.id == 'pickup')
-                .latlng
-                .longitude >
-            addressList
-                .firstWhere((element) => element.id == 'drop')
-                .latlng
-                .longitude) {
-          bound = LatLngBounds(
-              southwest: LatLng(
-                  addressList
-                      .firstWhere((element) => element.id == 'pickup')
-                      .latlng
-                      .latitude,
-                  addressList
-                      .firstWhere((element) => element.id == 'drop')
-                      .latlng
-                      .longitude),
-              northeast: LatLng(
-                  addressList
-                      .firstWhere((element) => element.id == 'drop')
-                      .latlng
-                      .latitude,
-                  addressList
-                      .firstWhere((element) => element.id == 'pickup')
-                      .latlng
-                      .longitude));
-        } else if (addressList
-                .firstWhere((element) => element.id == 'pickup')
-                .latlng
-                .latitude >
-            addressList
-                .firstWhere((element) => element.id == 'drop')
-                .latlng
-                .latitude) {
-          bound = LatLngBounds(
-              southwest: LatLng(
-                  addressList
-                      .firstWhere((element) => element.id == 'drop')
-                      .latlng
-                      .latitude,
-                  addressList
-                      .firstWhere((element) => element.id == 'pickup')
-                      .latlng
-                      .longitude),
-              northeast: LatLng(
-                  addressList
-                      .firstWhere((element) => element.id == 'pickup')
-                      .latlng
-                      .latitude,
-                  addressList
-                      .firstWhere((element) => element.id == 'drop')
-                      .latlng
-                      .longitude));
-        } else {
-          bound = LatLngBounds(
-              southwest: addressList
-                  .firstWhere((element) => element.id == 'pickup')
-                  .latlng,
-              northeast: addressList
-                  .firstWhere((element) => element.id == 'drop')
-                  .latlng);
-        }
+        pickPoint = addressList
+            .firstWhere((element) => element.id == 'pickup')
+            .latlng;
+        dropPoint = addressList
+            .firstWhere((element) => element.id == 'drop')
+            .latlng;
       }
-      CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
-      _controller!.animateCamera(cameraUpdate);
-      // CameraUpdate.newCameraPosition(CameraPosition(target: target))
+      final bounds = BoundingBox(
+        southWest: Point(
+          latitude: math.min(pickPoint.latitude, dropPoint.latitude),
+          longitude: math.min(pickPoint.longitude, dropPoint.longitude),
+        ),
+        northEast: Point(
+          latitude: math.max(pickPoint.latitude, dropPoint.latitude),
+          longitude: math.max(pickPoint.longitude, dropPoint.longitude),
+        ),
+      );
+      _controller?.moveCamera(
+        CameraUpdate.newGeometry(Geometry.fromBoundingBox(bounds)),
+        animation: const MapAnimation(type: MapAnimationType.smooth, duration: 0.5),
+      );
     }
   }
 
   addMarker() async {
     var testIcon = await _capturePng(iconKey);
     if (testIcon != null) {
+      final point = (userRequestData.isEmpty)
+          ? addressList.firstWhere((element) => element.id == 'pickup').latlng
+          : Point(
+              latitude: userRequestData['pick_lat'],
+              longitude: userRequestData['pick_lng'],
+            );
       setState(() {
-        myMarker.add(Marker(
-            markerId: const MarkerId('pointpick'),
+        myMarker.add(
+          _buildPlacemark(
+            markerId: 'pointpick',
+            point: point,
             icon: testIcon,
-            position: (userRequestData.isEmpty)
-                ? addressList
-                    .firstWhere((element) => element.id == 'pickup')
-                    .latlng
-                : LatLng(
-                    userRequestData['pick_lat'], userRequestData['pick_lng'])));
+          ),
+        );
       });
     }
   }
@@ -361,13 +285,26 @@ class _BookingConfirmationState extends State<BookingConfirmation>
       getPolylines();
     } else if (widget.type == 1 || widget.type == 2) {
       if (userRequestData.isNotEmpty) {
-        CameraUpdate cameraUpdate = CameraUpdate.newLatLng(
-            LatLng(userRequestData['pick_lat'], userRequestData['pick_lng']));
-        _controller!.animateCamera(cameraUpdate);
+        _controller?.moveCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: Point(
+                latitude: userRequestData['pick_lat'],
+                longitude: userRequestData['pick_lng'],
+              ),
+            ),
+          ),
+        );
       } else {
-        CameraUpdate cameraUpdate = CameraUpdate.newLatLng(
-            addressList.firstWhere((element) => element.id == 'pickup').latlng);
-        _controller!.animateCamera(cameraUpdate);
+        _controller?.moveCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: addressList
+                  .firstWhere((element) => element.id == 'pickup')
+                  .latlng,
+            ),
+          ),
+        );
       }
     }
   }
@@ -387,7 +324,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     setState(() {
       _center = (userRequestData.isEmpty)
           ? addressList.firstWhere((element) => element.id == 'pickup').latlng
-          : LatLng(userRequestData['pick_lat'], userRequestData['pick_lng']);
+          : Point(
+              latitude: userRequestData['pick_lat'],
+              longitude: userRequestData['pick_lng'],
+            );
     });
     if (await geolocs.GeolocatorPlatform.instance.isLocationServiceEnabled()) {
       serviceEnabled = true;
@@ -431,11 +371,19 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     });
   }
 
-  void _onMapCreated(GoogleMapController controller) async {
+  void _onMapCreated(YandexMapController controller) async {
     setState(() {
       _controller = controller;
-      _controller?.setMapStyle(mapStyle);
     });
+    _controller?.toggleUserLayer(visible: true);
+    _controller?.moveCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: _center, zoom: 11.0),
+      ),
+    );
+    if (mapStyle.isNotEmpty) {
+      _controller?.setMapStyle(mapStyle);
+    }
     // await getBounds();
 
 // Future.delayed(const Duration(seconds: 1)).then((value) {
@@ -455,6 +403,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     // print(CameraPosition.zoom)
   }
 
+  /*
+  // Google Maps camera bounds check (disabled; switched to Yandex MapKit)
   void check(CameraUpdate u, GoogleMapController c) async {
     c.animateCamera(u);
     _controller!.animateCamera(u);
@@ -464,6 +414,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
       check(u, c);
     }
   }
+  */
 
   @override
   Widget build(BuildContext context) {
@@ -552,7 +503,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                 if (requestCancelledByDriver == true ||
                     cancelRequestByUser == true) {
                   myMarker.clear();
-                  polyline.clear();
+                  polyline = null;
+                  polyList.clear();
                   addressList.removeWhere((element) => element.id == 'drop');
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     Navigator.pushAndRemoveUntil(
@@ -601,60 +553,42 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         e['updated_at']);
                                 if (DateTime.now().difference(dt).inMinutes <=
                                     2) {
-                                  if (myMarker
-                                      .where((element) => element.markerId
-                                          .toString()
-                                          .contains('car${e['id']}'))
-                                      .isEmpty) {
-                                    myMarker.add(Marker(
-                                      markerId: MarkerId('car${e['id']}'),
-                                      rotation:
-                                          (myBearings[e['id'].toString()] !=
-                                                  null)
-                                              ? myBearings[e['id'].toString()]
-                                              : 0.0,
-                                      position: LatLng(e['l'][0], e['l'][1]),
-                                      icon: (e['vehicle_type_icon'] ==
-                                              'motor_bike')
+                                  final markerId = 'car${e['id']}';
+                                  final existingIndex = myMarker.indexWhere(
+                                      (element) =>
+                                          element.mapId.value == markerId);
+                                  final icon =
+                                      (e['vehicle_type_icon'] == 'motor_bike')
                                           ? pinLocationIcon2
-                                          : pinLocationIcon,
-                                    ));
+                                          : pinLocationIcon;
+                                  final bearing =
+                                      (myBearings[e['id'].toString()] != null)
+                                          ? myBearings[e['id'].toString()]
+                                          : 0.0;
+                                  final nextPoint = Point(
+                                    latitude: e['l'][0],
+                                    longitude: e['l'][1],
+                                  );
+                                  if (existingIndex == -1) {
+                                    myMarker.add(
+                                      _buildPlacemark(
+                                        markerId: markerId,
+                                        point: nextPoint,
+                                        icon: icon,
+                                        direction: bearing,
+                                      ),
+                                    );
                                   } else if (_controller != null) {
-                                    var dist = calculateDistance(
-                                        myMarker
-                                            .lastWhere((element) => element
-                                                .markerId
-                                                .toString()
-                                                .contains('car${e['id']}'))
-                                            .position
-                                            .latitude,
-                                        myMarker
-                                            .lastWhere((element) => element
-                                                .markerId
-                                                .toString()
-                                                .contains('car${e['id']}'))
-                                            .position
-                                            .longitude,
+                                    final existing = myMarker[existingIndex];
+                                    final dist = calculateDistance(
+                                        existing.point.latitude,
+                                        existing.point.longitude,
                                         e['l'][0],
                                         e['l'][1]);
                                     if (dist > 100) {
-                                      if (myMarker
-                                                  .lastWhere((element) =>
-                                                      element.markerId
-                                                          .toString()
-                                                          .contains(
-                                                              'car${e['id']}'))
-                                                  .position
-                                                  .latitude !=
+                                      if (existing.point.latitude !=
                                               e['l'][0] ||
-                                          myMarker
-                                                  .lastWhere((element) =>
-                                                      element.markerId
-                                                          .toString()
-                                                          .contains(
-                                                              'car${e['id']}'))
-                                                  .position
-                                                  .longitude !=
+                                          existing.point.longitude !=
                                               e['l'][1]) {
                                         animationController =
                                             AnimationController(
@@ -665,31 +599,16 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           vsync: this, //From the widget
                                         );
                                         animateCar(
-                                          myMarker
-                                              .lastWhere((element) => element
-                                                  .markerId
-                                                  .toString()
-                                                  .contains('car${e['id']}'))
-                                              .position
-                                              .latitude,
-                                          myMarker
-                                              .lastWhere((element) => element
-                                                  .markerId
-                                                  .toString()
-                                                  .contains('car${e['id']}'))
-                                              .position
-                                              .longitude,
+                                          existing.point.latitude,
+                                          existing.point.longitude,
                                           e['l'][0],
                                           e['l'][1],
                                           _mapMarkerSink,
                                           this,
                                           _controller,
-                                          'car${e['id']}',
+                                          markerId,
                                           e['id'],
-                                          (e['vehicle_type_icon'] ==
-                                                  'motor_bike')
-                                              ? pinLocationIcon2
-                                              : pinLocationIcon,
+                                          icon,
                                         );
                                       }
                                     }
@@ -697,14 +616,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                 }
                               } else {
                                 if (myMarker
-                                    .where((element) => element.markerId
-                                        .toString()
-                                        .contains('car${e['id']}'))
+                                    .where((element) =>
+                                        element.mapId.value ==
+                                        'car${e['id']}')
                                     .isNotEmpty) {
-                                  myMarker.removeWhere((element) => element
-                                      .markerId
-                                      .toString()
-                                      .contains('car${e['id']}'));
+                                  myMarker.removeWhere((element) =>
+                                      element.mapId.value ==
+                                      'car${e['id']}');
                                 }
                               }
                             });
@@ -727,10 +645,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                             if (userRequestData['accepted_at'] != null) {
                               driversData.clear();
                               if (myMarker.length > 3) {
-                                myMarker.removeWhere((element) => element
-                                    .markerId
-                                    .toString()
-                                    .contains('car'));
+                                myMarker.removeWhere(
+                                    (element) => element.mapId.value.contains('car'));
                               }
 
                               DataSnapshot snapshots = event.data!.snapshot;
@@ -748,68 +664,45 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                     _dist = double.parse(
                                         (distCalc / 1000).toString());
                                   }
-                                  if (myMarker
-                                      .where((element) => element.markerId
-                                          .toString()
-                                          .contains('car${driverData['id']}'))
-                                      .isEmpty) {
+                                  final markerId =
+                                      'car${driverData['id']}';
+                                  final existingIndex = myMarker.indexWhere(
+                                      (element) =>
+                                          element.mapId.value == markerId);
+                                  final icon =
+                                      (driverData['vehicle_type_icon'] ==
+                                              'motor_bike')
+                                          ? pinLocationIcon2
+                                          : pinLocationIcon;
+                                  final bearing = (myBearings[
+                                              driverData['id'].toString()] !=
+                                          null)
+                                      ? myBearings[driverData['id'].toString()]
+                                      : 0.0;
+                                  final nextPoint = Point(
+                                    latitude: driverData['l'][0],
+                                    longitude: driverData['l'][1],
+                                  );
+                                  if (existingIndex == -1) {
                                     myMarker.add(
-                                      Marker(
-                                        markerId:
-                                            MarkerId('car${driverData['id']}'),
-                                        rotation: (myBearings[driverData['id']
-                                                    .toString()] !=
-                                                null)
-                                            ? myBearings[
-                                                driverData['id'].toString()]
-                                            : 0.0,
-                                        position: LatLng(driverData['l'][0],
-                                            driverData['l'][1]),
-                                        icon:
-                                            (driverData['vehicle_type_icon'] ==
-                                                    'motor_bike')
-                                                ? pinLocationIcon2
-                                                : pinLocationIcon,
+                                      _buildPlacemark(
+                                        markerId: markerId,
+                                        point: nextPoint,
+                                        icon: icon,
+                                        direction: bearing,
                                       ),
                                     );
                                   } else if (_controller != null) {
-                                    var dist = calculateDistance(
-                                        myMarker
-                                            .lastWhere((element) => element
-                                                .markerId
-                                                .toString()
-                                                .contains(
-                                                    'car${driverData['id']}'))
-                                            .position
-                                            .latitude,
-                                        myMarker
-                                            .lastWhere((element) => element
-                                                .markerId
-                                                .toString()
-                                                .contains(
-                                                    'car${driverData['id']}'))
-                                            .position
-                                            .longitude,
+                                    final existing = myMarker[existingIndex];
+                                    final dist = calculateDistance(
+                                        existing.point.latitude,
+                                        existing.point.longitude,
                                         driverData['l'][0],
                                         driverData['l'][1]);
                                     if (dist > 100) {
-                                      if (myMarker
-                                                  .lastWhere((element) => element
-                                                      .markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${driverData['id']}'))
-                                                  .position
-                                                  .latitude !=
+                                      if (existing.point.latitude !=
                                               driverData['l'][0] ||
-                                          myMarker
-                                                  .lastWhere((element) => element
-                                                      .markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${driverData['id']}'))
-                                                  .position
-                                                  .longitude !=
+                                          existing.point.longitude !=
                                               driverData['l'][1]) {
                                         animationController =
                                             AnimationController(
@@ -821,33 +714,16 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         );
 
                                         animateCar(
-                                          myMarker
-                                              .lastWhere((element) => element
-                                                  .markerId
-                                                  .toString()
-                                                  .contains(
-                                                      'car${driverData['id']}'))
-                                              .position
-                                              .latitude,
-                                          myMarker
-                                              .firstWhere((element) => element
-                                                  .markerId
-                                                  .toString()
-                                                  .contains(
-                                                      'car${driverData['id']}'))
-                                              .position
-                                              .longitude,
+                                          existing.point.latitude,
+                                          existing.point.longitude,
                                           driverData['l'][0],
                                           driverData['l'][1],
                                           _mapMarkerSink,
                                           this,
                                           _controller,
-                                          'car${driverData['id']}',
+                                          markerId,
                                           driverData['id'],
-                                          (driverData['vehicle_type_icon'] ==
-                                                  'motor_bike')
-                                              ? pinLocationIcon2
-                                              : pinLocationIcon,
+                                          icon,
                                         );
                                       }
                                     }
@@ -864,28 +740,27 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                               height: media.height * 1,
                               width: media.width * 1,
                               //get drivers location updates
-                              child: StreamBuilder<List<Marker>>(
+                              child: StreamBuilder<List<PlacemarkMapObject>>(
                                 stream: mapMarkerStream,
                                 builder: (context, snapshot) {
-                                  return GoogleMap(
-                                    padding: EdgeInsets.only(
-                                        bottom: mapPadding,
-                                        top: media.height * 0.1 +
-                                            MediaQuery.of(context).padding.top),
+                                  final mapObjects = <MapObject>[
+                                    ...myMarker,
+                                    if (polyline != null)
+                                      PolylineMapObject(
+                                        mapId: const MapObjectId('route'),
+                                        polyline: polyline!,
+                                        strokeColor: const Color(0xffFD9898),
+                                        strokeWidth: 4,
+                                      ),
+                                  ];
+                                  return YandexMap(
+                                    mapType: MapType.vector,
                                     onMapCreated: _onMapCreated,
-                                    compassEnabled: false,
-                                    initialCameraPosition: CameraPosition(
-                                      target: _center,
-                                      zoom: 11.0,
+                                    cameraBounds: const CameraBounds(
+                                      minZoom: 0.0,
+                                      maxZoom: 20.0,
                                     ),
-                                    markers: Set<Marker>.from(myMarker),
-                                    polylines: polyline,
-                                    minMaxZoomPreference:
-                                        const MinMaxZoomPreference(0.0, 20.0),
-                                    myLocationButtonEnabled: false,
-                                    buildingsEnabled: false,
-                                    zoomControlsEnabled: false,
-                                    myLocationEnabled: true,
+                                    mapObjects: mapObjects,
                                   );
                                 },
                               ),
@@ -996,12 +871,21 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                             onTap: () async {
                                               if (locationAllowed == true) {
                                                 if (currentLocation != null) {
-                                                  center = currentLocation;
+                                                  final loc = currentLocation;
+                                                  if (loc == null) {
+                                                    return;
+                                                  }
+                                                  center = loc;
 
-                                                  _controller?.animateCamera(
-                                                      CameraUpdate
-                                                          .newLatLngZoom(
-                                                              center, 18.0));
+                                                  _controller?.moveCamera(
+                                                    CameraUpdate
+                                                        .newCameraPosition(
+                                                      CameraPosition(
+                                                        target: center,
+                                                        zoom: 18.0,
+                                                      ),
+                                                    ),
+                                                  );
                                                 }
                                               } else {
                                                 if (serviceEnabled == true) {
@@ -4634,25 +4518,47 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     );
   }
 
-  double getBearing(LatLng begin, LatLng end) {
+  double getBearing(Point begin, Point end) {
     double lat = (begin.latitude - end.latitude).abs();
 
     double lng = (begin.longitude - end.longitude).abs();
 
     if (begin.latitude < end.latitude && begin.longitude < end.longitude) {
-      return vector.degrees(atan(lng / lat));
+      return vector.degrees(math.atan(lng / lat));
     } else if (begin.latitude >= end.latitude &&
         begin.longitude < end.longitude) {
-      return (90 - vector.degrees(atan(lng / lat))) + 90;
+      return (90 - vector.degrees(math.atan(lng / lat))) + 90;
     } else if (begin.latitude >= end.latitude &&
         begin.longitude >= end.longitude) {
-      return vector.degrees(atan(lng / lat)) + 180;
+      return vector.degrees(math.atan(lng / lat)) + 180;
     } else if (begin.latitude < end.latitude &&
         begin.longitude >= end.longitude) {
-      return (90 - vector.degrees(atan(lng / lat))) + 270;
+      return (90 - vector.degrees(math.atan(lng / lat))) + 270;
     }
 
     return -1;
+  }
+
+  PlacemarkMapObject _buildPlacemark({
+    required String markerId,
+    required Point point,
+    required BitmapDescriptor icon,
+    double direction = 0.0,
+  }) {
+    return PlacemarkMapObject(
+      mapId: MapObjectId(markerId),
+      point: point,
+      direction: direction,
+      opacity: 1,
+      icon: PlacemarkIcon.single(
+        PlacemarkIconStyle(
+          image: icon,
+          anchor: const Offset(0.5, 0.5),
+          rotationType: RotationType.rotate,
+          isFlat: true,
+        ),
+      ),
+    );
   }
 
   animateCar(
@@ -4664,40 +4570,40 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
       double toLong, //Ending longitude
 
-      StreamSink<List<Marker>> mapMarkerSink,
+      StreamSink<List<PlacemarkMapObject>> mapMarkerSink,
       //Stream build of map to update the UI
 
       TickerProvider provider,
       //Ticker provider of the widget. This is used for animation
 
-      GoogleMapController controller, //Google map controller of our widget
+      YandexMapController? controller, //Map controller of our widget
 
       markerid,
       markerBearing,
       icon) async {
-    final double bearing =
-        getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
+    final double bearing = getBearing(
+      Point(latitude: fromLat, longitude: fromLong),
+      Point(latitude: toLat, longitude: toLong),
+    );
 
     myBearings[markerBearing.toString()] = bearing;
 
-    var carMarker = Marker(
-        markerId: MarkerId(markerid),
-        position: LatLng(fromLat, fromLong),
-        icon: icon,
-        anchor: const Offset(0.5, 0.5),
-        flat: true,
-        draggable: false);
+    var carMarker = _buildPlacemark(
+      markerId: markerid,
+      point: Point(latitude: fromLat, longitude: fromLong),
+      icon: icon,
+    );
 
     myMarker.add(carMarker);
 
-    mapMarkerSink.add(Set<Marker>.from(myMarker).toList());
+    mapMarkerSink.add(List<PlacemarkMapObject>.from(myMarker));
 
     Tween<double> tween = Tween(begin: 0, end: 1);
 
     _animation = tween.animate(animationController)
       ..addListener(() async {
-        myMarker
-            .removeWhere((element) => element.markerId == MarkerId(markerid));
+        myMarker.removeWhere((element) =>
+            element.mapId == MapObjectId(markerid.toString()));
 
         final v = _animation!.value;
 
@@ -4705,24 +4611,22 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
         double lat = v * toLat + (1 - v) * fromLat;
 
-        LatLng newPos = LatLng(lat, lng);
+        Point newPos = Point(latitude: lat, longitude: lng);
 
         //New marker location
 
-        carMarker = Marker(
-            markerId: MarkerId(markerid),
-            position: newPos,
-            icon: icon,
-            anchor: const Offset(0.5, 0.5),
-            flat: true,
-            rotation: bearing,
-            draggable: false);
+        carMarker = _buildPlacemark(
+          markerId: markerid,
+          point: newPos,
+          icon: icon,
+          direction: bearing,
+        );
 
         //Adding new marker to our list and updating the google map UI.
 
         myMarker.add(carMarker);
 
-        mapMarkerSink.add(Set<Marker>.from(myMarker).toList());
+        mapMarkerSink.add(List<PlacemarkMapObject>.from(myMarker));
       });
 
     //Starting the animation

@@ -1,16 +1,16 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yandex_mapkit/yandex_mapkit.dart';
 
 class StackOneWidget extends StatelessWidget {
   final Query fdb;
-  final List<Marker> myMarkers;
+  final List<PlacemarkMapObject> myMarkers;
   final Function(dynamic event) eventData;
-  final Stream<List<Marker>>? carMarkerStream;
-  final Function(GoogleMapController)? onMapCreated;
+  final Stream<List<PlacemarkMapObject>>? carMarkerStream;
+  final Function(YandexMapController)? onMapCreated;
   final Function(CameraPosition) centerLocation;
   final Function() cameraIdle;
-  final LatLng center;
+  final Point center;
 
   const StackOneWidget({
     super.key,
@@ -36,25 +36,21 @@ class StackOneWidget extends StatelessWidget {
           if (event.hasData) {
             eventData(event);
           }
-          return StreamBuilder<List<Marker>>(
+          return StreamBuilder<List<PlacemarkMapObject>>(
             stream: carMarkerStream,
             builder: (context, snapshot) {
-              return GoogleMap(
-                mapType: MapType.normal,
+              return YandexMap(
+                mapType: MapType.vector,
                 onMapCreated: onMapCreated,
-                compassEnabled: false,
-                initialCameraPosition: CameraPosition(
-                  target: center,
-                  zoom: 14.0,
-                ),
-                onCameraMove: centerLocation,
-                onCameraIdle: () => cameraIdle(),
-                minMaxZoomPreference: const MinMaxZoomPreference(8.0, 20.0),
-                myLocationButtonEnabled: false,
-                markers: Set<Marker>.from(myMarkers),
-                buildingsEnabled: false,
-                zoomControlsEnabled: false,
-                myLocationEnabled: true,
+                cameraBounds: const CameraBounds(minZoom: 8.0, maxZoom: 20.0),
+                onCameraPositionChanged:
+                    (cameraPosition, reason, finished) {
+                  centerLocation(cameraPosition);
+                  if (finished) {
+                    cameraIdle();
+                  }
+                },
+                mapObjects: List<MapObject>.from(myMarkers),
               );
             },
           );

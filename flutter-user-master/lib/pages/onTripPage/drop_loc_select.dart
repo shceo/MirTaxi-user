@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
@@ -23,25 +23,29 @@ class DropLocation extends StatefulWidget {
 
 class _DropLocationState extends State<DropLocation>
     with WidgetsBindingObserver {
-  GoogleMapController? _controller;
+  YandexMapController? _controller;
   late PermissionStatus permission;
   Location location = Location();
   String _state = '';
   bool _isLoading = false;
   String sessionToken = const Uuid().v4();
-  LatLng _center = const LatLng(41.4219057, -102.0840772);
-  LatLng _centerLocation = const LatLng(41.4219057, -102.0840772);
+  Point _center = const Point(latitude: 41.4219057, longitude: -102.0840772);
+  Point _centerLocation =
+      const Point(latitude: 41.4219057, longitude: -102.0840772);
   TextEditingController search = TextEditingController();
   String favNameText = '';
   bool _locationDenied = false;
   bool favAddressAdd = false;
   bool _showToast = false;
 
-  void _onMapCreated(GoogleMapController controller) {
+  void _onMapCreated(YandexMapController controller) {
     setState(() {
       _controller = controller;
-      _controller?.setMapStyle(mapStyle);
     });
+    _controller?.toggleUserLayer(visible: true);
+    if (mapStyle.isNotEmpty) {
+      _controller?.setMapStyle(mapStyle);
+    }
   }
 
   @override
@@ -54,7 +58,7 @@ class _DropLocationState extends State<DropLocation>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if (_controller != null) {
+      if (_controller != null && mapStyle.isNotEmpty) {
         _controller?.setMapStyle(mapStyle);
       }
       if (timerLocation == null && locationAllowed == true) {
@@ -90,22 +94,34 @@ class _DropLocationState extends State<DropLocation>
       var locs = await geolocs.Geolocator.getLastKnownPosition();
       if (locs != null) {
         setState(() {
-          _center = LatLng(double.parse(locs.latitude.toString()),
-              double.parse(locs.longitude.toString()));
-          _centerLocation = LatLng(double.parse(locs.latitude.toString()),
-              double.parse(locs.longitude.toString()));
+          _center = Point(
+            latitude: double.parse(locs.latitude.toString()),
+            longitude: double.parse(locs.longitude.toString()),
+          );
+          _centerLocation = Point(
+            latitude: double.parse(locs.latitude.toString()),
+            longitude: double.parse(locs.longitude.toString()),
+          );
         });
       } else {
         var loc = await geolocs.Geolocator.getCurrentPosition(
             desiredAccuracy: geolocs.LocationAccuracy.low);
         setState(() {
-          _center = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
-          _centerLocation = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
+          _center = Point(
+            latitude: double.parse(loc.latitude.toString()),
+            longitude: double.parse(loc.longitude.toString()),
+          );
+          _centerLocation = Point(
+            latitude: double.parse(loc.latitude.toString()),
+            longitude: double.parse(loc.longitude.toString()),
+          );
         });
       }
-      _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 14.0));
+      _controller?.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _center, zoom: 14.0),
+        ),
+      );
       setState(() {
         _state = '3';
         _isLoading = false;
@@ -134,25 +150,19 @@ class _DropLocationState extends State<DropLocation>
                       height: media.height * 1,
                       width: media.width * 1,
                       child: (_state == '3')
-                          ? GoogleMap(
+                          ? YandexMap(
+                              mapType: MapType.vector,
                               onMapCreated: _onMapCreated,
-                              initialCameraPosition: CameraPosition(
-                                target: _center,
-                                zoom: 14.0,
-                              ),
-                              onCameraMove: (CameraPosition position) {
-                                //pick current location
+                              cameraBounds:
+                                  const CameraBounds(minZoom: 8.0, maxZoom: 20.0),
+                              onCameraPositionChanged:
+                                  (cameraPosition, reason, finished) async {
                                 setState(() {
-                                  _centerLocation = position.target;
+                                  _centerLocation = cameraPosition.target;
                                 });
-                              },
-                              onCameraIdle: () async {
-                                // if (addAutoFill.isEmpty) {
-                                //   addToast();
-                                // } else {
-                                //   addAutoFill.clear();
-                                //   search.clear();
-                                // }
+                                if (!finished) {
+                                  return;
+                                }
                                 if (addAutoFill.isEmpty) {
                                   var val = await geoCoding(
                                       _centerLocation.latitude,
@@ -166,12 +176,7 @@ class _DropLocationState extends State<DropLocation>
                                   search.clear();
                                 }
                               },
-                              minMaxZoomPreference:
-                                  const MinMaxZoomPreference(8.0, 20.0),
-                              myLocationButtonEnabled: false,
-                              buildingsEnabled: false,
-                              zoomControlsEnabled: false,
-                              myLocationEnabled: true,
+                              mapObjects: const [],
                             )
                           : (_state == '2')
                               ? Container(
@@ -262,9 +267,14 @@ class _DropLocationState extends State<DropLocation>
                               child: InkWell(
                                 onTap: () async {
                                   if (locationAllowed == true) {
-                                    _controller?.animateCamera(
-                                        CameraUpdate.newLatLngZoom(
-                                            center, 18.0));
+                                    _controller?.moveCamera(
+                                      CameraUpdate.newCameraPosition(
+                                        CameraPosition(
+                                          target: _center,
+                                          zoom: 18.0,
+                                        ),
+                                      ),
+                                    );
                                   } else {
                                     if (serviceEnabled == true) {
                                       setState(() {
@@ -635,9 +645,18 @@ class _DropLocationState extends State<DropLocation>
                                                                               [
                                                                               'description'];
 
-                                                                      _controller?.moveCamera(CameraUpdate.newLatLngZoom(
-                                                                          _center,
-                                                                          14.0));
+                                                                      _controller
+                                                                          ?.moveCamera(
+                                                                        CameraUpdate
+                                                                            .newCameraPosition(
+                                                                          CameraPosition(
+                                                                            target:
+                                                                                _center,
+                                                                            zoom:
+                                                                                14.0,
+                                                                          ),
+                                                                        ),
+                                                                      );
                                                                     });
                                                                     FocusManager
                                                                         .instance

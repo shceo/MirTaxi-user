@@ -12,7 +12,7 @@
 
     <application
         android:label="Mir Taxi"
-        android:name="${applicationName}"
+        android:name=".MainApplication"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -39,8 +39,11 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <!-- Google Maps API key (disabled; switched to Yandex MapKit) -->
+        <!--
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyCe7XyWJbAkb1Fw6RNc8vlzPPcxx7X4ImM"/>
+        -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

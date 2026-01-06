@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
+import 'package:yandex_mapkit/yandex_mapkit.dart';
 
 class StackThreeWidget extends StatelessWidget {
   final int bottom;
@@ -121,7 +121,9 @@ class StackThreeWidget extends StatelessWidget {
                                                     id: '',
                                                     address: '',
                                                     latlng:
-                                                        const LatLng(0.0, 0.0),
+                                                        const Point(
+                                                            latitude: 0.0,
+                                                            longitude: 0.0),
                                                   ),
                                                 )
                                                 .address

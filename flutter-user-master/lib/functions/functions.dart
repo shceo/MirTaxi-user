@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'dart:io';
-import 'dart:math';
+import 'dart:math' as math;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +27,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,7 +45,10 @@ List<AddressModel> lastAddress = [];
 //base url
 String url =
     'https://mirtaxi.mdtaxi.uz/'; //please add '/' at the end of the url as 'https://yourwebsite.com/'
-String mapkey = 'AIzaSyCe7XyWJbAkb1Fw6RNc8vlzPPcxx7X4ImM';
+// Google Maps key (disabled; switched to Yandex MapKit)
+// String mapkey = 'AIzaSyCe7XyWJbAkb1Fw6RNc8vlzPPcxx7X4ImM';
+const String yandexMapkitKey =
+    'd91bb4f0-deaa-4b35-8764-1e08e6b8a38b'; // Reference only; set natively.
 
 //check internet connection
 
@@ -76,9 +79,7 @@ getDetailsOfDevice() async {
     internet = true;
   }
   try {
-    rootBundle.loadString('assets/map_style_black.json').then((value) {
-      mapStyle = value;
-    });
+    mapStyle = '';
     var token = await FirebaseMessaging.instance.getToken();
     fcm = token;
     pref = await SharedPreferences.getInstance();
@@ -99,7 +100,7 @@ getCurrentLocation() {
       var loc = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.medium);
 
-      currentLocation = LatLng(loc.latitude, loc.longitude);
+      currentLocation = Point(latitude: loc.latitude, longitude: loc.longitude);
     } else {
       timer.cancel();
       timerLocation = null;
@@ -638,16 +639,18 @@ getUserDetails() async {
           AddressList(
               id: 'pickup',
               address: userRequestData['pick_address'],
-              latlng: LatLng(
-                  userRequestData['pick_lat'], userRequestData['pick_lng'])),
+              latlng: Point(
+                  latitude: userRequestData['pick_lat'],
+                  longitude: userRequestData['pick_lng'])),
         );
         if (userRequestData['drop_address'] != null) {
           addressList.add(
             AddressList(
                 id: 'drop',
                 address: userRequestData['drop_address'],
-                latlng: LatLng(
-                    userRequestData['drop_lat'], userRequestData['drop_lng'])),
+                latlng: Point(
+                    latitude: userRequestData['drop_lat'],
+                    longitude: userRequestData['drop_lng'])),
           );
         }
 
@@ -758,24 +761,51 @@ AudioPlayer audioPlayers = AudioPlayer();
 var pickupAddress = '';
 var dropAddress = '';
 
+BoundingBox _suggestBoundingBox(Point centerPoint, {double delta = 0.2}) {
+  return BoundingBox(
+    southWest: Point(
+      latitude: centerPoint.latitude - delta,
+      longitude: centerPoint.longitude - delta,
+    ),
+    northEast: Point(
+      latitude: centerPoint.latitude + delta,
+      longitude: centerPoint.longitude + delta,
+    ),
+  );
+}
+
+Point? _firstPointFromGeometry(List<Geometry>? geometries) {
+  if (geometries == null) {
+    return null;
+  }
+  for (final geometry in geometries) {
+    if (geometry.point != null) {
+      return geometry.point;
+    }
+  }
+  return null;
+}
+
 geoCoding(double lat, double lng) async {
   dynamic result;
   try {
-    var response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$mapkey'));
-
-    if (response.statusCode == 200) {
-      var val = jsonDecode(response.body);
-      print("VAL=> $val");
-      result = val['results'][0]['formatted_address'];
+    final (session, resultFuture) = await YandexSearch.searchByPoint(
+      point: Point(latitude: lat, longitude: lng),
+      searchOptions: const SearchOptions(
+        searchType: SearchType.geo,
+        resultPageSize: 1,
+      ),
+    );
+    final response = await resultFuture;
+    await session.close();
+    if (response.items != null && response.items!.isNotEmpty) {
+      final item = response.items!.first;
+      result =
+          item.toponymMetadata?.address.formattedAddress ?? item.name;
     } else {
-      debugPrint(response.body);
       result = '';
     }
   } catch (e) {
-    print(e);
-    print(Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$mapkey'));
     if (e is SocketException) {
       internet = false;
       result = 'no internet';
@@ -827,24 +857,28 @@ getlangid() async {
 List addAutoFill = [];
 
 getAutoAddress(input, sessionToken, lat, lng) async {
-  dynamic response;
-  var countryCode = userDetails['country_code'];
   try {
-    if (userDetails['enable_country_restrict_on_map'] == '1' &&
-        userDetails['country_code'] != null) {
-      response = await http.get(Uri.parse(
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&library=places&location=$lat%2C$lng&radius=2000&components=country:$countryCode&key=$mapkey&sessiontoken=$sessionToken'));
-    } else {
-      response = await http.get(Uri.parse(
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&library=places&key=$mapkey&sessiontoken=$sessionToken'));
-    }
-    if (response.statusCode == 200) {
-      addAutoFill = jsonDecode(response.body)['predictions'];
-      valueNotifierHome.incrementNotifier();
-    } else {
-      debugPrint(response.body);
-      valueNotifierHome.incrementNotifier();
-    }
+    final centerPoint = Point(latitude: lat, longitude: lng);
+    final bounds = _suggestBoundingBox(centerPoint);
+    final (session, resultFuture) = await YandexSuggest.getSuggestions(
+      text: input,
+      boundingBox: bounds,
+      suggestOptions: SuggestOptions(
+        suggestType: SuggestType.geo,
+        userPosition: centerPoint,
+      ),
+    );
+    final response = await resultFuture;
+    await session.close();
+    addAutoFill = (response.items ?? [])
+        .map((item) => {
+              'description':
+                  item.displayText.isNotEmpty ? item.displayText : item.title,
+              'place_id': item.center ?? item.searchText,
+              'search_text': item.searchText,
+            })
+        .toList();
+    valueNotifierHome.incrementNotifier();
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -856,14 +890,33 @@ getAutoAddress(input, sessionToken, lat, lng) async {
 
 geoCodingForLatLng(placeid) async {
   try {
-    var response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/place/details/json?placeid=$placeid&key=$mapkey'));
-
-    if (response.statusCode == 200) {
-      var val = jsonDecode(response.body)['result']['geometry']['location'];
-      center = LatLng(val['lat'], val['lng']);
-    } else {
-      debugPrint(response.body);
+    if (placeid is Point) {
+      center = placeid;
+      return center;
+    }
+    final query = placeid?.toString() ?? '';
+    if (query.isEmpty) {
+      return center;
+    }
+    final bounds = _suggestBoundingBox(center);
+    final (session, resultFuture) = await YandexSearch.searchByText(
+      searchText: query,
+      geometry: Geometry.fromBoundingBox(bounds),
+      searchOptions: const SearchOptions(
+        searchType: SearchType.geo,
+        geometry: true,
+        resultPageSize: 1,
+      ),
+    );
+    final response = await resultFuture;
+    await session.close();
+    if (response.items != null && response.items!.isNotEmpty) {
+      final item = response.items!.first;
+      final point = _firstPointFromGeometry(item.geometry) ??
+          item.toponymMetadata?.balloonPoint;
+      if (point != null) {
+        center = point;
+      }
     }
     return center;
   } catch (e) {
@@ -877,7 +930,7 @@ geoCodingForLatLng(placeid) async {
 
 class AddressList {
   String address;
-  LatLng latlng;
+  Point latlng;
   String id;
 
   AddressList({required this.id, required this.address, required this.latlng});
@@ -885,126 +938,80 @@ class AddressList {
 
 //get polylines
 
-List<LatLng> polyList = [];
+List<Point> polyList = [];
+Polyline? polyline;
 
-getPolylines() async {
-  polyList.clear();
-  String pickLat = '';
-  String pickLng = '';
-  String dropLat = '';
-  String dropLng = '';
-  if (userRequestData.isEmpty) {
-    pickLat = addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng
-        .latitude
-        .toString();
-    pickLng = addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng
-        .longitude
-        .toString();
-    dropLat = addressList
-        .firstWhere((element) => element.id == 'drop')
-        .latlng
-        .latitude
-        .toString();
-    dropLng = addressList
-        .firstWhere((element) => element.id == 'drop')
-        .latlng
-        .longitude
-        .toString();
-  } else {
-    pickLat = userRequestData['pick_lat'].toString();
-    pickLng = userRequestData['pick_lng'].toString();
-    dropLat = userRequestData['drop_lat'].toString();
-    dropLng = userRequestData['drop_lng'].toString();
-  }
-
+Future<List<Point>> _buildRoutePoints(Point start, Point end) async {
   try {
-    var response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
-    if (response.statusCode == 200) {
-      var steps =
-          jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
-      decodeEncodedPolyline(steps);
-    } else {
-      debugPrint(response.body);
+    final (session, resultFuture) = await YandexDriving.requestRoutes(
+      points: [
+        RequestPoint(point: start, requestPointType: RequestPointType.wayPoint),
+        RequestPoint(point: end, requestPointType: RequestPointType.wayPoint),
+      ],
+      drivingOptions: const DrivingOptions(routesCount: 1),
+    );
+    final response = await resultFuture;
+    await session.close();
+    if (response.routes != null && response.routes!.isNotEmpty) {
+      return response.routes!.first.geometry.points;
     }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
     }
   }
+  return [];
+}
+
+getPolylines() async {
+  polyList.clear();
+  Point? pickPoint;
+  Point? dropPoint;
+  if (userRequestData.isEmpty) {
+    pickPoint = addressList
+        .firstWhere((element) => element.id == 'pickup')
+        .latlng;
+    dropPoint = addressList
+        .firstWhere((element) => element.id == 'drop')
+        .latlng;
+  } else {
+    pickPoint = Point(
+      latitude: double.parse(userRequestData['pick_lat'].toString()),
+      longitude: double.parse(userRequestData['pick_lng'].toString()),
+    );
+    dropPoint = Point(
+      latitude: double.parse(userRequestData['drop_lat'].toString()),
+      longitude: double.parse(userRequestData['drop_lng'].toString()),
+    );
+  }
+
+  if (pickPoint != null && dropPoint != null) {
+    polyList = await _buildRoutePoints(pickPoint, dropPoint);
+  }
+
+  polyline = polyList.isNotEmpty ? Polyline(points: polyList) : null;
+  valueNotifierBook.incrementNotifier();
   return polyList;
 }
 
 getPolylineshistory({pickLat, pickLng, dropLat, dropLng}) async {
   polyList.clear();
-
-  try {
-    var response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
-    if (response.statusCode == 200) {
-      var steps =
-          jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
-      decodeEncodedPolyline(steps);
-    } else {
-      debugPrint(response.body);
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
-  }
+  final pickPoint = Point(
+    latitude: double.parse(pickLat.toString()),
+    longitude: double.parse(pickLng.toString()),
+  );
+  final dropPoint = Point(
+    latitude: double.parse(dropLat.toString()),
+    longitude: double.parse(dropLng.toString()),
+  );
+  polyList = await _buildRoutePoints(pickPoint, dropPoint);
+  polyline = polyList.isNotEmpty ? Polyline(points: polyList) : null;
+  valueNotifierBook.incrementNotifier();
   return polyList;
 }
 
-//polyline decode
-
-Set<Polyline> polyline = {};
-
-List<PointLatLng> decodeEncodedPolyline(String encoded) {
-  List<PointLatLng> poly = [];
-  int index = 0, len = encoded.length;
-  int lat = 0, lng = 0;
-  polyline.clear();
-
-  while (index < len) {
-    int b, shift = 0, result = 0;
-    do {
-      b = encoded.codeUnitAt(index++) - 63;
-      result |= (b & 0x1f) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-    lat += dlat;
-
-    shift = 0;
-    result = 0;
-    do {
-      b = encoded.codeUnitAt(index++) - 63;
-      result |= (b & 0x1f) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-    lng += dlng;
-    LatLng p = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
-    polyList.add(p);
-  }
-
-  polyline.add(
-    Polyline(
-        polylineId: const PolylineId('1'),
-        color: const Color(0xffFD9898),
-        visible: true,
-        width: 4,
-        points: polyList),
-  );
-  valueNotifierBook.incrementNotifier();
-  return poly;
-}
-
+/*
+// Google polyline helper (disabled; Yandex routing now in use)
 class PointLatLng {
   /// Creates a geographical location specified in degrees [latitude] and
   /// [longitude].
@@ -1030,6 +1037,7 @@ class PointLatLng {
     return "lat: $latitude / longitude: $longitude";
   }
 }
+*/
 
 List etaDetails = [];
 var currencyFormat =
@@ -1241,9 +1249,12 @@ rentalRequestWithPromo() async {
 calculateDistance(lat1, lon1, lat2, lon2) {
   var p = 0.017453292519943295;
   var a = 0.5 -
-      cos((lat2 - lat1) * p) / 2 +
-      cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
-  var val = (12742 * asin(sqrt(a))) * 1000;
+      math.cos((lat2 - lat1) * p) / 2 +
+      math.cos(lat1 * p) *
+          math.cos(lat2 * p) *
+          (1 - math.cos((lon2 - lon1) * p)) /
+          2;
+  var val = (12742 * math.asin(math.sqrt(a))) * 1000;
   return val;
 }
 

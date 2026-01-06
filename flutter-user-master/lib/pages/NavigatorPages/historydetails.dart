@@ -1,7 +1,8 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
@@ -21,8 +22,8 @@ class HistoryDetails extends StatefulWidget {
 
 class _HistoryDetailsState extends State<HistoryDetails> {
   dynamic mapPadding = 0.0;
-  List myMarker = [];
-  LatLng center = const LatLng(41.4219057, -102.0840772);
+  List<PlacemarkMapObject> myMarker = [];
+  Point center = const Point(latitude: 41.4219057, longitude: -102.0840772);
 
   dynamic pickicon;
   dynamic dropicon;
@@ -52,172 +53,45 @@ class _HistoryDetailsState extends State<HistoryDetails> {
   addMarker() async {}
 
   addPickDropMarker() async {
-
-    // addMarker();
-    // var testIcon1 = await _capturePng(offlineicon);
-    // if (testIcon1 != null) {
+    final pickPoint = Point(
+      latitude: myHistory[selectedHistory]['pick_lat'],
+      longitude: myHistory[selectedHistory]['pick_lng'],
+    );
+    final dropPoint = Point(
+      latitude: myHistory[selectedHistory]['drop_lat'],
+      longitude: myHistory[selectedHistory]['drop_lng'],
+    );
     setState(() {
-      myMarker.add(Marker(
-          markerId: const MarkerId('pointpick'),
+      myMarker.add(
+        _buildPlacemark(
+          markerId: 'pointpick',
+          point: pickPoint,
           icon: pickicon,
-          position: LatLng(myHistory[selectedHistory]['pick_lat'],
-              myHistory[selectedHistory]['pick_lng'])));
-    });
-    // }
-
-    // var testIcon = await _capturePng(onlineicon);
-    // if (testIcon != null) {
-    setState(() {
-      myMarker.add(Marker(
-          markerId: const MarkerId('pointdrop'),
+        ),
+      );
+      myMarker.add(
+        _buildPlacemark(
+          markerId: 'pointdrop',
+          point: dropPoint,
           icon: dropicon,
-          position: LatLng(myHistory[selectedHistory]['drop_lat'],
-              myHistory[selectedHistory]['drop_lng'])));
+        ),
+      );
     });
-    // }
 
-    LatLngBounds bound;
-    if (myHistory.isNotEmpty) {
-      if (myHistory[selectedHistory]['pick_lat'] >
-              myHistory[selectedHistory]['drop_lat'] &&
-          myHistory[selectedHistory]['pick_lng'] >
-              myHistory[selectedHistory]['drop_lng']) {
-        bound = LatLngBounds(
-            southwest: LatLng(myHistory[selectedHistory]['drop_lat'],
-                myHistory[selectedHistory]['drop_lng']),
-            northeast: LatLng(myHistory[selectedHistory]['pick_lat'],
-                myHistory[selectedHistory]['pick_lng']));
-      } else if (myHistory[selectedHistory]['pick_lng'] >
-          myHistory[selectedHistory]['drop_lng']) {
-        bound = LatLngBounds(
-            southwest: LatLng(myHistory[selectedHistory]['pick_lat'],
-                myHistory[selectedHistory]['drop_lng']),
-            northeast: LatLng(myHistory[selectedHistory]['drop_lat'],
-                myHistory[selectedHistory]['pick_lng']));
-      } else if (myHistory[selectedHistory]['pick_lat'] >
-          myHistory[selectedHistory]['drop_lat']) {
-        bound = LatLngBounds(
-            southwest: LatLng(myHistory[selectedHistory]['drop_lat'],
-                myHistory[selectedHistory]['pick_lng']),
-            northeast: LatLng(myHistory[selectedHistory]['pick_lat'],
-                myHistory[selectedHistory]['drop_lng']));
-      } else {
-        bound = LatLngBounds(
-            southwest: LatLng(myHistory[selectedHistory]['pick_lat'],
-                myHistory[selectedHistory]['pick_lng']),
-            northeast: LatLng(myHistory[selectedHistory]['drop_lat'],
-                myHistory[selectedHistory]['drop_lng']));
-      }
-    } else {
-      if (myHistory
-                  .firstWhere((element) => element.id == 'pickup')
-                  .LatLng(myHistory[selectedHistory]['pick_lat'],
-                      myHistory[selectedHistory]['pick_lng'])
-                  .myHistory[selectedHistory]['pick_lat'] >
-              myHistory
-                  .firstWhere((element) => element.id == 'drop')
-                  .LatLng(myHistory[selectedHistory]['drop_lat'],
-                      myHistory[selectedHistory]['drop_lng'])
-                  .myHistory[selectedHistory]['drop_lat'] &&
-          myHistory
-                  .firstWhere((element) => element.id == 'pickup')
-                  .LatLng(myHistory[selectedHistory]['pick_lat'],
-                      myHistory[selectedHistory]['pick_lng'])
-                  .myHistory[selectedHistory]['pick_lng'] >
-              myHistory
-                  .firstWhere((element) => element.id == 'drop')
-                  .LatLng(myHistory[selectedHistory]['drop_lat'],
-                      myHistory[selectedHistory]['drop_lng'])
-                  .myHistory[selectedHistory]['drop_lng']) {
-        bound = LatLngBounds(
-            southwest: myHistory
-                .firstWhere((element) => element.id == 'drop')
-                .LatLng(myHistory[selectedHistory]['drop_lat'],
-                    myHistory[selectedHistory]['drop_lng']),
-            northeast: myHistory
-                .firstWhere((element) => element.id == 'pickup')
-                .LatLng(myHistory[selectedHistory]['pick_lat'],
-                    myHistory[selectedHistory]['pick_lng']));
-      } else if (myHistory
-              .firstWhere((element) => element.id == 'pickup')
-              .LatLng(myHistory[selectedHistory]['pick_lat'],
-                  myHistory[selectedHistory]['pick_lng'])
-              .myHistory[selectedHistory]['pick_lng'] >
-          myHistory
-              .firstWhere((element) => element.id == 'drop')
-              .LatLng(myHistory[selectedHistory]['drop_lat'],
-                  myHistory[selectedHistory]['drop_lng'])
-              .myHistory[selectedHistory]['drop_lng']) {
-        bound = LatLngBounds(
-            southwest: LatLng(
-                myHistory
-                    .firstWhere((element) => element.id == 'pickup')
-                    .LatLng(myHistory[selectedHistory]['pick_lat'],
-                        myHistory[selectedHistory]['pick_lng'])
-                    .myHistory[selectedHistory]['pick_lat'],
-                myHistory
-                    .firstWhere((element) => element.id == 'drop')
-                    .LatLng(myHistory[selectedHistory]['drop_lat'],
-                        myHistory[selectedHistory]['drop_lng'])
-                    .myHistory[selectedHistory]['drop_lng']),
-            northeast: LatLng(
-                myHistory
-                    .firstWhere((element) => element.id == 'drop')
-                    .LatLng(myHistory[selectedHistory]['drop_lat'],
-                        myHistory[selectedHistory]['drop_lng'])
-                    .myHistory[selectedHistory]['drop_lat'],
-                myHistory
-                    .firstWhere((element) => element.id == 'pickup')
-                    .LatLng(myHistory[selectedHistory]['pick_lat'],
-                        myHistory[selectedHistory]['pick_lng'])
-                    .myHistory[selectedHistory]['pick_lng']));
-      } else if (myHistory
-              .firstWhere((element) => element.id == 'pickup')
-              .LatLng(myHistory[selectedHistory]['pick_lat'],
-                  myHistory[selectedHistory]['pick_lng'])
-              .myHistory[selectedHistory]['pick_lat'] >
-          myHistory
-              .firstWhere((element) => element.id == 'drop')
-              .LatLng(myHistory[selectedHistory]['drop_lat'],
-                  myHistory[selectedHistory]['drop_lng'])
-              .myHistory[selectedHistory]['drop_lat']) {
-        bound = LatLngBounds(
-            southwest: LatLng(
-                myHistory
-                    .firstWhere((element) => element.id == 'drop')
-                    .LatLng(myHistory[selectedHistory]['drop_lat'],
-                        myHistory[selectedHistory]['drop_lng'])
-                    .myHistory[selectedHistory]['drop_lat'],
-                myHistory
-                    .firstWhere((element) => element.id == 'pickup')
-                    .LatLng(myHistory[selectedHistory]['pick_lat'],
-                        myHistory[selectedHistory]['pick_lng'])
-                    .myHistory[selectedHistory]['pick_lng']),
-            northeast: LatLng(
-                myHistory
-                    .firstWhere((element) => element.id == 'pickup')
-                    .LatLng(myHistory[selectedHistory]['pick_lat'],
-                        myHistory[selectedHistory]['pick_lng'])
-                    .myHistory[selectedHistory]['pick_lat'],
-                myHistory
-                    .firstWhere((element) => element.id == 'drop')
-                    .LatLng(myHistory[selectedHistory]['drop_lat'],
-                        myHistory[selectedHistory]['drop_lng'])
-                    .myHistory[selectedHistory]['drop_lng']));
-      } else {
-        bound = LatLngBounds(
-            southwest: myHistory
-                .firstWhere((element) => element.id == 'pickup')
-                .LatLng(myHistory[selectedHistory]['pick_lat'],
-                    myHistory[selectedHistory]['pick_lng']),
-            northeast: myHistory
-                .firstWhere((element) => element.id == 'drop')
-                .LatLng(myHistory[selectedHistory]['drop_lat'],
-                    myHistory[selectedHistory]['drop_lng']));
-      }
-    }
-    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
-    _controller!.moveCamera(cameraUpdate);
+    final bounds = BoundingBox(
+      southWest: Point(
+        latitude: math.min(pickPoint.latitude, dropPoint.latitude),
+        longitude: math.min(pickPoint.longitude, dropPoint.longitude),
+      ),
+      northEast: Point(
+        latitude: math.max(pickPoint.latitude, dropPoint.latitude),
+        longitude: math.max(pickPoint.longitude, dropPoint.longitude),
+      ),
+    );
+    _controller?.moveCamera(
+      CameraUpdate.newGeometry(Geometry.fromBoundingBox(bounds)),
+      animation: const MapAnimation(type: MapAnimationType.smooth, duration: 0.5),
+    );
     await getPolylineshistory(
         pickLat: myHistory[selectedHistory]['pick_lat'],
         pickLng: myHistory[selectedHistory]['pick_lng'],
@@ -236,13 +110,35 @@ class _HistoryDetailsState extends State<HistoryDetails> {
         .asUint8List();
   }
 
-  dynamic _controller;
+  PlacemarkMapObject _buildPlacemark({
+    required String markerId,
+    required Point point,
+    required BitmapDescriptor icon,
+  }) {
+    return PlacemarkMapObject(
+      mapId: MapObjectId(markerId),
+      point: point,
+      opacity: 1,
+      icon: PlacemarkIcon.single(
+        PlacemarkIconStyle(
+          image: icon,
+          anchor: const Offset(0.5, 0.5),
+          rotationType: RotationType.noRotation,
+          isFlat: true,
+        ),
+      ),
+    );
+  }
 
-  void onMapCreated(GoogleMapController controller) async {
+  YandexMapController? _controller;
+
+  void onMapCreated(YandexMapController controller) async {
     setState(() {
       _controller = controller;
-      _controller?.setMapStyle(mapStyle);
     });
+    if (mapStyle.isNotEmpty) {
+      _controller?.setMapStyle(mapStyle);
+    }
     getLocs();
   }
 
@@ -316,22 +212,21 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                         height: media.width * 0.5,
                         width: media.width * 0.9,
                         // color: Colors.black,
-                        child: GoogleMap(
-                          padding: const EdgeInsets.all(5),
+                        child: YandexMap(
+                          mapType: MapType.vector,
                           onMapCreated: onMapCreated,
-                          compassEnabled: false,
-                          initialCameraPosition: CameraPosition(
-                            target: center,
-                            // zoom: 0.0,
-                          ),
-                          markers: Set<Marker>.from(myMarker),
                           scrollGesturesEnabled: false,
                           zoomGesturesEnabled: false,
-                          polylines: polyline,
-                          // minMaxZoomPreference: const MinMaxZoomPreference(0.0, 20.0),
-                          myLocationButtonEnabled: false,
-                          buildingsEnabled: false,
-                          zoomControlsEnabled: false,
+                          mapObjects: <MapObject>[
+                            ...myMarker,
+                            if (polyline != null)
+                              PolylineMapObject(
+                                mapId: const MapObjectId('route'),
+                                polyline: polyline!,
+                                strokeColor: const Color(0xffFD9898),
+                                strokeWidth: 4,
+                              ),
+                          ],
                         ),
                       ),
                       SizedBox(

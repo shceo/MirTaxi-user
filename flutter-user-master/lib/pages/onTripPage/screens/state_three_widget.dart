@@ -1,6 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/screens/stack/stack_five_widget.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/screens/stack/stack_four_widget.dart';
@@ -11,10 +11,10 @@ import 'package:tagyourtaxi_driver/pages/onTripPage/screens/stack/stack_two_widg
 
 class StateThreeWidget extends StatelessWidget {
   final Query fdb;
-  final List<Marker> myMarkers;
+  final List<PlacemarkMapObject> myMarkers;
   final Function(dynamic event) eventData;
-  final Stream<List<Marker>>? carMarkerStream;
-  final Function(GoogleMapController) onMapCreated;
+  final Stream<List<PlacemarkMapObject>>? carMarkerStream;
+  final Function(YandexMapController) onMapCreated;
   final Function(CameraPosition) centerLocation;
   final Function() changePosition;
   final Function(String) addDirections;
@@ -28,7 +28,7 @@ class StateThreeWidget extends StatelessWidget {
   final Function(int i) onChange5;
   final Function(int i) onChange6;
   final Function() onChange7;
-  final LatLng center;
+  final Point center;
   final int bottom;
   final bool dropLocationMap;
   final bool pickaddress;

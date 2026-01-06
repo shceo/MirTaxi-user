@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/drop_loc_select.dart';
 import 'package:tagyourtaxi_driver/pages/login/login.dart';
@@ -19,7 +19,7 @@ import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/functions/geohash.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'dart:async';
 import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
@@ -37,11 +37,11 @@ class Maps extends StatefulWidget {
 }
 
 dynamic serviceEnabled;
-dynamic currentLocation;
-LatLng center = const LatLng(41.4219057, -102.0840772);
+Point? currentLocation;
+Point center = const Point(latitude: 41.4219057, longitude: -102.0840772);
 String mapStyle = '';
-List<Marker> myMarkers = [];
-Set<Marker> markers = {};
+List<PlacemarkMapObject> myMarkers = [];
+// Set<Marker> markers = {};
 String dropAddressConfirmation = '';
 List<AddressList> addressList = <AddressList>[];
 dynamic favLat;
@@ -56,7 +56,8 @@ bool deleteAccount = false;
 
 class _MapsState extends State<Maps>
     with WidgetsBindingObserver, TickerProviderStateMixin {
-  LatLng _centerLocation = const LatLng(41.4219057, -102.0840772);
+  Point _centerLocation =
+      const Point(latitude: 41.4219057, longitude: -102.0840772);
 
   dynamic animationController;
   dynamic _sessionToken;
@@ -71,7 +72,7 @@ class _MapsState extends State<Maps>
   late PermissionStatus permission;
   Location location = Location();
   String state = '';
-  dynamic _controller;
+  YandexMapController? _controller;
   Map myBearings = {};
 
   late BitmapDescriptor pinLocationIcon;
@@ -80,17 +81,26 @@ class _MapsState extends State<Maps>
   bool favAddressAdd = false;
   bool _showToast = false;
   bool contactus = false;
-  final _mapMarkerSC = StreamController<List<Marker>>();
+  final _mapMarkerSC = StreamController<List<PlacemarkMapObject>>();
 
-  StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
+  StreamSink<List<PlacemarkMapObject>> get _mapMarkerSink =>
+      _mapMarkerSC.sink;
 
-  Stream<List<Marker>> get carMarkerStream => _mapMarkerSC.stream;
+  Stream<List<PlacemarkMapObject>> get carMarkerStream => _mapMarkerSC.stream;
 
-  void _onMapCreated(GoogleMapController controller) {
+  void _onMapCreated(YandexMapController controller) {
     setState(() {
       _controller = controller;
-      _controller?.setMapStyle(mapStyle);
     });
+    _controller?.toggleUserLayer(visible: true);
+    _controller?.moveCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: center, zoom: 14.0),
+      ),
+    );
+    if (mapStyle.isNotEmpty) {
+      _controller?.setMapStyle(mapStyle);
+    }
   }
 
   @override
@@ -107,7 +117,7 @@ class _MapsState extends State<Maps>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if (_controller != null) {
+      if (_controller != null && mapStyle.isNotEmpty) {
         _controller?.setMapStyle(mapStyle);
       }
       if (timerLocation == null && locationAllowed == true) {
@@ -156,7 +166,8 @@ class _MapsState extends State<Maps>
     myBearings.clear;
     addressList.clear();
     serviceEnabled = await location.serviceEnabled();
-    polyline.clear();
+    polyline = null;
+    polyList.clear();
     final Uint8List markerIcon =
         await getBytesFromAsset('assets/images/top-taxi.png', 40);
     final Uint8List bikeIcons =
@@ -184,26 +195,42 @@ class _MapsState extends State<Maps>
       var locs = await geolocs.Geolocator.getLastKnownPosition();
       if (locs != null) {
         setState(() {
-          center = LatLng(double.parse(locs.latitude.toString()),
-              double.parse(locs.longitude.toString()));
-          _centerLocation = LatLng(double.parse(locs.latitude.toString()),
-              double.parse(locs.longitude.toString()));
-          currentLocation = LatLng(double.parse(locs.latitude.toString()),
-              double.parse(locs.longitude.toString()));
+          center = Point(
+            latitude: double.parse(locs.latitude.toString()),
+            longitude: double.parse(locs.longitude.toString()),
+          );
+          _centerLocation = Point(
+            latitude: double.parse(locs.latitude.toString()),
+            longitude: double.parse(locs.longitude.toString()),
+          );
+          currentLocation = Point(
+            latitude: double.parse(locs.latitude.toString()),
+            longitude: double.parse(locs.longitude.toString()),
+          );
         });
       } else {
         var loc = await geolocs.Geolocator.getCurrentPosition(
             desiredAccuracy: geolocs.LocationAccuracy.low);
         setState(() {
-          center = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
-          _centerLocation = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
-          currentLocation = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
+          center = Point(
+            latitude: double.parse(loc.latitude.toString()),
+            longitude: double.parse(loc.longitude.toString()),
+          );
+          _centerLocation = Point(
+            latitude: double.parse(loc.latitude.toString()),
+            longitude: double.parse(loc.longitude.toString()),
+          );
+          currentLocation = Point(
+            latitude: double.parse(loc.latitude.toString()),
+            longitude: double.parse(loc.longitude.toString()),
+          );
         });
       }
-      _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 14.0));
+      _controller?.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: center, zoom: 14.0),
+        ),
+      );
       setState(() {
         locationAllowed = true;
         state = '3';
@@ -387,9 +414,13 @@ class _MapsState extends State<Maps>
                                                       id: 'pickup',
                                                       address: lastAddress[i]
                                                           .dropAddress,
-                                                      latlng: LatLng(
-                                                        lastAddress[i].dropLat,
-                                                        lastAddress[i].dropLng,
+                                                      latlng: Point(
+                                                        latitude:
+                                                            lastAddress[i]
+                                                                .dropLat,
+                                                        longitude:
+                                                            lastAddress[i]
+                                                                .dropLng,
                                                       ),
                                                     ),
                                                   );
@@ -406,19 +437,28 @@ class _MapsState extends State<Maps>
                                                       .firstWhere((element) =>
                                                           element.id ==
                                                           'pickup')
-                                                      .latlng = LatLng(
-                                                    lastAddress[i].dropLat,
-                                                    lastAddress[i].dropLng,
+                                                      .latlng = Point(
+                                                    latitude:
+                                                        lastAddress[i].dropLat,
+                                                    longitude:
+                                                        lastAddress[i].dropLng,
                                                   );
                                                 }
                                                 _controller?.moveCamera(
-                                                  CameraUpdate.newLatLngZoom(
-                                                      LatLng(
-                                                          lastAddress[i]
-                                                              .dropLat,
-                                                          lastAddress[i]
-                                                              .dropLng),
-                                                      14.0),
+                                                  CameraUpdate
+                                                      .newCameraPosition(
+                                                    CameraPosition(
+                                                      target: Point(
+                                                        latitude: lastAddress[
+                                                                i]
+                                                            .dropLat,
+                                                        longitude:
+                                                            lastAddress[i]
+                                                                .dropLng,
+                                                      ),
+                                                      zoom: 14.0,
+                                                    ),
+                                                  ),
                                                 );
 
                                                 _bottom = 0;
@@ -434,9 +474,13 @@ class _MapsState extends State<Maps>
                                                       id: 'drop',
                                                       address: lastAddress[i]
                                                           .dropAddress,
-                                                      latlng: LatLng(
-                                                        lastAddress[i].dropLat,
-                                                        lastAddress[i].dropLng,
+                                                      latlng: Point(
+                                                        latitude:
+                                                            lastAddress[i]
+                                                                .dropLat,
+                                                        longitude:
+                                                            lastAddress[i]
+                                                                .dropLng,
                                                       ),
                                                     ),
                                                   );
@@ -453,11 +497,12 @@ class _MapsState extends State<Maps>
                                                                   element.id ==
                                                                   'drop')
                                                           .latlng =
-                                                      LatLng(
-                                                          lastAddress[i]
-                                                              .dropLat,
-                                                          lastAddress[i]
-                                                              .dropLng);
+                                                      Point(
+                                                    latitude:
+                                                        lastAddress[i].dropLat,
+                                                    longitude:
+                                                        lastAddress[i].dropLng,
+                                                  );
                                                 }
                                                 addAutoFill.clear();
                                                 _bottom = 0;
@@ -562,8 +607,13 @@ class _MapsState extends State<Maps>
                                             if (_pickaddress == true) {
                                               center = val;
                                               _controller?.moveCamera(
-                                                  CameraUpdate.newLatLngZoom(
-                                                      val, 14.0));
+                                                CameraUpdate.newCameraPosition(
+                                                  CameraPosition(
+                                                    target: val,
+                                                    zoom: 14.0,
+                                                  ),
+                                                ),
+                                              );
                                             }
                                             _bottom = 0;
                                             setState(() {});
@@ -611,9 +661,14 @@ class _MapsState extends State<Maps>
                                           },
                                           locationAllowed: () async {
                                             if (locationAllowed == true) {
-                                              _controller?.animateCamera(
-                                                  CameraUpdate.newLatLngZoom(
-                                                      center, 18.0));
+                                              _controller?.moveCamera(
+                                                CameraUpdate.newCameraPosition(
+                                                  CameraPosition(
+                                                    target: center,
+                                                    zoom: 18.0,
+                                                  ),
+                                                ),
+                                              );
                                             } else {
                                               if (serviceEnabled == true) {
                                                 setState(() {
@@ -662,7 +717,8 @@ class _MapsState extends State<Maps>
                                           },
                                           centerLocation: (d) {
                                             setState(() {
-                                              _centerLocation = center;
+                                              center = d.target;
+                                              _centerLocation = d.target;
                                             });
                                           },
                                           addDirections: (val) {
@@ -707,20 +763,25 @@ class _MapsState extends State<Maps>
                                                           element.id ==
                                                           'pickup');
                                                   add.address = val;
-                                                  add.latlng = LatLng(
-                                                      _centerLocation.latitude,
-                                                      _centerLocation
-                                                          .longitude);
+                                                  add.latlng = Point(
+                                                    latitude:
+                                                        _centerLocation.latitude,
+                                                    longitude:
+                                                        _centerLocation.longitude,
+                                                  );
                                                 } else {
                                                   addressList.add(
                                                     AddressList(
                                                       id: 'pickup',
                                                       address: val,
-                                                      latlng: LatLng(
-                                                          _centerLocation
-                                                              .latitude,
-                                                          _centerLocation
-                                                              .longitude),
+                                                      latlng: Point(
+                                                        latitude:
+                                                            _centerLocation
+                                                                .latitude,
+                                                        longitude:
+                                                            _centerLocation
+                                                                .longitude,
+                                                      ),
                                                     ),
                                                   );
                                                 }
@@ -751,73 +812,60 @@ class _MapsState extends State<Maps>
                                                         .difference(dt)
                                                         .inMinutes <=
                                                     2) {
-                                                  if (myMarkers
-                                                      .where((e) => e.markerId
-                                                          .toString()
-                                                          .contains(
-                                                              'car${element['id']}'))
-                                                      .isEmpty) {
+                                                  final markerId =
+                                                      'car${element['id']}';
+                                                  final existingIndex =
+                                                      myMarkers.indexWhere(
+                                                          (e) =>
+                                                              e.mapId.value ==
+                                                              markerId);
+                                                  final icon = (element[
+                                                              'vehicle_type_icon'] ==
+                                                          'taxi')
+                                                      ? pinLocationIcon
+                                                      : pinLocationIcon2;
+                                                  final bearing = (myBearings[
+                                                              element['id']
+                                                                  .toString()] !=
+                                                          null)
+                                                      ? myBearings[
+                                                          element['id']
+                                                              .toString()]
+                                                      : 0.0;
+                                                  final nextPoint = Point(
+                                                    latitude: element['l'][0],
+                                                    longitude: element['l'][1],
+                                                  );
+                                                  if (existingIndex == -1) {
                                                     myMarkers.add(
-                                                      Marker(
-                                                        markerId: MarkerId(
-                                                            'car${element['id']}'),
-                                                        rotation: (myBearings[
-                                                                    element['id']
-                                                                        .toString()] !=
-                                                                null)
-                                                            ? myBearings[
-                                                                element['id']
-                                                                    .toString()]
-                                                            : 0.0,
-                                                        position: LatLng(
-                                                            element['l'][0],
-                                                            element['l'][1]),
-                                                        icon: (element[
-                                                                    'vehicle_type_icon'] ==
-                                                                'taxi')
-                                                            ? pinLocationIcon
-                                                            : pinLocationIcon2,
+                                                      _buildVehicleMarker(
+                                                        markerId: markerId,
+                                                        point: nextPoint,
+                                                        icon: icon,
+                                                        direction: bearing,
                                                       ),
                                                     );
                                                   } else if (_controller !=
                                                       null) {
-                                                    if (myMarkers
-                                                                .lastWhere((e) => e
-                                                                    .markerId
-                                                                    .toString()
-                                                                    .contains(
-                                                                        'car${element['id']}'))
-                                                                .position
+                                                    final existing =
+                                                        myMarkers[existingIndex];
+                                                    if (existing
+                                                                .point
                                                                 .latitude !=
                                                             element['l'][0] ||
-                                                        myMarkers
-                                                                .lastWhere((e) => e
-                                                                    .markerId
-                                                                    .toString()
-                                                                    .contains(
-                                                                        'car${element['id']}'))
-                                                                .position
+                                                        existing
+                                                                .point
                                                                 .longitude !=
                                                             element['l'][1]) {
-                                                      var dist = calculateDistance(
-                                                          myMarkers
-                                                              .lastWhere((e) => e
-                                                                  .markerId
-                                                                  .toString()
-                                                                  .contains(
-                                                                      'car${element['id']}'))
-                                                              .position
-                                                              .latitude,
-                                                          myMarkers
-                                                              .lastWhere((e) => e
-                                                                  .markerId
-                                                                  .toString()
-                                                                  .contains(
-                                                                      'car${element['id']}'))
-                                                              .position
-                                                              .longitude,
-                                                          element['l'][0],
-                                                          element['l'][1]);
+                                                      final dist =
+                                                          calculateDistance(
+                                                        existing
+                                                            .point.latitude,
+                                                        existing
+                                                            .point.longitude,
+                                                        element['l'][0],
+                                                        element['l'][1],
+                                                      );
                                                       if (dist > 100) {
                                                         animationController =
                                                             AnimationController(
@@ -830,49 +878,33 @@ class _MapsState extends State<Maps>
                                                               this, //From the widget
                                                         );
                                                         animateCar(
-                                                            myMarkers
-                                                                .lastWhere((e) => e
-                                                                    .markerId
-                                                                    .toString()
-                                                                    .contains(
-                                                                        'car${element['id']}'))
-                                                                .position
+                                                            existing
+                                                                .point
                                                                 .latitude,
-                                                            myMarkers
-                                                                .lastWhere((e) => e
-                                                                    .markerId
-                                                                    .toString()
-                                                                    .contains(
-                                                                        'car${element['id']}'))
-                                                                .position
+                                                            existing
+                                                                .point
                                                                 .longitude,
                                                             element['l'][0],
                                                             element['l'][1],
                                                             _mapMarkerSink,
                                                             this,
                                                             _controller,
-                                                            'car${element['id']}',
+                                                            markerId,
                                                             element['id'],
-                                                            (element['vehicle_type_icon'] ==
-                                                                    'taxi')
-                                                                ? pinLocationIcon
-                                                                : pinLocationIcon2);
+                                                            icon);
                                                       }
                                                     }
                                                   }
                                                 }
                                               } else {
                                                 if (myMarkers
-                                                    .where((e) => e.markerId
-                                                        .toString()
-                                                        .contains(
-                                                            'car${element['id']}'))
+                                                    .where((e) =>
+                                                        e.mapId.value ==
+                                                        'car${element['id']}')
                                                     .isNotEmpty) {
-                                                  myMarkers.removeWhere((e) => e
-                                                      .markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'));
+                                                  myMarkers.removeWhere((e) =>
+                                                      e.mapId.value ==
+                                                      'car${element['id']}');
                                                 }
                                               }
                                             }
@@ -1309,25 +1341,47 @@ class _MapsState extends State<Maps>
     );
   }
 
-  double getBearing(LatLng begin, LatLng end) {
+  double getBearing(Point begin, Point end) {
     double lat = (begin.latitude - end.latitude).abs();
 
     double lng = (begin.longitude - end.longitude).abs();
 
     if (begin.latitude < end.latitude && begin.longitude < end.longitude) {
-      return vector.degrees(atan(lng / lat));
+      return vector.degrees(math.atan(lng / lat));
     } else if (begin.latitude >= end.latitude &&
         begin.longitude < end.longitude) {
-      return (90 - vector.degrees(atan(lng / lat))) + 90;
+      return (90 - vector.degrees(math.atan(lng / lat))) + 90;
     } else if (begin.latitude >= end.latitude &&
         begin.longitude >= end.longitude) {
-      return vector.degrees(atan(lng / lat)) + 180;
+      return vector.degrees(math.atan(lng / lat)) + 180;
     } else if (begin.latitude < end.latitude &&
         begin.longitude >= end.longitude) {
-      return (90 - vector.degrees(atan(lng / lat))) + 270;
+      return (90 - vector.degrees(math.atan(lng / lat))) + 270;
     }
 
     return -1;
+  }
+
+  PlacemarkMapObject _buildVehicleMarker({
+    required String markerId,
+    required Point point,
+    required BitmapDescriptor icon,
+    double direction = 0.0,
+  }) {
+    return PlacemarkMapObject(
+      mapId: MapObjectId(markerId),
+      point: point,
+      direction: direction,
+      opacity: 1,
+      icon: PlacemarkIcon.single(
+        PlacemarkIconStyle(
+          image: icon,
+          anchor: const Offset(0.5, 0.5),
+          rotationType: RotationType.rotate,
+          isFlat: true,
+        ),
+      ),
+    );
   }
 
   animateCar(
@@ -1339,40 +1393,39 @@ class _MapsState extends State<Maps>
 
       double toLong, //Ending longitude
 
-      StreamSink<List<Marker>> mapMarkerSink,
+      StreamSink<List<PlacemarkMapObject>> mapMarkerSink,
       //Stream build of map to update the UI
 
       TickerProvider provider,
       //Ticker provider of the widget. This is used for animation
 
-      GoogleMapController controller, //Google map controller of our widget
+      YandexMapController? controller, //Map controller of our widget
 
       markerid,
       markerBearing,
       icon) async {
     final double bearing =
-        getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
+        getBearing(Point(latitude: fromLat, longitude: fromLong),
+            Point(latitude: toLat, longitude: toLong));
 
     myBearings[markerBearing.toString()] = bearing;
 
-    var carMarker = Marker(
-        markerId: MarkerId(markerid),
-        position: LatLng(fromLat, fromLong),
-        icon: icon,
-        anchor: const Offset(0.5, 0.5),
-        flat: true,
-        draggable: false);
+    var carMarker = _buildVehicleMarker(
+      markerId: markerid,
+      point: Point(latitude: fromLat, longitude: fromLong),
+      icon: icon,
+    );
 
     myMarkers.add(carMarker);
 
-    mapMarkerSink.add(Set<Marker>.from(myMarkers).toList());
+    mapMarkerSink.add(List<PlacemarkMapObject>.from(myMarkers));
 
     Tween<double> tween = Tween(begin: 0, end: 1);
 
     _animation = tween.animate(animationController)
       ..addListener(() async {
-        myMarkers
-            .removeWhere((element) => element.markerId == MarkerId(markerid));
+        myMarkers.removeWhere((element) =>
+            element.mapId == MapObjectId(markerid.toString()));
 
         final v = _animation!.value;
 
@@ -1380,24 +1433,22 @@ class _MapsState extends State<Maps>
 
         double lat = v * toLat + (1 - v) * fromLat;
 
-        LatLng newPos = LatLng(lat, lng);
+        Point newPos = Point(latitude: lat, longitude: lng);
 
         //New marker location
 
-        carMarker = Marker(
-            markerId: MarkerId(markerid),
-            position: newPos,
-            icon: icon,
-            anchor: const Offset(0.5, 0.5),
-            flat: true,
-            rotation: bearing,
-            draggable: false);
+        carMarker = _buildVehicleMarker(
+          markerId: markerid,
+          point: newPos,
+          icon: icon,
+          direction: bearing,
+        );
 
         //Adding new marker to our list and updating the google map UI.
 
         myMarkers.add(carMarker);
 
-        mapMarkerSink.add(Set<Marker>.from(myMarkers).toList());
+        mapMarkerSink.add(List<PlacemarkMapObject>.from(myMarkers));
       });
 
     //Starting the animation
