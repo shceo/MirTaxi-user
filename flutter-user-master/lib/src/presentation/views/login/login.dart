@@ -58,7 +58,7 @@ class _LoginState extends State<Login> {
       child: Directionality(
         textDirection: (languageDirection == 'rtl') ? TextDirection.rtl : TextDirection.ltr,
         child: AnimatedBuilder(
-          animation: _viewModel,
+          animation: Listenable.merge([_viewModel, controller]),
           builder: (context, _) {
             final canSubmit = _viewModel.canSubmitPhone(controller.text);
 
