@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:tagyourtaxi_driver/functions/cache_service.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/functions/notifications.dart';
-import 'pages/loadingPage/loadingpage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'src/app.dart';
+import 'src/core/services/cache_service.dart';
+import 'src/core/services/functions.dart';
+import 'src/core/services/notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,32 +17,4 @@ void main() async {
 
   initMessaging();
   runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
-
-  @override
-  Widget build(BuildContext context) {
-    platform = Theme.of(context).platform;
-    return GestureDetector(
-      onTap: () {
-        //remove keyboard on touching anywhere on the screen.
-        FocusScopeNode currentFocus = FocusScope.of(context);
-
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-          FocusManager.instance.primaryFocus?.unfocus();
-        }
-      },
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Taxi user',
-        theme: ThemeData(),
-        home: const LoadingPage(),
-      ),
-    );
-  }
 }
