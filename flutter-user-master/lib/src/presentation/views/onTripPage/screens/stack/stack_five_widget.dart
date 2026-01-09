@@ -39,7 +39,7 @@ class StackFiveWidget extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: Icon(
-            Icons.navigation,
+            Icons.my_location,
             size: buttonSize * 0.55,
             color: textColor,
           ),
