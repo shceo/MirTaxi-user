@@ -10,6 +10,7 @@ class StackSixWidget extends StatelessWidget {
   final int bottom;
   final bool dropaddress;
   final bool pickaddress;
+  final bool isMapMoving;
   final Function(DragUpdateDetails)? onChange1;
   final Function() onChange2;
   final Function(String) onChange3;
@@ -23,6 +24,7 @@ class StackSixWidget extends StatelessWidget {
     required this.bottom,
     required this.dropaddress,
     required this.pickaddress,
+    required this.isMapMoving,
     required this.onChange1,
     required this.onChange2,
     required this.onChange3,
@@ -34,9 +36,13 @@ class StackSixWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var media = MediaQuery.of(context).size;
-    return Positioned(
-      bottom: 0,
+    final media = MediaQuery.of(context).size;
+    final hideOffset = media.width * 0.46;
+    final isHidden = isMapMoving && bottom == 0;
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      bottom: isHidden ? -hideOffset : 0,
       child: GestureDetector(
         onPanUpdate: (val) => onChange1!(val),
         child: AnimatedContainer(

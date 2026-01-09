@@ -54,6 +54,7 @@ class _MapsState extends State<Maps>
   bool _dropaddress = false;
   bool _dropLocationMap = false;
   bool _locationDenied = false;
+  bool _isMapMoving = false;
   int gettingPerm = 0;
   Animation<double>? _animation;
 
@@ -134,6 +135,14 @@ class _MapsState extends State<Maps>
   navigate() {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => BookingConfirmation()));
+  }
+
+  void _setMapMoving(bool isMoving) {
+    if (_isMapMoving == isMoving) return;
+    if (!mounted) return;
+    setState(() {
+      _isMapMoving = isMoving;
+    });
   }
 
 //get location permission and location details
@@ -349,6 +358,8 @@ class _MapsState extends State<Maps>
                                           dropLocationMap: _dropLocationMap,
                                           dropAddress: _dropaddress,
                                           pickaddress: _pickaddress,
+                                          isMapMoving: _isMapMoving,
+                                          onMapMove: _setMapMoving,
                                           onMapCreated: (d) {
                                             _onMapCreated(d);
                                           },

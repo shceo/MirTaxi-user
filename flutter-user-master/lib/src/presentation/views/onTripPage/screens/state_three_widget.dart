@@ -28,11 +28,13 @@ class StateThreeWidget extends StatelessWidget {
   final Function(int i) onChange5;
   final Function(int i) onChange6;
   final Function() onChange7;
+  final ValueChanged<bool> onMapMove;
   final Point center;
   final int bottom;
   final bool dropLocationMap;
   final bool pickaddress;
   final bool dropAddress;
+  final bool isMapMoving;
 
   const StateThreeWidget({
     super.key,
@@ -59,6 +61,8 @@ class StateThreeWidget extends StatelessWidget {
     required this.onChange5,
     required this.onChange6,
     required this.onChange7,
+    required this.onMapMove,
+    required this.isMapMoving,
   });
 
   @override
@@ -75,6 +79,7 @@ class StateThreeWidget extends StatelessWidget {
           onMapCreated: onMapCreated,
           center: center,
           centerLocation: centerLocation,
+          onMapMove: onMapMove,
         ),
         StackTwoWidget(dropLocationMap: dropLocationMap),
         StackThreeWidget(
@@ -89,6 +94,7 @@ class StateThreeWidget extends StatelessWidget {
           bottom: bottom,
           dropaddress: dropAddress,
           pickaddress: pickaddress,
+          isMapMoving: isMapMoving,
           onChange1: onChange1,
           onChange2: () => onChange2(),
           onChange3: (String a) => onChange3(a),

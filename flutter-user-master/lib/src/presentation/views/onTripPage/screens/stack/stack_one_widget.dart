@@ -10,6 +10,7 @@ class StackOneWidget extends StatelessWidget {
   final Function(YandexMapController)? onMapCreated;
   final Function(CameraPosition) centerLocation;
   final Function() cameraIdle;
+  final ValueChanged<bool>? onMapMove;
   final Point center;
 
   const StackOneWidget({
@@ -22,6 +23,7 @@ class StackOneWidget extends StatelessWidget {
     required this.center,
     required this.centerLocation,
     required this.cameraIdle,
+    this.onMapMove,
   });
 
   @override
@@ -46,6 +48,13 @@ class StackOneWidget extends StatelessWidget {
                 onCameraPositionChanged:
                     (cameraPosition, reason, finished) {
                   centerLocation(cameraPosition);
+                  if (onMapMove != null) {
+                    if (reason == CameraUpdateReason.gestures) {
+                      onMapMove!(!finished);
+                    } else if (finished) {
+                      onMapMove!(false);
+                    }
+                  }
                   if (finished) {
                     cameraIdle();
                   }
