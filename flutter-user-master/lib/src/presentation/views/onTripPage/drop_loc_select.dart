@@ -38,8 +38,6 @@ class _DropLocationState extends State<DropLocation>
   String favNameText = '';
   bool _locationDenied = false;
   bool favAddressAdd = false;
-  bool _showToast = false;
-
   void _onMapCreated(YandexMapController controller) {
     setState(() {
       _controller = controller;
@@ -67,18 +65,6 @@ class _DropLocationState extends State<DropLocation>
         getCurrentLocation();
       }
     }
-  }
-
-  //show toast for demo
-  addToast() {
-    setState(() {
-      _showToast = true;
-    });
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _showToast = false;
-      });
-    });
   }
 
 //get current location
@@ -1015,27 +1001,6 @@ class _DropLocationState extends State<DropLocation>
                                     ),
                                   )
                                 ],
-                              ),
-                            ))
-                        : Container(),
-
-                    //display toast
-                    (_showToast == true)
-                        ? Positioned(
-                            top: media.height * 0.5,
-                            child: Container(
-                              width: media.width * 0.9,
-                              margin: EdgeInsets.all(media.width * 0.05),
-                              padding: EdgeInsets.all(media.width * 0.025),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: page),
-                              child: Text(
-                                'Auto address by scrolling map feature is not available in demo',
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * twelve,
-                                    color: textColor),
-                                textAlign: TextAlign.center,
                               ),
                             ))
                         : Container(),
