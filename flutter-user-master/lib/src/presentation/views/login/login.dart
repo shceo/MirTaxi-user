@@ -18,15 +18,17 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  TextEditingController controller = TextEditingController();
-
+  final TextEditingController controller = TextEditingController();
   late final AuthViewModel _viewModel;
+  String _selectedLanguage = 'en';
 
   @override
   void initState() {
+    super.initState();
     _viewModel = AuthViewModel();
     _viewModel.loadCountries();
-    super.initState();
+    _selectedLanguage = choosenLanguage.isNotEmpty ? choosenLanguage : 'en';
+    updateAppLanguage(_selectedLanguage);
   }
 
   @override
@@ -92,6 +94,17 @@ class _LoginState extends State<Login> {
                             ),
                             child: Column(
                               children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    context.l10n.text_phone_number,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        fontWeight: FontWeight.w600,
+                                        color: textColor),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
                                 Container(
                                   padding: const EdgeInsets.only(bottom: 5),
                                   height: 55,
@@ -162,66 +175,89 @@ class _LoginState extends State<Login> {
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: media.height * 0.05),
-                                Row(
-                                  children: [
-                                    InkWell(
-                                      onTap: _viewModel.toggleTerms,
-                                      child: Container(
-                                          height: media.width * 0.08,
-                                          width: media.width * 0.08,
-                                          decoration: BoxDecoration(
-                                              border: Border.all(color: buttonColor, width: 2),
-                                              shape: BoxShape.circle,
-                                              color: (_viewModel.termsAccepted == true) ? buttonColor : page),
-                                          child: const Icon(Icons.done, color: Colors.white)),
-                                    ),
-                                    SizedBox(
-                                      width: media.width * 0.02,
-                                    ),
-
-                                    //terms and condition and privacy policy url
-                                    SizedBox(
-                                      width: media.width * 0.7,
-                                      child: Wrap(
-                                        direction: Axis.horizontal,
-                                        children: [
-                                          Text(
-                                            context.l10n.text_agree + ' ',
-                                            style: GoogleFonts.roboto(
-                                                fontSize: media.width * sixteen, color: textColor.withOpacity(0.7)),
-                                          ),
-                                          InkWell(
-                                            onTap: () {
-                                              openBrowser('terms and conditions url');
-                                            },
-                                            child: Text(
-                                              context.l10n.text_terms,
-                                              style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen, color: buttonColor),
-                                            ),
-                                          ),
-                                          Text(
-                                            ' ${context.l10n.text_and} ',
-                                            style: GoogleFonts.roboto(
-                                                fontSize: media.width * sixteen, color: textColor.withOpacity(0.7)),
-                                          ),
-                                          InkWell(
-                                            onTap: () {
-                                              openBrowser('privacy policy url');
-                                            },
-                                            child: Text(
-                                              context.l10n.text_privacy,
-                                              style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen, color: buttonColor),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ],
+                                SizedBox(height: media.height * 0.02),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    context.l10n.text_choose_language,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        fontWeight: FontWeight.w600,
+                                        color: textColor),
+                                  ),
                                 ),
-                                SizedBox(height: media.height * 0.1),
+                                const SizedBox(height: 6),
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    physics: const BouncingScrollPhysics(),
+                                    child: Column(
+                                      children: languagesCode
+                                          .map((value) {
+                                            final code = value['code'].toString();
+                                            final name = value['name'].toString();
+                                            final isSelected = _selectedLanguage == code;
+                                            return InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  _selectedLanguage = code;
+                                                  updateAppLanguage(code);
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(vertical: media.width * 0.02),
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                    bottom: BorderSide(color: underline),
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(
+                                                          name,
+                                                          style: GoogleFonts.roboto(
+                                                              fontSize: media.width * sixteen,
+                                                              color: textColor),
+                                                        ),
+                                                        const SizedBox(height: 2),
+                                                        Text(
+                                                          code.toUpperCase(),
+                                                          style: GoogleFonts.roboto(
+                                                              fontSize: media.width * twelve,
+                                                              color: textColor.withOpacity(0.6)),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Container(
+                                                      height: media.width * 0.07,
+                                                      width: media.width * 0.07,
+                                                      decoration: BoxDecoration(
+                                                          shape: BoxShape.circle,
+                                                          border: Border.all(
+                                                              color: const Color(0xff222222), width: 1.2)),
+                                                      alignment: Alignment.center,
+                                                      child: isSelected
+                                                          ? Container(
+                                                              height: media.width * 0.04,
+                                                              width: media.width * 0.04,
+                                                              decoration: const BoxDecoration(
+                                                                  shape: BoxShape.circle, color: Color(0xff222222)),
+                                                            )
+                                                          : Container(),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          })
+                                          .toList(),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: media.height * 0.02),
                                 if (canSubmit)
                                   Container(
                                     width: media.width * 1 - media.width * 0.08,
@@ -229,6 +265,7 @@ class _LoginState extends State<Login> {
                                     child: Button(
                                       onTap: () async {
                                         FocusManager.instance.primaryFocus?.unfocus();
+                                        updateAppLanguage(_selectedLanguage);
                                         HttpResult val = await _viewModel.requestOtp(controller.text);
                                         if (val.isSuccess) {
                                           phoneAuthCheck = false;

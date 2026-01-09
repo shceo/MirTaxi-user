@@ -107,7 +107,7 @@ class LoadingViewModel extends ChangeNotifier {
       return LoadingDestination.selectTask;
     }
 
-    if (localState == '2') {
+    if (localState == '2' || localState == '1') {
       return LoadingDestination.login;
     }
 

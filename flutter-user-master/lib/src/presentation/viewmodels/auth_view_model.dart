@@ -24,7 +24,6 @@ class AuthVerificationResult {
 
 class AuthViewModel extends ChangeNotifier {
   bool isLoading = false;
-  bool termsAccepted = true;
   int resendSeconds = 60;
   Timer? _resendTimer;
   String errorMessage = '';
@@ -45,12 +44,7 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   bool canSubmitPhone(String phone) {
-    return termsAccepted && phone.length >= dialMinLength;
-  }
-
-  void toggleTerms() {
-    termsAccepted = !termsAccepted;
-    notifyListeners();
+    return phone.length >= dialMinLength;
   }
 
   Future<HttpResult> requestOtp(String phone) async {

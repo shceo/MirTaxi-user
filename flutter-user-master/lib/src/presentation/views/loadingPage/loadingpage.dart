@@ -4,8 +4,6 @@ import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.da
 import 'package:tagyourtaxi_driver/src/presentation/views/login/select_task_screen.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/invoice.dart';
-import 'package:tagyourtaxi_driver/src/presentation/views/language/languages.dart';
-
 import 'package:tagyourtaxi_driver/src/presentation/viewmodels/loading_view_model.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/login/login.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
@@ -65,7 +63,7 @@ class _LoadingPageState extends State<LoadingPage> {
           break;
         case LoadingDestination.chooseLanguage:
           Future.delayed(const Duration(seconds: 2), () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Languages()));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
           });
           break;
       }
