@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/viewmodels/auth_view_model.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/login/get_started.dart';
@@ -93,10 +93,10 @@ class _OtpState extends State<Otp> {
                 final resendTime = _viewModel.resendSeconds;
                 final otpLength = otpController.text.length;
                 final buttonText = (otpLength == 6)
-                    ? languages[choosenLanguage]['text_verify']
+                    ? context.l10n.text_verify
                     : (resendTime == 0)
-                        ? languages[choosenLanguage]['text_resend_code']
-                        : "${languages[choosenLanguage]['text_resend_code']} $resendTime";
+                        ? context.l10n.text_resend_code
+                        : "${context.l10n.text_resend_code} $resendTime";
                 final isButtonDisabled = resendTime != 0 && otpLength != 6;
 
                 return Stack(
@@ -132,7 +132,7 @@ class _OtpState extends State<Otp> {
                                 SizedBox(
                                   width: media.width * 1,
                                   child: Text(
-                                    languages[choosenLanguage]['text_phone_verify'],
+                                    context.l10n.text_phone_verify,
                                     style: GoogleFonts.roboto(
                                       fontSize: media.width * twentyeight,
                                       fontWeight: FontWeight.bold,
@@ -142,7 +142,7 @@ class _OtpState extends State<Otp> {
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
-                                  languages[choosenLanguage]['text_enter_otp'],
+                                  context.l10n.text_enter_otp,
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * sixteen, color: textColor.withValues(alpha: 0.3)),
                                 ),
@@ -179,7 +179,7 @@ class _OtpState extends State<Otp> {
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       counterText: '',
-                                      hintText: languages[choosenLanguage]['text_enter_otp_login'],
+                                      hintText: context.l10n.text_enter_otp_login,
                                     ),
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.roboto(

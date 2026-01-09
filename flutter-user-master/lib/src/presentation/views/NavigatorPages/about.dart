@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 
 class About extends StatefulWidget {
   const About({Key? key}) : super(key: key);
@@ -39,7 +39,7 @@ class _AboutState extends State<About> {
                           width: media.width * 1,
                           alignment: Alignment.center,
                           child: Text(
-                            languages[choosenLanguage]['text_about'],
+                            context.l10n.text_about,
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * twenty,
                                 fontWeight: FontWeight.w600,
@@ -74,7 +74,7 @@ class _AboutState extends State<About> {
                         openBrowser('terms and conditions url');
                       },
                       child: Text(
-                        languages[choosenLanguage]['text_termsandconditions'],
+                        context.l10n.text_termsandconditions,
                         style: GoogleFonts.roboto(
                             fontSize: media.width * sixteen,
                             fontWeight: FontWeight.w600,
@@ -90,7 +90,7 @@ class _AboutState extends State<About> {
                         openBrowser('privacy policy url');
                       },
                       child: Text(
-                        languages[choosenLanguage]['text_privacy'],
+                        context.l10n.text_privacy,
                         style: GoogleFonts.roboto(
                             fontSize: media.width * sixteen,
                             fontWeight: FontWeight.w600,
@@ -106,7 +106,7 @@ class _AboutState extends State<About> {
                         openBrowser('website url');
                       },
                       child: Text(
-                        languages[choosenLanguage]['text_about'],
+                        context.l10n.text_about,
                         style: GoogleFonts.roboto(
                             fontSize: media.width * sixteen,
                             fontWeight: FontWeight.w600,

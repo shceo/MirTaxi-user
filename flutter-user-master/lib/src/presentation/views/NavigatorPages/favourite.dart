@@ -4,7 +4,7 @@ import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class Favorite extends StatefulWidget {
@@ -48,7 +48,7 @@ class _FavoriteState extends State<Favorite> {
                               width: media.width * 1,
                               alignment: Alignment.center,
                               child: Text(
-                                languages[choosenLanguage]['text_favourites'],
+                                context.l10n.text_favourites,
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * twenty,
                                     fontWeight: FontWeight.w600,
@@ -198,7 +198,7 @@ class _FavoriteState extends State<Favorite> {
                                 ),
                               )
                             : Text(
-                                languages[choosenLanguage]['text_noDataFound'],
+                                context.l10n.text_no_data_found,
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * eighteen,
                                     fontWeight: FontWeight.w600,
@@ -249,8 +249,7 @@ class _FavoriteState extends State<Favorite> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      languages[choosenLanguage]
-                                          ['text_removeFav'],
+                                      context.l10n.text_removeFav,
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * sixteen,
@@ -276,8 +275,7 @@ class _FavoriteState extends State<Favorite> {
                                             _isLoading = false;
                                           });
                                         },
-                                        text: languages[choosenLanguage]
-                                            ['text_confirm'])
+                                        text: context.l10n.text_confirm)
                                   ],
                                 ),
                               )

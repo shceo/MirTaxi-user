@@ -6,7 +6,7 @@ import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 
 class Faq extends StatefulWidget {
   const Faq({Key? key}) : super(key: key);
@@ -84,7 +84,7 @@ class _FaqState extends State<Faq> {
                               width: media.width * 1,
                               alignment: Alignment.center,
                               child: Text(
-                                languages[choosenLanguage]['text_faq'],
+                                context.l10n.text_faq,
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * twenty,
                                     fontWeight: FontWeight.w600,
@@ -221,8 +221,7 @@ class _FaqState extends State<Faq> {
                                   )
                                 : (_faqCompleted == true)
                                     ? Text(
-                                        languages[choosenLanguage]
-                                            ['text_noDataFound'],
+                                        context.l10n.text_no_data_found,
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * eighteen,
                                             fontWeight: FontWeight.w600,

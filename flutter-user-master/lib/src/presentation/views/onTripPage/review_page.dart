@@ -5,7 +5,7 @@ import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class Review extends StatefulWidget {
@@ -162,7 +162,7 @@ class _ReviewState extends State<Review> {
                         });
                       },
                       decoration: InputDecoration(
-                          hintText: languages[choosenLanguage]['text_feedback'],
+                          hintText: context.l10n.text_feedback,
                           border: InputBorder.none),
                     ),
                   ),
@@ -187,7 +187,7 @@ class _ReviewState extends State<Review> {
                           }
                         }
                       },
-                      text: languages[choosenLanguage]['text_submit'])
+                      text: context.l10n.text_submit)
                 ],
               ),
             ),

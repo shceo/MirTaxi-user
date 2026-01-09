@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class StateTwoWidget extends StatelessWidget {
@@ -32,7 +32,7 @@ class StateTwoWidget extends StatelessWidget {
             height: media.width * 0.05,
           ),
           Text(
-            languages[choosenLanguage]['text_trustedtaxi'],
+            context.l10n.text_trustedtaxi,
             style: GoogleFonts.roboto(
                 fontSize: media.width * eighteen, fontWeight: FontWeight.w600),
           ),
@@ -40,13 +40,13 @@ class StateTwoWidget extends StatelessWidget {
             height: media.width * 0.025,
           ),
           Text(
-            languages[choosenLanguage]['text_allowpermission1'],
+            context.l10n.text_allowpermission1,
             style: GoogleFonts.roboto(
               fontSize: media.width * fourteen,
             ),
           ),
           Text(
-            languages[choosenLanguage]['text_allowpermission2'],
+            context.l10n.text_allowpermission2,
             style: GoogleFonts.roboto(
               fontSize: media.width * fourteen,
             ),
@@ -70,7 +70,7 @@ class StateTwoWidget extends StatelessWidget {
                 SizedBox(
                   width: media.width * 0.7,
                   child: Text(
-                    languages[choosenLanguage]['text_loc_permission_user'],
+                    context.l10n.text_loc_permission_user,
                     style: GoogleFonts.roboto(
                       fontSize: media.width * fourteen,
                       fontWeight: FontWeight.w600,
@@ -86,7 +86,7 @@ class StateTwoWidget extends StatelessWidget {
               onTap: () {
                 onTap();
               },
-              text: languages[choosenLanguage]['text_continue'],
+              text: context.l10n.text_continue,
             ),
           ),
         ],

@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/app_state.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class AddFavAddressWidget extends StatelessWidget {
@@ -63,7 +63,7 @@ class AddFavAddressWidget extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      languages[choosenLanguage]['text_saveaddressas'],
+                      context.l10n.text_saveaddressas,
                       style: GoogleFonts.roboto(
                           fontSize: media.width * sixteen,
                           color: textColor,
@@ -117,7 +117,7 @@ class AddFavAddressWidget extends StatelessWidget {
                                 SizedBox(
                                   width: media.width * 0.01,
                                 ),
-                                Text(languages[choosenLanguage]['text_home'])
+                                Text(context.l10n.text_home)
                               ],
                             ),
                           ),
@@ -156,7 +156,7 @@ class AddFavAddressWidget extends StatelessWidget {
                                 SizedBox(
                                   width: media.width * 0.01,
                                 ),
-                                Text(languages[choosenLanguage]['text_work'])
+                                Text(context.l10n.text_work)
                               ],
                             ),
                           ),
@@ -192,7 +192,7 @@ class AddFavAddressWidget extends StatelessWidget {
                                 SizedBox(
                                   width: media.width * 0.01,
                                 ),
-                                Text(languages[choosenLanguage]['text_others'])
+                                Text(context.l10n.text_others)
                               ],
                             ),
                           ),
@@ -209,8 +209,7 @@ class AddFavAddressWidget extends StatelessWidget {
                             child: TextField(
                               decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: languages[choosenLanguage]
-                                      ['text_enterfavname'],
+                                  hintText: context.l10n.text_enterfavname,
                                   hintStyle: GoogleFonts.roboto(
                                       fontSize: media.width * twelve,
                                       color: hintColor)),
@@ -226,7 +225,7 @@ class AddFavAddressWidget extends StatelessWidget {
                     ),
                     Button(
                         onTap: () => button(),
-                        text: languages[choosenLanguage]['text_confirm'])
+                        text: context.l10n.text_confirm)
                   ],
                 ),
               )

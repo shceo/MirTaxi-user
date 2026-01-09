@@ -20,7 +20,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/boo
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'package:location/location.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/booking/address_view_widget.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 import 'package:vector_math/vector_math.dart' as vector;
@@ -1096,7 +1096,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                             //             crossAxisAlignment: CrossAxisAlignment.start,
                                             //             children: [
                                             //               Text(
-                                            //                 languages[choosenLanguage]['text_payingvia'],
+                                            //                 context.l10n.text_payingvia,
                                             //                 style: GoogleFonts.roboto(
                                             //                   fontSize: media.width * twelve,
                                             //                   color: const Color(0xff666666),
@@ -1247,7 +1247,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                             //                 crossAxisAlignment: CrossAxisAlignment.start,
                                             //                 children: [
                                             //                   Text(
-                                            //                     languages[choosenLanguage]['text_payingvia'],
+                                            //                     context.l10n.text_payingvia,
                                             //                     style: GoogleFonts.roboto(
                                             //                       fontSize: media.width * twelve,
                                             //                       color: const Color(0xff666666),
@@ -1351,7 +1351,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                             //                                                           .split(',')
                                             //                                                           .toList()[payingVia] ==
                                             //                                                       'upi')
-                                            //                                                   ? languages[choosenLanguage]['text_payupi']
+                                            //                                                   ? context.l10n.text_payupi
                                             //                                                   : '',
                                             //                                   style: GoogleFonts.roboto(
                                             //                                     fontSize: media.width * ten,
@@ -1430,8 +1430,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                     _isLoading = false;
                                                   });
                                                 },
-                                                text: languages[choosenLanguage]
-                                                    ['text_ridenow']),
+                                                text: context.l10n.text_ridenow),
                                           ],
                                         ),
                                       ),
@@ -1528,10 +1527,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           height: media.width *
                                                               0.05),
                                                       Text(
-                                                        languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_supported_vehicles'],
+                                                        context.l10n.text_supported_vehicles,
                                                         style:
                                                             GoogleFonts.roboto(
                                                                 fontSize: media
@@ -1571,10 +1567,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             width: media.width *
                                                                 0.4,
                                                             child: Text(
-                                                              languages[
-                                                                      choosenLanguage]
-                                                                  [
-                                                                  'text_estimated_amount'],
+                                                              context.l10n.text_estimated_amount,
                                                               style: GoogleFonts.roboto(
                                                                   fontSize: media
                                                                           .width *
@@ -1702,10 +1695,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           height: media.width *
                                                               0.05),
                                                       Text(
-                                                        languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_supported_vehicles'],
+                                                        context.l10n.text_supported_vehicles,
                                                         style:
                                                             GoogleFonts.roboto(
                                                                 fontSize: media
@@ -1742,10 +1732,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                            languages[
-                                                                    choosenLanguage]
-                                                                [
-                                                                'text_estimated_amount'],
+                                                            context.l10n.text_estimated_amount,
                                                             style: GoogleFonts.roboto(
                                                                 fontSize: media
                                                                         .width *
@@ -1875,8 +1862,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                             height: media.width * 0.05,
                                           ),
                                           Text(
-                                            languages[choosenLanguage]
-                                                ['text_nodriver'],
+                                            context.l10n.text_nodriver,
                                             style: GoogleFonts.roboto(
                                                 fontSize:
                                                     media.width * eighteen,
@@ -1892,8 +1878,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   noDriverFound = false;
                                                 });
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_tryagain'])
+                                              text: context.l10n.text_tryagain)
                                         ],
                                       ),
                                     ))
@@ -1941,8 +1926,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           SizedBox(
                                             width: media.width * 0.8,
                                             child: Text(
-                                                languages[choosenLanguage][
-                                                    'text_internal_server_error'],
+                                                context.l10n.text_internal_server_error,
                                                 style: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * eighteen,
@@ -1959,8 +1943,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   tripReqError = false;
                                                 });
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_tryagain'])
+                                              text: context.l10n.text_tryagain)
                                         ],
                                       ),
                                     ))
@@ -2008,8 +1991,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           SizedBox(
                                             width: media.width * 0.8,
                                             child: Text(
-                                                languages[choosenLanguage]
-                                                    ['text_no_service'],
+                                                context.l10n.text_no_service,
                                                 style: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * eighteen,
@@ -2032,8 +2014,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                 }
                                                 setState(() {});
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_tryagain'])
+                                              text: context.l10n.text_tryagain)
                                         ],
                                       ),
                                     ))
@@ -2111,10 +2092,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             .start,
                                                     children: [
                                                       Text(
-                                                        languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_paymentmethod'],
+                                                        context.l10n.text_paymentmethod,
                                                         style:
                                                             GoogleFonts.roboto(
                                                                 fontSize: media
@@ -2131,10 +2109,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             0.015,
                                                       ),
                                                       Text(
-                                                        languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_choose_paynoworlater'],
+                                                        context.l10n.text_choose_paynoworlater,
                                                         style:
                                                             GoogleFonts.roboto(
                                                                 fontSize: media
@@ -2219,13 +2194,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         ),
                                                                                         Text(
                                                                                           (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'cash')
-                                                                                              ? languages[choosenLanguage]['text_paycash']
+                                                                                              ? context.l10n.text_paycash
                                                                                               : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'wallet')
-                                                                                                  ? languages[choosenLanguage]['text_paywallet']
+                                                                                                  ? context.l10n.text_paywallet
                                                                                                   : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'card')
-                                                                                                      ? languages[choosenLanguage]['text_paycard']
+                                                                                                      ? context.l10n.text_paycard
                                                                                                       : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'upi')
-                                                                                                          ? languages[choosenLanguage]['text_payupi']
+                                                                                                          ? context.l10n.text_payupi
                                                                                                           : '',
                                                                                           style: GoogleFonts.roboto(
                                                                                             fontSize: media.width * ten,
@@ -2324,13 +2299,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         ),
                                                                                         Text(
                                                                                           (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'cash')
-                                                                                              ? languages[choosenLanguage]['text_paycash']
+                                                                                              ? context.l10n.text_paycash
                                                                                               : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'wallet')
-                                                                                                  ? languages[choosenLanguage]['text_paywallet']
+                                                                                                  ? context.l10n.text_paywallet
                                                                                                   : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'card')
-                                                                                                      ? languages[choosenLanguage]['text_paycard']
+                                                                                                      ? context.l10n.text_paycard
                                                                                                       : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'upi')
-                                                                                                          ? languages[choosenLanguage]['text_payupi']
+                                                                                                          ? context.l10n.text_payupi
                                                                                                           : '',
                                                                                           style: GoogleFonts.roboto(
                                                                                             fontSize: media.width * ten,
@@ -2419,9 +2394,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                       decoration: InputDecoration(
                                                                           border: InputBorder
                                                                               .none,
-                                                                          hintText: languages[choosenLanguage]
-                                                                              [
-                                                                              'text_enterpromo'],
+                                                                          hintText: context.l10n.text_enterpromo,
                                                                           hintStyle: GoogleFonts.roboto(
                                                                               fontSize: media.width * twelve,
                                                                               color: hintColor)),
@@ -2442,7 +2415,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                               Column(
                                                                                 children: [
                                                                                   Text(promoKey.text, style: GoogleFonts.roboto(fontSize: media.width * ten, color: const Color(0xff319900))),
-                                                                                  Text(languages[choosenLanguage]['text_promoaccepted'], style: GoogleFonts.roboto(fontSize: media.width * ten, color: const Color(0xff319900))),
+                                                                                  Text(context.l10n.text_promoaccepted, style: GoogleFonts.roboto(fontSize: media.width * ten, color: const Color(0xff319900))),
                                                                                 ],
                                                                               ),
                                                                               InkWell(
@@ -2464,7 +2437,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                     }
                                                                                   });
                                                                                 },
-                                                                                child: Text(languages[choosenLanguage]['text_remove'], style: GoogleFonts.roboto(fontSize: media.width * twelve, color: const Color(0xff319900))),
+                                                                                child: Text(context.l10n.text_remove, style: GoogleFonts.roboto(fontSize: media.width * twelve, color: const Color(0xff319900))),
                                                                               )
                                                                             ],
                                                                           ),
@@ -2491,7 +2464,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         }
                                                                                       });
                                                                                     },
-                                                                                    child: Text(languages[choosenLanguage]['text_remove'], style: GoogleFonts.roboto(fontSize: media.width * twelve, color: const Color(0xffFF0000))),
+                                                                                    child: Text(context.l10n.text_remove, style: GoogleFonts.roboto(fontSize: media.width * twelve, color: const Color(0xffFF0000))),
                                                                                   )
                                                                                 ],
                                                                               ),
@@ -2517,10 +2490,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                               .height *
                                                                           0.02),
                                                               child: Text(
-                                                                  languages[
-                                                                          choosenLanguage]
-                                                                      [
-                                                                      'text_promorejected'],
+                                                                  context.l10n.text_promorejected,
                                                                   style: GoogleFonts.roboto(
                                                                       fontSize:
                                                                           media.width *
@@ -2558,9 +2528,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                               });
                                                             }
                                                           },
-                                                          text: languages[
-                                                                  choosenLanguage]
-                                                              ['text_confirm'])
+                                                          text: context.l10n.text_confirm)
                                                     ],
                                                   ),
                                                 ),
@@ -2648,16 +2616,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                               'arrived_at'] ==
                                                           null &&
                                                       _dist != null)
-                                                  ? languages[choosenLanguage]
-                                                          ['text_arrive_eta'] +
+                                                  ? context.l10n.text_arrive_eta +
                                                       ' ' +
                                                       double.parse(((_dist * 2))
                                                               .toString())
                                                           .round()
                                                           .toString() +
                                                       ' ' +
-                                                      languages[choosenLanguage]
-                                                          ['text_mins']
+                                                      context.l10n.text_mins
                                                   : (userRequestData[
                                                                   'accepted_at'] !=
                                                               null &&
@@ -2665,16 +2631,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                               null &&
                                                           userRequestData['is_trip_start'] ==
                                                               0)
-                                                      ? languages[choosenLanguage]
-                                                          ['text_arrived']
+                                                      ? context.l10n.text_arrived
                                                       : (userRequestData['accepted_at'] !=
                                                                   null &&
                                                               userRequestData['arrived_at'] !=
                                                                   null &&
                                                               userRequestData['is_trip_start'] !=
                                                                   null)
-                                                          ? languages[choosenLanguage]
-                                                              ['text_onride']
+                                                          ? context.l10n.text_onride
                                                           : '',
                                               style: GoogleFonts.roboto(
                                                 fontSize: media.width * twelve,
@@ -2736,8 +2700,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              languages[choosenLanguage]
-                                                      ['text_findingdriver'] +
+                                              context.l10n.text_findingdriver +
                                                   ' >',
                                               style: GoogleFonts.roboto(
                                                 fontSize:
@@ -2807,8 +2770,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         height: media.height * 0.02,
                                       ),
                                       Text(
-                                        languages[choosenLanguage]
-                                            ['text_finddriverdesc'],
+                                        context.l10n.text_finddriverdesc,
                                         style: GoogleFonts.roboto(
                                           fontSize: media.width * twelve,
                                           color: textColor,
@@ -2834,8 +2796,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         height: media.height * 0.01,
                                       ),
                                       Text(
-                                        languages[choosenLanguage]
-                                            ['text_cancel'],
+                                        context.l10n.text_cancel,
                                         style: GoogleFonts.roboto(
                                           fontSize: media.width * fourteen,
                                           color: Colors.grey,
@@ -3192,10 +3153,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           0.02,
                                                                     ),
                                                                     Text(
-                                                                      languages[
-                                                                              choosenLanguage]
-                                                                          [
-                                                                          'text_cancel'],
+                                                                      context.l10n.text_cancel,
                                                                       style: GoogleFonts.roboto(
                                                                           fontSize: media.width *
                                                                               ten,
@@ -3394,9 +3352,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         width:
                                                             media.width * 0.05,
                                                       ),
-                                                      Text(languages[
-                                                              choosenLanguage]
-                                                          ['text_others'])
+                                                      Text(context.l10n.text_others)
                                                     ],
                                                   ),
                                                 ),
@@ -3428,10 +3384,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         decoration: InputDecoration(
                                                             border: InputBorder
                                                                 .none,
-                                                            hintText: languages[
-                                                                    choosenLanguage]
-                                                                [
-                                                                'text_cancelRideReason'],
+                                                            hintText: context.l10n.text_cancelRideReason,
                                                             hintStyle: GoogleFonts.roboto(
                                                                 fontSize: media
                                                                         .width *
@@ -3499,10 +3452,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             } else {
                                                               setState(() {
                                                                 _cancellingError =
-                                                                    languages[
-                                                                            choosenLanguage]
-                                                                        [
-                                                                        'text_add_cancel_reason'];
+                                                                    context.l10n.text_add_cancel_reason;
                                                               });
                                                             }
                                                           } else {
@@ -3518,9 +3468,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           _isLoading = false;
                                                         });
                                                       },
-                                                      text: languages[
-                                                              choosenLanguage]
-                                                          ['text_cancel']),
+                                                      text: context.l10n.text_cancel),
                                                   Button(
                                                       width: media.width * 0.39,
                                                       onTap: () {
@@ -3528,9 +3476,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           _cancelling = false;
                                                         });
                                                       },
-                                                      text: languages[
-                                                              choosenLanguage]
-                                                          ['tex_dontcancel'])
+                                                      text: context.l10n.tex_dontcancel)
                                                 ],
                                               )
                                             ]),
@@ -3613,8 +3559,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                     });
                                                   },
                                                   text:
-                                                      languages[choosenLanguage]
-                                                          ['text_confirm']))
+                                                      context.l10n.text_confirm))
                                         ],
                                       ),
                                     ))
@@ -3669,8 +3614,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                             child: Column(
                                               children: [
                                                 Text(
-                                                  languages[choosenLanguage]
-                                                      ['text_confirmridelater'],
+                                                  context.l10n.text_confirmridelater,
                                                   style: GoogleFonts.roboto(
                                                       fontSize: media.width *
                                                           fourteen,
@@ -3790,9 +3734,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         });
                                                       }
                                                     },
-                                                    text: languages[
-                                                            choosenLanguage]
-                                                        ['text_confirm'])
+                                                    text: context.l10n.text_confirm)
                                               ],
                                             ),
                                           )
@@ -3824,8 +3766,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                             child: Column(
                                               children: [
                                                 Text(
-                                                  languages[choosenLanguage]
-                                                      ['text_rideLaterSuccess'],
+                                                  context.l10n.text_rideLaterSuccess,
                                                   style: GoogleFonts.roboto(
                                                       fontSize: media.width *
                                                           fourteen,
@@ -3852,9 +3793,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                   const Maps()),
                                                           (route) => false);
                                                     },
-                                                    text: languages[
-                                                            choosenLanguage]
-                                                        ['text_confirm'])
+                                                    text: context.l10n.text_confirm)
                                               ],
                                             ),
                                           )
@@ -3953,10 +3892,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    languages[
-                                                                            choosenLanguage]
-                                                                        [
-                                                                        'text_notifyadmin'],
+                                                                    context.l10n.text_notifyadmin,
                                                                     style: GoogleFonts.roboto(
                                                                         fontSize:
                                                                             media.width *
@@ -3973,7 +3909,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                               EdgeInsets.only(top: media.width * 0.01),
                                                                           child:
                                                                               Text(
-                                                                            languages[choosenLanguage]['text_notifysuccess'],
+                                                                            context.l10n.text_notifysuccess,
                                                                             style:
                                                                                 GoogleFonts.roboto(
                                                                               fontSize: media.width * twelve,
@@ -4051,10 +3987,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                   Alignment
                                                                       .center,
                                                               child: Text(
-                                                                languages[
-                                                                        choosenLanguage]
-                                                                    [
-                                                                    'text_noDataFound'],
+                                                                context.l10n.text_no_data_found,
                                                                 style: GoogleFonts.roboto(
                                                                     fontSize: media
                                                                             .width *
@@ -4130,8 +4063,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                               SizedBox(
                                                   width: media.width * 0.8,
                                                   child: Text(
-                                                    languages[choosenLanguage][
-                                                        'text_open_loc_settings'],
+                                                    context.l10n.text_open_loc_settings,
                                                     style: GoogleFonts.roboto(
                                                         fontSize: media.width *
                                                             sixteen,
@@ -4152,10 +4084,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             .openAppSettings();
                                                       },
                                                       child: Text(
-                                                        languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_open_settings'],
+                                                        context.l10n.text_open_settings,
                                                         style:
                                                             GoogleFonts.roboto(
                                                                 fontSize: media
@@ -4183,9 +4112,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         }
                                                       },
                                                       child: Text(
-                                                        languages[
-                                                                choosenLanguage]
-                                                            ['text_done'],
+                                                        context.l10n.text_done,
                                                         style:
                                                             GoogleFonts.roboto(
                                                                 fontSize: media
@@ -4282,8 +4209,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    languages[choosenLanguage]
-                                                        ['text_pickpoint'],
+                                                    context.l10n.text_pickpoint,
                                                     style: GoogleFonts.roboto(
                                                         fontSize: media.width *
                                                             twelve,
@@ -4411,10 +4337,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                               .start,
                                                       children: [
                                                         Text(
-                                                          languages[
-                                                                  choosenLanguage]
-                                                              [
-                                                              'text_droppoint'],
+                                                          context.l10n.text_droppoint,
                                                           style: GoogleFonts.roboto(
                                                               fontSize:
                                                                   media.width *

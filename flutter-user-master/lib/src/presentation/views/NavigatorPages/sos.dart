@@ -4,7 +4,7 @@ import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/NavigatorPages/pickcontacts.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class Sos extends StatefulWidget {
@@ -56,7 +56,7 @@ class _SosState extends State<Sos> {
                                 width: media.width * 1,
                                 alignment: Alignment.center,
                                 child: Text(
-                                  languages[choosenLanguage]['text_sos'],
+                                  context.l10n.text_sos,
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * twenty,
                                       fontWeight: FontWeight.w600,
@@ -85,14 +85,14 @@ class _SosState extends State<Sos> {
                             height: media.width * 0.05,
                           ),
                           Text(
-                            languages[choosenLanguage]['text_trust_contact_3'],
+                            context.l10n.text_trust_contact_3,
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * fourteen,
                                 fontWeight: FontWeight.w600,
                                 color: textColor),
                           ),
                           Text(
-                            languages[choosenLanguage]['text_trust_contact_4'],
+                            context.l10n.text_trust_contact_4,
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * twelve,
                                 color: textColor),
@@ -102,8 +102,7 @@ class _SosState extends State<Sos> {
                             height: media.width * 0.05,
                           ),
                           Text(
-                            languages[choosenLanguage]
-                                ['text_yourTrustedContacts'],
+                            context.l10n.text_yourTrustedContacts,
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * fourteen,
                                 fontWeight: FontWeight.w600,
@@ -203,8 +202,7 @@ class _SosState extends State<Sos> {
                                               .toList(),
                                         )
                                       : Text(
-                                          languages[choosenLanguage]
-                                              ['text_noDataFound'],
+                                          context.l10n.text_no_data_found,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * eighteen,
                                               fontWeight: FontWeight.w600,
@@ -236,8 +234,7 @@ class _SosState extends State<Sos> {
                                           setState(() {});
                                         }
                                       },
-                                      text: languages[choosenLanguage]
-                                          ['text_add_trust_contact']))
+                                      text: context.l10n.text_add_trust_contact))
                               : Container()
                         ],
                       ),
@@ -285,8 +282,7 @@ class _SosState extends State<Sos> {
                                     child: Column(
                                       children: [
                                         Text(
-                                          languages[choosenLanguage]
-                                              ['text_removeSos'],
+                                          context.l10n.text_removeSos,
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
@@ -313,8 +309,7 @@ class _SosState extends State<Sos> {
                                                 _isLoading = false;
                                               });
                                             },
-                                            text: languages[choosenLanguage]
-                                                ['text_confirm'])
+                                            text: context.l10n.text_confirm)
                                       ],
                                     ),
                                   )

@@ -9,7 +9,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/sta
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/state_three_widget.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/state_two_widget.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/user_cancel_request_widget.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -1022,8 +1022,7 @@ class _MapsState extends State<Maps>
                                 child: Column(
                                   children: [
                                     Text(
-                                      languages[choosenLanguage]
-                                          ['text_delete_confirm'],
+                                      context.l10n.text_delete_confirm,
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
@@ -1061,8 +1060,7 @@ class _MapsState extends State<Maps>
                                           _loading = false;
                                         });
                                       },
-                                      text: languages[choosenLanguage]
-                                          ['text_confirm'],
+                                      text: context.l10n.text_confirm,
                                     ),
                                   ],
                                 ),
@@ -1116,8 +1114,7 @@ class _MapsState extends State<Maps>
                                 child: Column(
                                   children: [
                                     Text(
-                                      languages[choosenLanguage]
-                                          ['text_confirmlogout'],
+                                      context.l10n.text_confirmlogout,
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
@@ -1155,8 +1152,7 @@ class _MapsState extends State<Maps>
                                           _loading = false;
                                         });
                                       },
-                                      text: languages[choosenLanguage]
-                                          ['text_confirm'],
+                                      text: context.l10n.text_confirm,
                                     )
                                   ],
                                 ),
@@ -1222,8 +1218,7 @@ class _MapsState extends State<Maps>
                                     SizedBox(
                                       width: media.width * 0.8,
                                       child: Text(
-                                        languages[choosenLanguage]
-                                            ['text_open_loc_settings'],
+                                        context.l10n.text_open_loc_settings,
                                         style: GoogleFonts.roboto(
                                           fontSize: media.width * sixteen,
                                           color: textColor,
@@ -1241,8 +1236,7 @@ class _MapsState extends State<Maps>
                                             await perm.openAppSettings();
                                           },
                                           child: Text(
-                                            languages[choosenLanguage]
-                                                ['text_open_settings'],
+                                            context.l10n.text_open_settings,
                                             style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: buttonColor,
@@ -1260,8 +1254,7 @@ class _MapsState extends State<Maps>
                                             getLocs();
                                           },
                                           child: Text(
-                                            languages[choosenLanguage]
-                                                ['text_done'],
+                                            context.l10n.text_done,
                                             style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: buttonColor,

@@ -4,7 +4,7 @@ import 'package:tagyourtaxi_driver/src/core/services/app_state.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/data/models/address_list.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
 
 class StackThreeWidget extends StatelessWidget {
@@ -91,8 +91,7 @@ class StackThreeWidget extends StatelessWidget {
                                             bottom: media.width * 0.035)
                                         : EdgeInsets.only(
                                             bottom: media.width * 0.047),
-                                    hintText: languages[choosenLanguage]
-                                        ['text_4lettersforautofill'],
+                                    hintText: context.l10n.text_4lettersforautofill,
                                     hintStyle: GoogleFonts.roboto(
                                         fontSize: media.width * twelve,
                                         color: hintColor),
@@ -128,8 +127,7 @@ class StackThreeWidget extends StatelessWidget {
                                                   ),
                                                 )
                                                 .address
-                                            : languages[choosenLanguage]
-                                                ['text_4lettersforautofill'],
+                                            : context.l10n.text_4lettersforautofill,
                                         style: GoogleFonts.roboto(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,

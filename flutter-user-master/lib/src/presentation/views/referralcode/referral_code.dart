@@ -5,7 +5,7 @@ import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class Referral extends StatefulWidget {
@@ -63,7 +63,7 @@ class _ReferralState extends State<Referral> {
                   SizedBox(
                       width: media.width * 1,
                       child: Text(
-                        languages[choosenLanguage]['text_apply_referral'],
+                        context.l10n.text_apply_referral,
                         style: GoogleFonts.roboto(
                             fontSize: media.width * twenty,
                             color: textColor,
@@ -71,7 +71,7 @@ class _ReferralState extends State<Referral> {
                       )),
                   const SizedBox(height: 10),
                   InputField(
-                    text: languages[choosenLanguage]['text_enter_referral'],
+                    text: context.l10n.text_enter_referral,
                     textController: controller,
                     onTap: (val) {
                       setState(() {
@@ -121,7 +121,7 @@ class _ReferralState extends State<Referral> {
                               _loading = false;
                             });
                           },
-                          text: languages[choosenLanguage]['text_skip']),
+                          text: context.l10n.text_skip),
                       //apply code
                       Button(
                         onTap: () async {
@@ -138,8 +138,7 @@ class _ReferralState extends State<Referral> {
                               navigate();
                             } else {
                               setState(() {
-                                _error = languages[choosenLanguage]
-                                    ['text_referral_code'];
+                                _error = context.l10n.text_referral_code;
                               });
                             }
                             // } else {
@@ -153,7 +152,7 @@ class _ReferralState extends State<Referral> {
                             });
                           } else {}
                         },
-                        text: languages[choosenLanguage]['text_apply'],
+                        text: context.l10n.text_apply,
                         color: (controller.text.isNotEmpty)
                             ? buttonColor
                             : Colors.grey,

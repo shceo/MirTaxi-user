@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class UserCancelRequestWidget extends StatelessWidget {
@@ -30,7 +30,7 @@ class UserCancelRequestWidget extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      languages[choosenLanguage]['text_cancelsuccess'],
+                      context.l10n.text_cancelsuccess,
                       style: GoogleFonts.roboto(
                           fontSize: media.width * fourteen,
                           fontWeight: FontWeight.w600,
@@ -43,7 +43,7 @@ class UserCancelRequestWidget extends StatelessWidget {
                         onTap: () {
                           onTap();
                         },
-                        text: languages[choosenLanguage]['text_ok'])
+                        text: context.l10n.text_ok)
                   ],
                 ),
               )

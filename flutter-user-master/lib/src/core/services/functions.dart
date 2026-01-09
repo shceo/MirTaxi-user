@@ -161,6 +161,20 @@ List languagesCode = [
   {'name': 'Uzbek', 'code': 'uz'},
 ];
 
+ValueNotifier<Locale?> localeNotifier =
+    ValueNotifier<Locale?>(const Locale('en'));
+
+bool _isRtlLanguage(String code) =>
+    code == 'ar' || code == 'ur' || code == 'iw';
+
+void updateAppLanguage(String code) {
+  choosenLanguage = code;
+  languageDirection = _isRtlLanguage(code) ? 'rtl' : 'ltr';
+  localeNotifier.value = Locale(code);
+  pref?.setString('languageDirection', languageDirection);
+  pref?.setString('choosenLanguage', choosenLanguage);
+}
+
 //getting country code
 
 List countries = [];
@@ -236,29 +250,28 @@ getLocalData() async {
   var connectivityResult = await Connectivity().checkConnectivity();
   internet = _hasConnection(connectivityResult);
   try {
-    if (pref.containsKey('choosenLanguage')) {
-      choosenLanguage = pref.getString('choosenLanguage');
-      languageDirection = pref.getString('languageDirection');
-      if (choosenLanguage.isNotEmpty) {
-        if (pref.containsKey('Bearer')) {
-          var tokens = pref.getString('Bearer');
-          if (tokens != null) {
-            bearerToken.add(BearerClass(type: 'Bearer', token: tokens));
+    choosenLanguage = pref.getString('choosenLanguage') ?? '';
+    languageDirection =
+        pref.getString('languageDirection') ?? (_isRtlLanguage(choosenLanguage) ? 'rtl' : 'ltr');
+    localeNotifier.value = Locale(choosenLanguage.isNotEmpty ? choosenLanguage : 'en');
 
-            var responce = await getUserDetails();
-            if (responce == true) {
-              result = '3';
-            } else if (responce == false) {
-              result = '2';
-            }
-          } else {
+    if (choosenLanguage.isNotEmpty) {
+      if (pref.containsKey('Bearer')) {
+        var tokens = pref.getString('Bearer');
+        if (tokens != null) {
+          bearerToken.add(BearerClass(type: 'Bearer', token: tokens));
+
+          var responce = await getUserDetails();
+          if (responce == true) {
+            result = '3';
+          } else if (responce == false) {
             result = '2';
           }
         } else {
           result = '2';
         }
       } else {
-        result = '1';
+        result = '2';
       }
     } else {
       result = '1';

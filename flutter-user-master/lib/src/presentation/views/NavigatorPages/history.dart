@@ -6,7 +6,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/NavigatorPages/history
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class History extends StatefulWidget {
@@ -74,8 +74,7 @@ class _HistoryState extends State<History> {
                                 width: media.width * 1,
                                 alignment: Alignment.center,
                                 child: Text(
-                                  languages[choosenLanguage]
-                                      ['text_enable_history'],
+                                  context.l10n.text_enable_history,
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * twenty,
                                       fontWeight: FontWeight.w600,
@@ -132,8 +131,7 @@ class _HistoryState extends State<History> {
                                               ? const Color(0xff222222)
                                               : page),
                                       child: Text(
-                                        languages[choosenLanguage]
-                                            ['text_upcoming'],
+                                        context.l10n.text_upcoming,
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * fifteen,
                                             fontWeight: FontWeight.w600,
@@ -167,8 +165,7 @@ class _HistoryState extends State<History> {
                                               ? const Color(0xff222222)
                                               : page),
                                       child: Text(
-                                        languages[choosenLanguage]
-                                            ['text_completed'],
+                                        context.l10n.text_completed,
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * fifteen,
                                             fontWeight: FontWeight.w600,
@@ -202,8 +199,7 @@ class _HistoryState extends State<History> {
                                               ? const Color(0xff222222)
                                               : page),
                                       child: Text(
-                                        languages[choosenLanguage]
-                                            ['text_cancelled'],
+                                        context.l10n.text_cancelled,
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * fifteen,
                                             fontWeight: FontWeight.w600,
@@ -382,11 +378,11 @@ class _HistoryState extends State<History> {
                                                                                 ),
                                                                                 Text(
                                                                                   (myHistory[i]['payment_opt'] == '1')
-                                                                                      ? languages[choosenLanguage]['text_cash']
+                                                                                      ? context.l10n.text_cash
                                                                                       : (myHistory[i]['payment_opt'] == '2')
-                                                                                          ? languages[choosenLanguage]['text_wallet']
+                                                                                          ? context.l10n.text_wallet
                                                                                           : (myHistory[i]['payment_opt'] == '0')
-                                                                                              ? languages[choosenLanguage]['text_card']
+                                                                                              ? context.l10n.text_card
                                                                                               : '',
                                                                                   style: GoogleFonts.roboto(fontSize: media.width * twelve, fontWeight: FontWeight.w600),
                                                                                 ),
@@ -819,7 +815,7 @@ class _HistoryState extends State<History> {
                                                                                   });
                                                                                 },
                                                                                 child: Text(
-                                                                                  languages[choosenLanguage]['text_cancel_ride'],
+                                                                                  context.l10n.text_cancel_ride,
                                                                                   style: GoogleFonts.roboto(fontSize: media.width * sixteen, fontWeight: FontWeight.w600, color: buttonColor),
                                                                                 ),
                                                                               ),
@@ -967,8 +963,7 @@ class _HistoryState extends State<History> {
                                               SizedBox(
                                                 width: media.width * 0.9,
                                                 child: Text(
-                                                  languages[choosenLanguage]
-                                                      ['text_noDataFound'],
+                                                  context.l10n.text_no_data_found,
                                                   style: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * sixteen,
@@ -1018,8 +1013,7 @@ class _HistoryState extends State<History> {
                                                       color: borderLines,
                                                       width: 1.2)),
                                               child: Text(
-                                                languages[choosenLanguage]
-                                                    ['text_loadmore'],
+                                                context.l10n.text_loadmore,
                                                 style: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * sixteen,
@@ -1077,8 +1071,7 @@ class _HistoryState extends State<History> {
                                     child: Column(
                                       children: [
                                         Text(
-                                          languages[choosenLanguage]
-                                              ['text_ridecancel'],
+                                          context.l10n.text_ridecancel,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * fourteen,
                                               color: textColor),
@@ -1099,8 +1092,7 @@ class _HistoryState extends State<History> {
                                                 _cancelId = '';
                                               });
                                             },
-                                            text: languages[choosenLanguage]
-                                                ['text_cancel_ride'])
+                                            text: context.l10n.text_cancel_ride)
                                       ],
                                     ),
                                   )

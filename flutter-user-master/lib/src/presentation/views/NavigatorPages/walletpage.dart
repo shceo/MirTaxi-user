@@ -5,7 +5,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/NavigatorPages/selectw
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 import 'paystackpayment.dart';
 import 'flutterWavePage.dart';
@@ -113,8 +113,7 @@ class _WalletPageState extends State<WalletPage> {
                                 width: media.width * 1,
                                 alignment: Alignment.center,
                                 child: Text(
-                                  languages[choosenLanguage]
-                                      ['text_enable_wallet'],
+                                  context.l10n.text_enable_wallet,
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * twenty,
                                       fontWeight: FontWeight.w600,
@@ -136,8 +135,7 @@ class _WalletPageState extends State<WalletPage> {
                               ? Column(
                                   children: [
                                     Text(
-                                      languages[choosenLanguage]
-                                          ['text_availablebalance'],
+                                      context.l10n.text_availablebalance,
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * twelve,
                                           color: textColor),
@@ -162,8 +160,7 @@ class _WalletPageState extends State<WalletPage> {
                                           ispop = true;
                                         });
                                       },
-                                      text: languages[choosenLanguage]
-                                          ['text_share_money'],
+                                      text: context.l10n.text_share_money,
                                       width: media.width * 0.3,
                                     ),
                                     SizedBox(
@@ -172,8 +169,7 @@ class _WalletPageState extends State<WalletPage> {
                                     SizedBox(
                                       width: media.width * 0.9,
                                       child: Text(
-                                        languages[choosenLanguage]
-                                            ['text_recenttransactions'],
+                                        context.l10n.text_recenttransactions,
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * fourteen,
                                             color: textColor,
@@ -338,8 +334,7 @@ class _WalletPageState extends State<WalletPage> {
                                               SizedBox(
                                                 width: media.width * 0.9,
                                                 child: Text(
-                                                  languages[choosenLanguage]
-                                                      ['text_noDataFound'],
+                                                  context.l10n.text_no_data_found,
                                                   style: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * sixteen,
@@ -385,8 +380,7 @@ class _WalletPageState extends State<WalletPage> {
                                                       color: borderLines,
                                                       width: 1.2)),
                                               child: Text(
-                                                languages[choosenLanguage]
-                                                    ['text_loadmore'],
+                                                context.l10n.text_loadmore,
                                                 style: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * sixteen,
@@ -414,8 +408,7 @@ class _WalletPageState extends State<WalletPage> {
                                           });
                                         }
                                       },
-                                      text: languages[choosenLanguage]
-                                          ['text_addmoney']),
+                                      text: context.l10n.text_addmoney),
                                 )
                               : Container()
                         ],
@@ -497,8 +490,7 @@ class _WalletPageState extends State<WalletPage> {
                                                 decoration: InputDecoration(
                                                   border: InputBorder.none,
                                                   hintText:
-                                                      languages[choosenLanguage]
-                                                          ['text_enteramount'],
+                                                      context.l10n.text_enteramount,
                                                   hintStyle: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * twelve,
@@ -637,8 +629,7 @@ class _WalletPageState extends State<WalletPage> {
                                                 addMoneyController.clear();
                                               });
                                             },
-                                            text: languages[choosenLanguage]
-                                                ['text_cancel'],
+                                            text: context.l10n.text_cancel,
                                             width: media.width * 0.4,
                                           ),
                                           Button(
@@ -654,8 +645,7 @@ class _WalletPageState extends State<WalletPage> {
                                                 });
                                               }
                                             },
-                                            text: languages[choosenLanguage]
-                                                ['text_addmoney'],
+                                            text: context.l10n.text_addmoney,
                                             width: media.width * 0.4,
                                           ),
                                         ],
@@ -716,8 +706,7 @@ class _WalletPageState extends State<WalletPage> {
                                       SizedBox(
                                           width: media.width * 0.7,
                                           child: Text(
-                                            languages[choosenLanguage]
-                                                ['text_choose_payment'],
+                                            context.l10n.text_choose_payment,
                                             style: GoogleFonts.roboto(
                                                 fontSize:
                                                     media.width * eighteen,
@@ -1009,8 +998,7 @@ class _WalletPageState extends State<WalletPage> {
                                               },
                                               items: dropdownItems),
                                           InputField(
-                                              text: languages[choosenLanguage]
-                                                  ['text_enteramount'],
+                                              text: context.l10n.text_enteramount,
                                               textController: amount,
                                               inputType: TextInputType.number),
                                           // InputField(
@@ -1038,8 +1026,7 @@ class _WalletPageState extends State<WalletPage> {
                                             keyboardType: TextInputType.number,
                                             decoration: InputDecoration(
                                               hintText:
-                                                  languages[choosenLanguage]
-                                                      ['text_phone_number'],
+                                                  context.l10n.text_phone_number,
                                               counterText: '',
                                               hintStyle: GoogleFonts.roboto(
                                                   fontSize:
@@ -1093,8 +1080,7 @@ class _WalletPageState extends State<WalletPage> {
                                                     });
                                                   },
                                                   text:
-                                                      languages[choosenLanguage]
-                                                          ['text_close']),
+                                                      context.l10n.text_close),
                                               SizedBox(
                                                 width: media.width * 0.05,
                                               ),
@@ -1110,10 +1096,7 @@ class _WalletPageState extends State<WalletPage> {
                                                         amount.text == '') {
                                                       setState(() {
                                                         error = true;
-                                                        errortext = languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_fill_fileds'];
+                                                        errortext = context.l10n.text_fill_fileds;
                                                         _isLoading = false;
                                                       });
                                                     } else {
@@ -1150,8 +1133,7 @@ class _WalletPageState extends State<WalletPage> {
                                                     }
                                                   },
                                                   text:
-                                                      languages[choosenLanguage]
-                                                          ['text_share']),
+                                                      context.l10n.text_share),
                                             ],
                                           )
                                         ],
@@ -1178,8 +1160,7 @@ class _WalletPageState extends State<WalletPage> {
                                   borderRadius: BorderRadius.circular(10),
                                   color: Colors.transparent.withOpacity(0.6)),
                               child: Text(
-                                languages[choosenLanguage]
-                                    ['text_transferred_successfully'],
+                                context.l10n.text_transferred_successfully,
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * twelve,
                                     color: Colors.white),

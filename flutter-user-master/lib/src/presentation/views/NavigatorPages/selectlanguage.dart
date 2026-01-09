@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class SelectLanguage extends StatefulWidget {
@@ -32,7 +32,9 @@ class _SelectLanguageState extends State<SelectLanguage> {
       },
       child: Material(
         child: Directionality(
-          textDirection: (languageDirection == 'rtl')
+          textDirection: (_choosenLanguage == 'ar' ||
+                  _choosenLanguage == 'ur' ||
+                  _choosenLanguage == 'iw')
               ? TextDirection.rtl
               : TextDirection.ltr,
           child: Stack(
@@ -53,7 +55,7 @@ class _SelectLanguageState extends State<SelectLanguage> {
                           width: media.width * 1,
                           alignment: Alignment.center,
                           child: Text(
-                            languages[choosenLanguage]['text_change_language'],
+                            context.l10n.text_change_language,
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * twenty,
                                 fontWeight: FontWeight.w600,
@@ -87,61 +89,53 @@ class _SelectLanguageState extends State<SelectLanguage> {
                         child: SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
                           child: Column(
-                            children: languages
-                                .map((i, value) {
-                                  return MapEntry(
-                                      i,
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            _choosenLanguage = i;
-                                          });
-                                        },
-                                        child: Container(
-                                          padding:
-                                              EdgeInsets.all(media.width * 0.025),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                languagesCode
-                                                    .firstWhere((e) =>
-                                                        e['code'] == i)['name']
-                                                    .toString(),
-                                                style: GoogleFonts.roboto(
-                                                    fontSize: media.width * sixteen,
-                                                    color: textColor),
-                                              ),
-                                              Container(
-                                                height: media.width * 0.05,
-                                                width: media.width * 0.05,
-                                                decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                        color:
-                                                            const Color(0xff222222),
-                                                        width: 1.2)),
-                                                alignment: Alignment.center,
-                                                child: (_choosenLanguage == i)
-                                                    ? Container(
-                                                        height: media.width * 0.03,
-                                                        width: media.width * 0.03,
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                                shape:
-                                                                    BoxShape.circle,
-                                                                color: Color(
-                                                                    0xff222222)),
-                                                      )
-                                                    : Container(),
-                                              )
-                                            ],
+                            children: languagesCode
+                                .map(
+                                  (value) => InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _choosenLanguage = value['code'];
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(media.width * 0.025),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            value['name'].toString(),
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * sixteen,
+                                                color: textColor),
                                           ),
-                                        ),
-                                      ));
-                                })
-                                .values
+                                          Container(
+                                            height: media.width * 0.05,
+                                            width: media.width * 0.05,
+                                            decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color: const Color(0xff222222),
+                                                    width: 1.2)),
+                                            alignment: Alignment.center,
+                                            child: (_choosenLanguage == value['code'])
+                                                ? Container(
+                                                    height: media.width * 0.03,
+                                                    width: media.width * 0.03,
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color:
+                                                                Color(0xff222222)),
+                                                  )
+                                                : Container(),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )
                                 .toList(),
                           ),
                         ),
@@ -149,27 +143,18 @@ class _SelectLanguageState extends State<SelectLanguage> {
                     ),
                     Button(
                         onTap: () async {
-                          choosenLanguage = _choosenLanguage;
-                          if (choosenLanguage == 'ar' ||
-                              choosenLanguage == 'ur' ||
-                              choosenLanguage == 'iw') {
-                            languageDirection = 'rtl';
-                          } else {
-                            languageDirection = 'ltr';
-                          }
                           setState(() {
                               _isLoading = true;
                             });
+                          updateAppLanguage(_choosenLanguage);
                           await getlangid();
-                          pref.setString('languageDirection', languageDirection);
-                          pref.setString('choosenLanguage', _choosenLanguage);
                           valueNotifierHome.incrementNotifier();
                           setState(() {
                               _isLoading = false;
                             });
                           pop();
                         },
-                        text: languages[choosenLanguage]['text_confirm'])
+                        text: context.l10n.text_confirm)
                   ],
                 ),
               ),

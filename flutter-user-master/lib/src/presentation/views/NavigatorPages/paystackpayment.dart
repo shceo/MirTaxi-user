@@ -6,7 +6,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/NavigatorPages/walletp
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class PayStackPage extends StatefulWidget {
@@ -79,7 +79,7 @@ class _PayStackPageState extends State<PayStackPage> {
                                 width: media.width * 0.9,
                                 alignment: Alignment.center,
                                 child: Text(
-                                  languages[choosenLanguage]['text_addmoney'],
+                                  context.l10n.text_addmoney,
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
@@ -151,8 +151,7 @@ class _PayStackPageState extends State<PayStackPage> {
                                               });
                                               Navigator.pop(context, false);
                                             },
-                                            text: languages[choosenLanguage]
-                                                ['text_ok'])
+                                            text: context.l10n.text_ok)
                                       ],
                                     ),
                                   )
@@ -181,8 +180,7 @@ class _PayStackPageState extends State<PayStackPage> {
                                     child: Column(
                                       children: [
                                         Text(
-                                          languages[choosenLanguage]
-                                              ['text_paymentsuccess'],
+                                          context.l10n.text_paymentsuccess,
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
@@ -200,8 +198,7 @@ class _PayStackPageState extends State<PayStackPage> {
                                                 Navigator.pop(context, true);
                                               });
                                             },
-                                            text: languages[choosenLanguage]
-                                                ['text_ok'])
+                                            text: context.l10n.text_ok)
                                       ],
                                     ),
                                   )

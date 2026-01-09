@@ -11,7 +11,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/map_page.da
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
 import 'package:location/location.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 import 'package:uuid/uuid.dart';
 import 'package:permission_handler/permission_handler.dart' as perm;
@@ -205,8 +205,7 @@ class _DropLocationState extends State<DropLocation>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          languages[choosenLanguage]
-                                              ['text_loc_permission'],
+                                          context.l10n.text_loc_permission,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: textColor,
@@ -224,8 +223,7 @@ class _DropLocationState extends State<DropLocation>
                                               getLocs();
                                             },
                                             child: Text(
-                                              languages[choosenLanguage]
-                                                  ['text_ok'],
+                                              context.l10n.text_ok,
                                               style: GoogleFonts.roboto(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize:
@@ -361,8 +359,7 @@ class _DropLocationState extends State<DropLocation>
                                             child: (dropAddressConfirmation ==
                                                     '')
                                                 ? Text(
-                                                    languages[choosenLanguage][
-                                                        'text_pickdroplocation'],
+                                                    context.l10n.text_pickdroplocation,
                                                     style: GoogleFonts.roboto(
                                                         fontSize: media.width *
                                                             twelve,
@@ -473,8 +470,7 @@ class _DropLocationState extends State<DropLocation>
                                           }
                                         }
                                       },
-                                      text: languages[choosenLanguage]
-                                          ['text_confirm'])
+                                      text: context.l10n.text_confirm)
                                 ],
                               ),
                             ),
@@ -555,8 +551,7 @@ class _DropLocationState extends State<DropLocation>
                                                         bottom: media.width *
                                                             0.042),
                                             border: InputBorder.none,
-                                            hintText: languages[choosenLanguage]
-                                                ['text_4lettersforautofill'],
+                                            hintText: context.l10n.text_4lettersforautofill,
                                             hintStyle: GoogleFonts.roboto(
                                                 fontSize: media.width * twelve,
                                                 color: hintColor)),
@@ -751,8 +746,7 @@ class _DropLocationState extends State<DropLocation>
                                     child: Column(
                                       children: [
                                         Text(
-                                          languages[choosenLanguage]
-                                              ['text_saveaddressas'],
+                                          context.l10n.text_saveaddressas,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: textColor,
@@ -822,9 +816,7 @@ class _DropLocationState extends State<DropLocation>
                                                     SizedBox(
                                                       width: media.width * 0.01,
                                                     ),
-                                                    Text(languages[
-                                                            choosenLanguage]
-                                                        ['text_home'])
+                                                    Text(context.l10n.text_home)
                                                   ],
                                                 ),
                                               ),
@@ -877,9 +869,7 @@ class _DropLocationState extends State<DropLocation>
                                                     SizedBox(
                                                       width: media.width * 0.01,
                                                     ),
-                                                    Text(languages[
-                                                            choosenLanguage]
-                                                        ['text_work'])
+                                                    Text(context.l10n.text_work)
                                                   ],
                                                 ),
                                               ),
@@ -933,9 +923,7 @@ class _DropLocationState extends State<DropLocation>
                                                     SizedBox(
                                                       width: media.width * 0.01,
                                                     ),
-                                                    Text(languages[
-                                                            choosenLanguage]
-                                                        ['text_others'])
+                                                    Text(context.l10n.text_others)
                                                   ],
                                                 ),
                                               ),
@@ -956,9 +944,7 @@ class _DropLocationState extends State<DropLocation>
                                                 child: TextField(
                                                   decoration: InputDecoration(
                                                       border: InputBorder.none,
-                                                      hintText: languages[
-                                                              choosenLanguage][
-                                                          'text_enterfavname'],
+                                                      hintText: context.l10n.text_enterfavname,
                                                       hintStyle:
                                                           GoogleFonts.roboto(
                                                               fontSize:
@@ -1024,8 +1010,7 @@ class _DropLocationState extends State<DropLocation>
                                                 });
                                               }
                                             },
-                                            text: languages[choosenLanguage]
-                                                ['text_confirm'])
+                                            text: context.l10n.text_confirm)
                                       ],
                                     ),
                                   )
@@ -1108,8 +1093,7 @@ class _DropLocationState extends State<DropLocation>
                                       SizedBox(
                                           width: media.width * 0.8,
                                           child: Text(
-                                            languages[choosenLanguage]
-                                                ['text_open_loc_settings'],
+                                            context.l10n.text_open_loc_settings,
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * sixteen,
                                                 color: textColor,
@@ -1125,8 +1109,7 @@ class _DropLocationState extends State<DropLocation>
                                                 await perm.openAppSettings();
                                               },
                                               child: Text(
-                                                languages[choosenLanguage]
-                                                    ['text_open_settings'],
+                                                context.l10n.text_open_settings,
                                                 style: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * sixteen,
@@ -1144,8 +1127,7 @@ class _DropLocationState extends State<DropLocation>
                                                 getLocs();
                                               },
                                               child: Text(
-                                                languages[choosenLanguage]
-                                                    ['text_done'],
+                                                context.l10n.text_done,
                                                 style: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * sixteen,

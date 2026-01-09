@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/data/models/http_result.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/viewmodels/auth_view_model.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/login/otp_page.dart';
@@ -150,7 +150,7 @@ class _LoginState extends State<Login> {
                                               fontSize: media.width * sixteen, color: textColor, letterSpacing: 1),
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
-                                            hintText: languages[choosenLanguage]['text_phone_number'],
+                                            hintText: context.l10n.text_phone_number,
                                             counterText: '',
                                             hintStyle: GoogleFonts.roboto(
                                                 fontSize: media.width * sixteen, color: textColor.withOpacity(0.7)),
@@ -187,7 +187,7 @@ class _LoginState extends State<Login> {
                                         direction: Axis.horizontal,
                                         children: [
                                           Text(
-                                            languages[choosenLanguage]['text_agree'] + ' ',
+                                            context.l10n.text_agree + ' ',
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * sixteen, color: textColor.withOpacity(0.7)),
                                           ),
@@ -196,13 +196,13 @@ class _LoginState extends State<Login> {
                                               openBrowser('terms and conditions url');
                                             },
                                             child: Text(
-                                              languages[choosenLanguage]['text_terms'],
+                                              context.l10n.text_terms,
                                               style: GoogleFonts.roboto(
                                                   fontSize: media.width * sixteen, color: buttonColor),
                                             ),
                                           ),
                                           Text(
-                                            ' ${languages[choosenLanguage]['text_and']} ',
+                                            ' ${context.l10n.text_and} ',
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * sixteen, color: textColor.withOpacity(0.7)),
                                           ),
@@ -211,7 +211,7 @@ class _LoginState extends State<Login> {
                                               openBrowser('privacy policy url');
                                             },
                                             child: Text(
-                                              languages[choosenLanguage]['text_privacy'],
+                                              context.l10n.text_privacy,
                                               style: GoogleFonts.roboto(
                                                   fontSize: media.width * sixteen, color: buttonColor),
                                             ),
@@ -235,7 +235,7 @@ class _LoginState extends State<Login> {
                                           _navigateToOtp();
                                         }
                                       },
-                                      text: languages[choosenLanguage]['text_login'],
+                                      text: context.l10n.text_login,
                                     ),
                                   ),
                               ],

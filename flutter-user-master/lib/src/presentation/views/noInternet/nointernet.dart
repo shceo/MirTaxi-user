@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 // ignore: must_be_immutable
@@ -45,9 +45,7 @@ class _NoInternetState extends State<NoInternet> {
                   height: media.width * 0.05,
                 ),
                 Text(
-                  (languages.isNotEmpty && choosenLanguage != '')
-                      ? languages[choosenLanguage]['text_nointernet']
-                      : 'No Internet Connection',
+                  context.l10n.text_nointernet,
                   style: GoogleFonts.roboto(
                       fontSize: media.width * eighteen,
                       fontWeight: FontWeight.w600,
@@ -57,9 +55,7 @@ class _NoInternetState extends State<NoInternet> {
                   height: media.width * 0.05,
                 ),
                 Text(
-                  (languages.isNotEmpty && choosenLanguage != '')
-                      ? languages[choosenLanguage]['text_nointernetdesc']
-                      : 'Please check your Internet connection, try enabling wifi or tey again later',
+                  context.l10n.text_nointernetdesc,
                   style: GoogleFonts.roboto(
                       fontSize: media.width * fourteen, color: hintColor),
                 ),
@@ -68,9 +64,7 @@ class _NoInternetState extends State<NoInternet> {
                 ),
                 Button(
                     onTap: widget.onTap,
-                    text: (languages.isNotEmpty && choosenLanguage != '')
-                        ? languages[choosenLanguage]['text_ok']
-                        : 'Ok')
+                    text: context.l10n.text_ok)
               ],
             ),
           )

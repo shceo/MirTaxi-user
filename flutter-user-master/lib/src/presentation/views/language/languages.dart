@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/login/login.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
@@ -19,8 +19,11 @@ class _LanguagesState extends State<Languages> {
   bool _isLoading = false;
   @override
   void initState() {
-    choosenLanguage = 'en';
-    languageDirection = 'ltr';
+    choosenLanguage = choosenLanguage.isNotEmpty ? choosenLanguage : 'en';
+    languageDirection =
+        (choosenLanguage == 'ar' || choosenLanguage == 'ur' || choosenLanguage == 'iw')
+            ? 'rtl'
+            : 'ltr';
     super.initState();
   }
 
@@ -61,7 +64,7 @@ class _LanguagesState extends State<Languages> {
                         child: Text(
                           (choosenLanguage.isEmpty)
                               ? 'Choose Language'
-                              : languages[choosenLanguage]['text_choose_language'],
+                              : context.l10n.text_choose_language,
                           style: GoogleFonts.roboto(
                               color: textColor,
                               fontSize: media.width * sixteen,
@@ -90,61 +93,50 @@ class _LanguagesState extends State<Languages> {
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Column(
-                      children: languages
-                          .map((i, value) => MapEntry(
-                              i,
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    choosenLanguage = i;
-                                    if (choosenLanguage == 'ar' ||
-                                        choosenLanguage == 'ur' ||
-                                        choosenLanguage == 'iw') {
-                                      languageDirection = 'rtl';
-                                    } else {
-                                      languageDirection = 'ltr';
-                                    }
-                                  });
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(media.width * 0.025),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        languagesCode
-                                            .firstWhere(
-                                                (e) => e['code'] == i)['name']
-                                            .toString(),
-                                        style: GoogleFonts.roboto(
-                                            fontSize: media.width * sixteen,
-                                            color: textColor),
-                                      ),
-                                      Container(
-                                        height: media.width * 0.05,
-                                        width: media.width * 0.05,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                                color: const Color(0xff222222),
-                                                width: 1.2)),
-                                        alignment: Alignment.center,
-                                        child: (choosenLanguage == i)
-                                            ? Container(
-                                                height: media.width * 0.03,
-                                                width: media.width * 0.03,
-                                                decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Color(0xff222222)),
-                                              )
-                                            : Container(),
-                                      )
-                                    ],
-                                  ),
+                      children: languagesCode
+                          .map(
+                            (value) => InkWell(
+                              onTap: () {
+                                setState(() {
+                                  updateAppLanguage(value['code']);
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(media.width * 0.025),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      value['name'].toString(),
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * sixteen,
+                                          color: textColor),
+                                    ),
+                                    Container(
+                                      height: media.width * 0.05,
+                                      width: media.width * 0.05,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                              color: const Color(0xff222222),
+                                              width: 1.2)),
+                                      alignment: Alignment.center,
+                                      child: (choosenLanguage == value['code'])
+                                          ? Container(
+                                              height: media.width * 0.03,
+                                              width: media.width * 0.03,
+                                              decoration: const BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Color(0xff222222)),
+                                            )
+                                          : Container(),
+                                    )
+                                  ],
                                 ),
-                              )))
-                          .values
+                              ),
+                            ),
+                          )
                           .toList(),
                     ),
                   ),
@@ -157,15 +149,14 @@ class _LanguagesState extends State<Languages> {
                           setState(() {
                               _isLoading = true;
                             });
+                          updateAppLanguage(choosenLanguage);
                           await getlangid();
-                          pref.setString('languageDirection', languageDirection);
-                          pref.setString('choosenLanguage', choosenLanguage);
                           setState(() {
                               _isLoading = false;
                             });
                           navigate();
                         },
-                        text: languages[choosenLanguage]['text_confirm'])
+                        text: context.l10n.text_confirm)
                     : Container(),
               ],
             ),

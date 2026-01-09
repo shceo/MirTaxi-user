@@ -5,7 +5,7 @@ import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 // ignore: must_be_immutable
@@ -82,7 +82,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
                           width: media.width * 1,
                           alignment: Alignment.center,
                           child: Text(
-                            languages[choosenLanguage]['text_make_complaints'],
+                            context.l10n.text_make_complaints,
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * twenty,
                                 fontWeight: FontWeight.w600,
@@ -164,11 +164,9 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                   border: InputBorder.none,
                                   hintStyle: GoogleFonts.roboto(
                                       fontSize: media.width * fourteen),
-                                  hintText: languages[choosenLanguage]
-                                          ['text_complaint_2'] +
+                                  hintText: context.l10n.text_complaint_2 +
                                       ' (' +
-                                      languages[choosenLanguage]
-                                          ['text_complaint_3'] +
+                                      context.l10n.text_complaint_3 +
                                       ')',
                                 ),
                               ),
@@ -200,8 +198,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                     });
                                   }
                                 },
-                                text: languages[choosenLanguage]
-                                    ['text_submit']),
+                                text: context.l10n.text_submit),
                           )
                         : Container()
                   ],
@@ -289,8 +286,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                   alignment: Alignment.center,
                                   width: media.width * 0.7,
                                   child: Text(
-                                    languages[choosenLanguage]
-                                        ['text_complaint_success'],
+                                    context.l10n.text_complaint_success,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         fontWeight: FontWeight.w600,
@@ -304,8 +300,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                   alignment: Alignment.center,
                                   width: media.width * 0.7,
                                   child: Text(
-                                    languages[choosenLanguage]
-                                        ['text_complaint_success_2'],
+                                    context.l10n.text_complaint_success_2,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         fontWeight: FontWeight.w600,
@@ -319,8 +314,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                     onTap: () {
                                       Navigator.pop(context, true);
                                     },
-                                    text: languages[choosenLanguage]
-                                        ['text_thankyou'])
+                                    text: context.l10n.text_thankyou)
                               ],
                             ),
                           )

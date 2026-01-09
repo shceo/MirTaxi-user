@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/app/app_svg_icon.dart';
 
 class StackSixWidget extends StatelessWidget {
@@ -97,7 +97,7 @@ class StackSixWidget extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          'Куда едем?',
+                          context.l10n.text_pickdroplocation,
                           style: GoogleFonts.roboto(
                             fontSize: media.width * twenty,
                             color: const Color.fromRGBO(0, 0, 0, 1),
@@ -144,8 +144,7 @@ class StackSixWidget extends StatelessWidget {
                                 ? EdgeInsets.only(bottom: media.width * 0.035)
                                 : EdgeInsets.only(bottom: media.width * 0.047),
                             border: InputBorder.none,
-                            hintText: languages[choosenLanguage]
-                                ['text_4lettersforautofill'],
+                            hintText: context.l10n.text_4lettersforautofill,
                             hintStyle: GoogleFonts.roboto(
                               fontSize: media.width * twelve,
                               color: hintColor,
@@ -295,9 +294,9 @@ class StackSixWidget extends StatelessWidget {
                             SizedBox(
                               width: media.width * 0.9,
                               child: Text(
-                                languages[choosenLanguage][(pickaddress == true)
-                                    ? 'text_pick_suggestion'
-                                    : 'text_drop_suggestion'],
+                                (pickaddress == true)
+                                    ? context.l10n.text_pick_suggestion
+                                    : context.l10n.text_drop_suggestion,
                                 style: GoogleFonts.roboto(
                                   fontSize: media.width * sixteen,
                                   color: textColor,
@@ -423,8 +422,7 @@ class StackSixWidget extends StatelessWidget {
                                   width: media.width * 0.025,
                                 ),
                                 Text(
-                                  languages[choosenLanguage]
-                                      ['text_chooseonmap'],
+                                  context.l10n.text_chooseonmap,
                                   style: GoogleFonts.roboto(
                                     fontSize: media.width * fourteen,
                                     color: textColor,

@@ -6,7 +6,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
 // import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class PickContact extends StatefulWidget {
@@ -106,7 +106,7 @@ class _PickContactState extends State<PickContact> {
                         width: media.width * 1,
                         alignment: Alignment.center,
                         child: Text(
-                          languages[choosenLanguage]['text_sos'],
+                          context.l10n.text_sos,
                           style: GoogleFonts.roboto(
                               fontSize: media.width * twenty,
                               fontWeight: FontWeight.w600,
@@ -267,7 +267,7 @@ class _PickContactState extends State<PickContact> {
                                   _isLoading = false;
                                 });
                               },
-                              text: languages[choosenLanguage]['text_confirm']),
+                              text: context.l10n.text_confirm),
                         )
                       : Container()
                 ]),
@@ -326,8 +326,7 @@ class _PickContactState extends State<PickContact> {
                                 SizedBox(
                                     width: media.width * 0.8,
                                     child: Text(
-                                      languages[choosenLanguage]
-                                          ['text_open_contact_setting'],
+                                      context.l10n.text_open_contact_setting,
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * sixteen,
                                           color: textColor,
@@ -343,8 +342,7 @@ class _PickContactState extends State<PickContact> {
                                           await openAppSettings();
                                         },
                                         child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_open_settings'],
+                                          context.l10n.text_open_settings,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: buttonColor,
@@ -358,8 +356,7 @@ class _PickContactState extends State<PickContact> {
                                           getContact();
                                         },
                                         child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_done'],
+                                          context.l10n.text_done,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: buttonColor,

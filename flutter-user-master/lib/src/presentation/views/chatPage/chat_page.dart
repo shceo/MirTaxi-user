@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -69,8 +69,7 @@ class _ChatPageState extends State<ChatPage> {
                                   height: media.width * 0.1,
                                   alignment: Alignment.center,
                                   child: Text(
-                                    languages[choosenLanguage]
-                                        ['text_chatwithdriver'],
+                                    context.l10n.text_chatwithdriver,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * twenty,
                                         color: textColor,
@@ -201,8 +200,7 @@ class _ChatPageState extends State<ChatPage> {
                                       controller: chatText,
                                       decoration: InputDecoration(
                                           border: InputBorder.none,
-                                          hintText: languages[choosenLanguage]
-                                              ['text_entermessage'],
+                                          hintText: context.l10n.text_entermessage,
                                           hintStyle: GoogleFonts.roboto(
                                               fontSize: media.width * twelve,
                                               color: hintColor)),

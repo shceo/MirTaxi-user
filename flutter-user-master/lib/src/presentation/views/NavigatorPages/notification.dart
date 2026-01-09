@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 import '../loadingPage/loading.dart';
 
@@ -79,7 +79,7 @@ class _NotificationPageState extends State<NotificationPage> {
                               width: media.width * 1,
                               alignment: Alignment.center,
                               child: Text(
-                                languages[choosenLanguage]['text_notification']
+                                context.l10n.text_notification
                                     .toString(),
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * twenty,
@@ -358,8 +358,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                   child: Column(
                                     children: [
                                       Text(
-                                        languages[choosenLanguage]
-                                            ['text_delete_notification'],
+                                        context.l10n.text_delete_notification,
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * sixteen,
                                             color: textColor,
@@ -379,8 +378,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                   notificationid = null;
                                                 });
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_no']),
+                                              text: context.l10n.text_no),
                                           SizedBox(
                                             width: media.width * 0.05,
                                           ),
@@ -406,8 +404,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                   // });
                                                 }
                                               },
-                                              text: languages[choosenLanguage]
-                                                  ['text_yes']),
+                                              text: context.l10n.text_yes),
                                         ],
                                       )
                                     ],
@@ -432,7 +429,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                 borderRadius: BorderRadius.circular(10),
                                 color: Colors.transparent.withOpacity(0.6)),
                             child: Text(
-                              languages[choosenLanguage]['text_notification_deleted'],
+                              context.l10n.text_notification_deleted,
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * twelve,
                                   color: Colors.white),

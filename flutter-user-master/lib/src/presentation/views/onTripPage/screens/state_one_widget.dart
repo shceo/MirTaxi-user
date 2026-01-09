@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 
 class StateOneWidget extends StatelessWidget {
   final Function() onTap;
@@ -35,7 +35,7 @@ class StateOneWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              languages[choosenLanguage]['text_enable_location'],
+              context.l10n.text_enable_location,
               style: GoogleFonts.roboto(
                 fontSize: media.width * sixteen,
                 color: textColor,
@@ -49,7 +49,7 @@ class StateOneWidget extends StatelessWidget {
                   onTap();
                 },
                 child: Text(
-                  languages[choosenLanguage]['text_ok'],
+                  context.l10n.text_ok,
                   style: GoogleFonts.roboto(
                     fontWeight: FontWeight.bold,
                     fontSize: media.width * twenty,

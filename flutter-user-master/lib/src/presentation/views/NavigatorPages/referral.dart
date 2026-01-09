@@ -5,7 +5,7 @@ import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -82,8 +82,7 @@ class _ReferralPageState extends State<ReferralPage> {
                                           width: media.width * 1,
                                           alignment: Alignment.center,
                                           child: Text(
-                                            languages[choosenLanguage]
-                                                ['text_enable_referal'],
+                                            context.l10n.text_enable_referal,
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * twenty,
                                                 fontWeight: FontWeight.w600,
@@ -168,16 +167,13 @@ class _ReferralPageState extends State<ReferralPage> {
                                 child: Button(
                                     onTap: () async {
                                       await Share.share(
-                                          languages[choosenLanguage]
-                                                  ['text_invitation_1'] +
+                                          context.l10n.text_invitation_1 +
                                               ' ' +
                                               myReferralCode['refferal_code'] +
                                               ' ' +
-                                              languages[choosenLanguage]
-                                                  ['text_invitation_2']);
+                                              context.l10n.text_invitation_2);
                                     },
-                                    text: languages[choosenLanguage]
-                                        ['text_invite']),
+                                    text: context.l10n.text_invite),
                               )
                             ],
                           )
@@ -212,7 +208,7 @@ class _ReferralPageState extends State<ReferralPage> {
                                 borderRadius: BorderRadius.circular(10),
                                 color: Colors.transparent.withOpacity(0.6)),
                             child: Text(
-                              languages[choosenLanguage]['text_code_copied'],
+                              context.l10n.text_code_copied,
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * twelve,
                                   color: Colors.white),

@@ -8,7 +8,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.da
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/referralcode/referral_code.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
@@ -133,7 +133,7 @@ class _GetStartedState extends State<GetStarted> {
                           SizedBox(
                             width: media.width * 1,
                             child: Text(
-                              languages[choosenLanguage]['text_get_started'],
+                              context.l10n.text_get_started,
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * twentyeight, fontWeight: FontWeight.bold, color: textColor),
                             ),
@@ -142,7 +142,7 @@ class _GetStartedState extends State<GetStarted> {
                             height: media.height * 0.012,
                           ),
                           Text(
-                            languages[choosenLanguage]['text_fill_form'],
+                            context.l10n.text_fill_form,
                             style:
                                 GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor.withOpacity(0.3)),
                           ),
@@ -174,7 +174,7 @@ class _GetStartedState extends State<GetStarted> {
                                         color: backgroundColor,
                                       ),
                                       child: Text(
-                                        languages[choosenLanguage]['text_add_photo'],
+                                        context.l10n.text_add_photo,
                                         style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor),
                                       ),
                                     ),
@@ -183,7 +183,7 @@ class _GetStartedState extends State<GetStarted> {
                           SizedBox(height: media.height * 0.04),
                           InputField(
                             icon: Icons.person_outline_rounded,
-                            text: languages[choosenLanguage]['text_name'],
+                            text: context.l10n.text_name,
                             onTap: (val) {
                               setState(() {
                                 name = nameText.text;
@@ -196,7 +196,7 @@ class _GetStartedState extends State<GetStarted> {
                           ),
                           InputField(
                             icon: Icons.email_outlined,
-                            text: languages[choosenLanguage]['text_email'],
+                            text: context.l10n.text_email,
                             onTap: (val) {
                               setState(() {
                                 email = emailText.text;
@@ -301,12 +301,12 @@ class _GetStartedState extends State<GetStarted> {
                                           });
                                         } else {
                                           setState(() {
-                                            verifyEmailError = languages[choosenLanguage]['text_email_validation'];
-                                            _error = languages[choosenLanguage]['text_email_validation'];
+                                            verifyEmailError = context.l10n.text_email_validation;
+                                            _error = context.l10n.text_email_validation;
                                           });
                                         }
                                       },
-                                      text: languages[choosenLanguage]['text_next']))
+                                      text: context.l10n.text_next))
                               : Container()
                         ],
                       ),
@@ -379,7 +379,7 @@ class _GetStartedState extends State<GetStarted> {
                                               height: media.width * 0.01,
                                             ),
                                             Text(
-                                              languages[choosenLanguage]['text_camera'],
+                                              context.l10n.text_camera,
                                               style: GoogleFonts.roboto(
                                                   fontSize: media.width * ten, color: const Color(0xff666666)),
                                             )
@@ -406,7 +406,7 @@ class _GetStartedState extends State<GetStarted> {
                                               height: media.width * 0.01,
                                             ),
                                             Text(
-                                              languages[choosenLanguage]['text_gallery'],
+                                              context.l10n.text_gallery,
                                               style: GoogleFonts.roboto(
                                                   fontSize: media.width * ten, color: const Color(0xff666666)),
                                             )
@@ -470,8 +470,8 @@ class _GetStartedState extends State<GetStarted> {
                                     width: media.width * 0.8,
                                     child: Text(
                                       (_permission == 'noPhotos')
-                                          ? languages[choosenLanguage]['text_open_photos_setting']
-                                          : languages[choosenLanguage]['text_open_camera_setting'],
+                                          ? context.l10n.text_open_photos_setting
+                                          : context.l10n.text_open_camera_setting,
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * sixteen,
                                           color: textColor,
@@ -486,7 +486,7 @@ class _GetStartedState extends State<GetStarted> {
                                           await openAppSettings();
                                         },
                                         child: Text(
-                                          languages[choosenLanguage]['text_open_settings'],
+                                          context.l10n.text_open_settings,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: buttonColor,
@@ -500,7 +500,7 @@ class _GetStartedState extends State<GetStarted> {
                                           });
                                         },
                                         child: Text(
-                                          languages[choosenLanguage]['text_done'],
+                                          context.l10n.text_done,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: buttonColor,

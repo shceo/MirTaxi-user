@@ -6,7 +6,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.da
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tagyourtaxi_driver/src/presentation/translations/translation.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
@@ -119,7 +119,7 @@ class _EditProfileState extends State<EditProfile> {
                               width: media.width * 1,
                               alignment: Alignment.center,
                               child: Text(
-                                languages[choosenLanguage]['text_editprofile'],
+                                context.l10n.text_editprofile,
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * twenty,
                                     fontWeight: FontWeight.w600,
@@ -161,7 +161,7 @@ class _EditProfileState extends State<EditProfile> {
                             });
                           },
                           child: Text(
-                              languages[choosenLanguage]['text_editimage'],
+                              context.l10n.text_editimage,
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * sixteen,
                                   color: buttonColor)),
@@ -179,8 +179,7 @@ class _EditProfileState extends State<EditProfile> {
                                 : TextDirection.ltr,
                             controller: name,
                             decoration: InputDecoration(
-                                labelText: languages[choosenLanguage]
-                                    ['text_name'],
+                                labelText: context.l10n.text_name,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
@@ -200,8 +199,7 @@ class _EditProfileState extends State<EditProfile> {
                                 ? TextDirection.rtl
                                 : TextDirection.ltr,
                             decoration: InputDecoration(
-                                labelText: languages[choosenLanguage]
-                                    ['text_email'],
+                                labelText: context.l10n.text_email,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
@@ -239,7 +237,7 @@ class _EditProfileState extends State<EditProfile> {
                               _isLoading = false;
                             });
                           },
-                          text: languages[choosenLanguage]['text_confirm']))
+                          text: context.l10n.text_confirm))
                 ],
               ),
             ),
@@ -316,8 +314,7 @@ class _EditProfileState extends State<EditProfile> {
                                             height: media.width * 0.01,
                                           ),
                                           Text(
-                                            languages[choosenLanguage]
-                                                ['text_camera'],
+                                            context.l10n.text_camera,
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * ten,
                                                 color: const Color(0xff666666)),
@@ -349,8 +346,7 @@ class _EditProfileState extends State<EditProfile> {
                                             height: media.width * 0.01,
                                           ),
                                           Text(
-                                            languages[choosenLanguage]
-                                                ['text_gallery'],
+                                            context.l10n.text_gallery,
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * ten,
                                                 color: const Color(0xff666666)),
@@ -422,10 +418,8 @@ class _EditProfileState extends State<EditProfile> {
                                   width: media.width * 0.8,
                                   child: Text(
                                     (_permission == 'noPhotos')
-                                        ? languages[choosenLanguage]
-                                            ['text_open_photos_setting']
-                                        : languages[choosenLanguage]
-                                            ['text_open_camera_setting'],
+                                        ? context.l10n.text_open_photos_setting
+                                        : context.l10n.text_open_camera_setting,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor,
@@ -441,8 +435,7 @@ class _EditProfileState extends State<EditProfile> {
                                         await openAppSettings();
                                       },
                                       child: Text(
-                                        languages[choosenLanguage]
-                                            ['text_open_settings'],
+                                        context.l10n.text_open_settings,
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * sixteen,
                                             color: buttonColor,
@@ -458,7 +451,7 @@ class _EditProfileState extends State<EditProfile> {
                                         });
                                       },
                                       child: Text(
-                                        languages[choosenLanguage]['text_done'],
+                                        context.l10n.text_done,
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * sixteen,
                                             color: buttonColor,
@@ -509,8 +502,7 @@ class _EditProfileState extends State<EditProfile> {
                           child: Column(
                             children: [
                               Text(
-                                languages[choosenLanguage]
-                                    ['text_somethingwentwrong'],
+                                context.l10n.text_somethingwentwrong,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * sixteen,
@@ -526,7 +518,7 @@ class _EditProfileState extends State<EditProfile> {
                                       _error = false;
                                     });
                                   },
-                                  text: languages[choosenLanguage]['text_ok'])
+                                  text: context.l10n.text_ok)
                             ],
                           ),
                         )
