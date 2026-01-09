@@ -85,7 +85,6 @@ class StateThreeWidget extends StatelessWidget {
           pickup: pickup,
         ),
         if (bottom == 0) const StackFourWidget(),
-        StackFiveWidget(locationAllowed: () => locationAllowed()),
         StackSixWidget(
           bottom: bottom,
           dropaddress: dropAddress,
@@ -97,6 +96,10 @@ class StateThreeWidget extends StatelessWidget {
           onChange5: onChange5,
           onChange6: onChange6,
           onChange7: onChange7,
+        ),
+        StackFiveWidget(
+          bottom: bottom,
+          locationAllowed: () => locationAllowed(),
         ),
       ],
     );

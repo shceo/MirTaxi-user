@@ -649,10 +649,47 @@ class _MapsState extends State<Maps>
                                           },
                                           locationAllowed: () async {
                                             if (locationAllowed == true) {
+                                              Point target = center;
+                                              bool hasLocation = false;
+
+                                              if (currentLocation != null) {
+                                                target = currentLocation!;
+                                                hasLocation = true;
+                                              } else {
+                                                geolocs.Position? loc;
+                                                try {
+                                                  loc = await geolocs
+                                                      .Geolocator
+                                                      .getLastKnownPosition();
+                                                  loc ??= await geolocs
+                                                      .Geolocator
+                                                      .getCurrentPosition(
+                                                          desiredAccuracy:
+                                                              geolocs
+                                                                  .LocationAccuracy
+                                                                  .high);
+                                                } catch (_) {}
+                                                if (loc != null) {
+                                                  target = Point(
+                                                    latitude: loc.latitude,
+                                                    longitude: loc.longitude,
+                                                  );
+                                                  hasLocation = true;
+                                                }
+                                              }
+
+                                              if (!mounted) return;
+                                              setState(() {
+                                                center = target;
+                                                _centerLocation = target;
+                                                if (hasLocation) {
+                                                  currentLocation = target;
+                                                }
+                                              });
                                               _controller?.moveCamera(
                                                 CameraUpdate.newCameraPosition(
                                                   CameraPosition(
-                                                    target: center,
+                                                    target: target,
                                                     zoom: 18.0,
                                                   ),
                                                 ),
