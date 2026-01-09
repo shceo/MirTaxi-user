@@ -97,7 +97,7 @@ class StackSixWidget extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          context.l10n.text_pickdroplocation,
+                          'Куда едем?',
                           style: GoogleFonts.roboto(
                             fontSize: media.width * twenty,
                             color: const Color.fromRGBO(0, 0, 0, 1),
