@@ -243,18 +243,19 @@ class ApiProvider {
   Map<String, String> header({
     bool isMultipart = false,
   }) {
-    return bearerToken[0].token == ""
-        ? {
-            "Accept": "application/json",
-            "lang": "en",
-            'content-type': 'application/json; charset=utf-8',
-          }
-        : {
-            'content-type':
-                isMultipart ? "multipart/form-data" : 'application/json',
-            'Accept': isMultipart ? '*/*' : 'application/json',
-            "lang": "en",
-            "Authorization": "Bearer ${bearerToken[0].token}",
-          };
+    final token = bearerToken.isNotEmpty ? bearerToken[0].token : '';
+    if (token.isEmpty) {
+      return {
+        "Accept": "application/json",
+        "lang": "en",
+        'content-type': 'application/json; charset=utf-8',
+      };
+    }
+    return {
+      'content-type': isMultipart ? "multipart/form-data" : 'application/json',
+      'Accept': isMultipart ? '*/*' : 'application/json',
+      "lang": "en",
+      "Authorization": "Bearer $token",
+    };
   }
 }
