@@ -84,7 +84,7 @@ class StackSixWidget extends StatelessWidget {
                   ),
                 ),
               SizedBox(height: media.width * 0.03),
-              if (!(dropaddress == true && bottom == 1))
+              if (bottom == 0)
                 GestureDetector(
                   onTap: () => onChange2(),
                   child: Container(
@@ -119,7 +119,7 @@ class StackSixWidget extends StatelessWidget {
                     ),
                   ),
                 )
-              else
+              else if (dropaddress == true)
                 Container(
                   padding: EdgeInsets.fromLTRB(
                     media.width * 0.03,
