@@ -25,57 +25,57 @@ class StackSixCollapsedContent extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          if (lastAddress.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.only(top: 16),
-              child: Column(
-                children: [
-                  for (int i = 0;
-                      i < (lastAddress.length > 3 ? 3 : lastAddress.length);
-                      i++)
-                    InkWell(
-                      onTap: () => onChange6(i),
-                      child: Container(
-                        width: media.width * 0.9,
-                        padding: EdgeInsets.only(
-                            top: media.width * 0.04,
-                            bottom: media.width * 0.04),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              width: 1,
-                              color: Color.fromRGBO(201, 201, 201, 1),
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const AppSvgAsset('assets/icons/location.svg'),
-                            SizedBox(
-                              width: media.width * 0.8,
-                              child: Text(
-                                lastAddress[i].dropAddress,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.roboto(
-                                  fontSize: media.width * twenty,
-                                  color: textColor,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          StackSixAutoFillList(
-            onChange4: onChange4,
-            onChange5: onChange5,
-          ),
+          // if (lastAddress.isNotEmpty)
+          //   Container(
+          //     margin: const EdgeInsets.only(top: 16),
+          //     child: Column(
+          //       children: [
+          //         for (int i = 0;
+          //             i < (lastAddress.length > 3 ? 3 : lastAddress.length);
+          //             i++)
+          //           InkWell(
+          //             onTap: () => onChange6(i),
+          //             child: Container(
+          //               width: media.width * 0.9,
+          //               padding: EdgeInsets.only(
+          //                   top: media.width * 0.04,
+          //                   bottom: media.width * 0.04),
+          //               decoration: const BoxDecoration(
+          //                 border: Border(
+          //                   bottom: BorderSide(
+          //                     width: 1,
+          //                     color: Color.fromRGBO(201, 201, 201, 1),
+          //                   ),
+          //                 ),
+          //               ),
+          //               child: Row(
+          //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //                 children: [
+          //                   const AppSvgAsset('assets/icons/location.svg'),
+          //                   SizedBox(
+          //                     width: media.width * 0.8,
+          //                     child: Text(
+          //                       lastAddress[i].dropAddress,
+          //                       maxLines: 1,
+          //                       overflow: TextOverflow.ellipsis,
+          //                       style: GoogleFonts.roboto(
+          //                         fontSize: media.width * twenty,
+          //                         color: textColor,
+          //                         fontWeight: FontWeight.w400,
+          //                       ),
+          //                     ),
+          //                   ),
+          //                 ],
+          //               ),
+          //             ),
+          //           ),
+          //       ],
+          //     ),
+          //   ),
+          // StackSixAutoFillList(
+          //   onChange4: onChange4,
+          //   onChange5: onChange5,
+          // ),
         ],
       ),
     );
