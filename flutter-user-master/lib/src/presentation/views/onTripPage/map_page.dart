@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/booking_confirmation.dart';
+import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/drop_loc_select.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/login/login.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/add_fav_address_widget.dart';
@@ -37,9 +38,6 @@ class Maps extends StatefulWidget {
   State<Maps> createState() => _MapsState();
 }
 
-dynamic serviceEnabled;
-dynamic favLat;
-dynamic favLng;
 
 class _MapsState extends State<Maps>
     with WidgetsBindingObserver, TickerProviderStateMixin {
@@ -434,7 +432,23 @@ class _MapsState extends State<Maps>
                                                     .where((element) =>
                                                         element.id == 'pickup')
                                                     .isNotEmpty) {
-                                              await _openDropLocationSheet();
+                                              final bool? selected =
+                                                  await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const DropLocation()));
+                                              if (!mounted) return;
+                                              if (selected == true) {
+                                                setState(() {
+                                                  _dropaddress = false;
+                                                  _bottom = 0;
+                                                  addAutoFill.clear();
+                                                });
+                                                if (addressList.length == 2) {
+                                                  navigate();
+                                                }
+                                              }
                                             }
                                           },
                                           onChange6: (i) {
