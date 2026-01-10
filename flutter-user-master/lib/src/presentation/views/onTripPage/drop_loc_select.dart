@@ -444,13 +444,13 @@ class _DropLocationState extends State<DropLocation>
                                                 .latlng = _center;
                                           }
                                           if (addressList.length == 2) {
-                                            var val =
+                                            final bool? val =
                                                 await Navigator.pushReplacement(
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (context) =>
                                                             BookingConfirmation()));
-                                            if (val) {
+                                            if (val == true) {
                                               setState(() {});
                                             }
                                           }

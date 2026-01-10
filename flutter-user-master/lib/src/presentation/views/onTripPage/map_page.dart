@@ -373,12 +373,13 @@ class _MapsState extends State<Maps>
                                                     .where((element) =>
                                                         element.id == 'pickup')
                                                     .isNotEmpty) {
-                                              var navigate = await Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const DropLocation()));
-                                              if (navigate) {
+                                              final bool? navigate =
+                                                  await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const DropLocation()));
+                                              if (navigate == true) {
                                                 setState(() {
                                                   addressList.removeWhere(
                                                       (element) =>
