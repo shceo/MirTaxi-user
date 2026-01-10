@@ -108,9 +108,8 @@ class StackSixExpandedContent extends StatelessWidget {
 
     final pickupMatches =
         addressList.where((element) => element.id == 'pickup');
-    final headerText = pickupMatches.isNotEmpty
-        ? pickupMatches.first.address
-        : (lastAddress.isNotEmpty ? lastAddress.first.dropAddress : '');
+    final headerText =
+        pickupMatches.isNotEmpty ? pickupMatches.first.address : '';
 
     return Directionality(
       textDirection:
@@ -137,7 +136,7 @@ class StackSixExpandedContent extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: _SearchBar(
-                hint: 'Куда поедем?',
+                hint: 'Куда едем?',
                 mapText: 'Карта',
                 onMapTap: onChange7,
                 onChanged: onSearchChanged,

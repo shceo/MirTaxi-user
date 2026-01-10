@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/booking_confirmation.dart';
-import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/drop_loc_select.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/login/login.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/add_fav_address_widget.dart';
@@ -57,6 +56,7 @@ class _MapsState extends State<Maps>
   bool _isMapMoving = false;
   int gettingPerm = 0;
   Animation<double>? _animation;
+  final ValueNotifier<String> _dropAddressNotifier = ValueNotifier('');
 
   late PermissionStatus permission;
   Location location = Location();
@@ -117,6 +117,7 @@ class _MapsState extends State<Maps>
   @override
   void dispose() {
     animationController?.dispose();
+    _dropAddressNotifier.dispose();
 
     super.dispose();
   }
@@ -135,6 +136,64 @@ class _MapsState extends State<Maps>
   navigate() {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => BookingConfirmation()));
+  }
+
+  Future<void> _updateDropAddressFromCenter() async {
+    final val = await geoCoding(
+        _centerLocation.latitude, _centerLocation.longitude);
+    dropAddressConfirmation = (val ?? '').toString();
+    _dropAddressNotifier.value = dropAddressConfirmation;
+  }
+
+  Future<void> _openDropLocationSheet() async {
+    if (!mounted) return;
+    setState(() {
+      _dropLocationMap = true;
+    });
+    await _updateDropAddressFromCenter();
+    if (!mounted) return;
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: false,
+      builder: (sheetContext) {
+        return _DropLocationSheet(
+          addressListenable: _dropAddressNotifier,
+          onBack: () => Navigator.pop(sheetContext),
+          onDone: () {
+            final address = _dropAddressNotifier.value;
+            if (address.isNotEmpty) {
+              if (addressList
+                  .where((element) => element.id == 'drop')
+                  .isEmpty) {
+                addressList.add(AddressList(
+                  id: 'drop',
+                  address: address,
+                  latlng: _centerLocation,
+                ));
+              } else {
+                addressList
+                    .firstWhere((element) => element.id == 'drop')
+                    .address = address;
+                addressList
+                    .firstWhere((element) => element.id == 'drop')
+                    .latlng = _centerLocation;
+              }
+              if (addressList.length == 2) {
+                Navigator.pop(sheetContext);
+                navigate();
+                return;
+              }
+            }
+            Navigator.pop(sheetContext);
+          },
+        );
+      },
+    );
+    if (!mounted) return;
+    setState(() {
+      _dropLocationMap = false;
+    });
   }
 
   void _setMapMoving(bool isMoving) {
@@ -364,6 +423,8 @@ class _MapsState extends State<Maps>
                                             _onMapCreated(d);
                                           },
                                           onChange7: () async {
+                                            FocusManager.instance.primaryFocus
+                                                ?.unfocus();
                                             setState(() {
                                               addAutoFill.clear();
                                               _bottom = 0;
@@ -373,19 +434,7 @@ class _MapsState extends State<Maps>
                                                     .where((element) =>
                                                         element.id == 'pickup')
                                                     .isNotEmpty) {
-                                              final bool? navigate =
-                                                  await Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const DropLocation()));
-                                              if (navigate == true) {
-                                                setState(() {
-                                                  addressList.removeWhere(
-                                                      (element) =>
-                                                          element.id == 'drop');
-                                                });
-                                              }
+                                              await _openDropLocationSheet();
                                             }
                                           },
                                           onChange6: (i) {
@@ -772,7 +821,9 @@ class _MapsState extends State<Maps>
                                             });
                                           },
                                           cameraIdle: () async {
-                                            if (_bottom == 0 &&
+                                            if (_dropLocationMap == true) {
+                                              await _updateDropAddressFromCenter();
+                                            } else if (_bottom == 0 &&
                                                 _pickaddress == false) {
                                               var val = await geoCoding(
                                                   _centerLocation.latitude,
@@ -1448,5 +1499,106 @@ class _MapsState extends State<Maps>
     //Starting the animation
 
     animationController.forward();
+  }
+}
+
+class _DropLocationSheet extends StatelessWidget {
+  final ValueNotifier<String> addressListenable;
+  final VoidCallback onBack;
+  final VoidCallback onDone;
+
+  const _DropLocationSheet({
+    required this.addressListenable,
+    required this.onBack,
+    required this.onDone,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context).size;
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        decoration: BoxDecoration(
+          color: page,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(media.width * 0.05),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                InkWell(
+                  onTap: onBack,
+                  child: Container(
+                    height: media.width * 0.1,
+                    width: media.width * 0.1,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.15),
+                          spreadRadius: 1,
+                          blurRadius: 2,
+                        )
+                      ],
+                      color: page,
+                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.arrow_back),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Точка назначения',
+                  style: GoogleFonts.roboto(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB)),
+            const SizedBox(height: 12),
+            ValueListenableBuilder<String>(
+              valueListenable: addressListenable,
+              builder: (context, address, child) {
+                final displayText =
+                    address.isNotEmpty ? address : 'Адрес не найден';
+                return Row(
+                  children: [
+                    const Icon(Icons.circle, size: 8, color: Color(0xFF111827)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        displayText,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            Button(
+              onTap: onDone,
+              text: 'Готово',
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
