@@ -45,7 +45,7 @@ dynamic favLng;
 class _MapsState extends State<Maps>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   Point _centerLocation =
-      const Point(latitude: 41.4219057, longitude: -102.0840772);
+      const Point(latitude: 41.2995, longitude: 69.2401);
 
   dynamic animationController;
   dynamic _sessionToken;

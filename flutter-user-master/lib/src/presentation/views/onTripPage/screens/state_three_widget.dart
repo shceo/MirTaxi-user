@@ -1,7 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
-import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/stack/stack_five_widget.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/stack/stack_four_widget.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/stack/stack_one_widget.dart';

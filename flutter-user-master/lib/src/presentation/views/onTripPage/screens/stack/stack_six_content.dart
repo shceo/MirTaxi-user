@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tagyourtaxi_driver/src/core/services/app_state.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/app/app_svg_icon.dart';
 
 class StackSixCollapsedContent extends StatelessWidget {
@@ -85,6 +85,7 @@ class StackSixCollapsedContent extends StatelessWidget {
 class StackSixExpandedContent extends StatelessWidget {
   final bool pickaddress;
   final bool dropaddress;
+  final ValueChanged<String> onSearchChanged;
   final Function(int i) onChange4;
   final Function(int i) onChange5;
   final Function(int i) onChange6;
@@ -94,6 +95,7 @@ class StackSixExpandedContent extends StatelessWidget {
     super.key,
     required this.pickaddress,
     required this.dropaddress,
+    required this.onSearchChanged,
     required this.onChange4,
     required this.onChange5,
     required this.onChange6,
@@ -104,8 +106,11 @@ class StackSixExpandedContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
 
-    final headerText =
-        lastAddress.isNotEmpty ? lastAddress.first.dropAddress : '';
+    final pickupMatches =
+        addressList.where((element) => element.id == 'pickup');
+    final headerText = pickupMatches.isNotEmpty
+        ? pickupMatches.first.address
+        : (lastAddress.isNotEmpty ? lastAddress.first.dropAddress : '');
 
     return Directionality(
       textDirection:
@@ -135,6 +140,7 @@ class StackSixExpandedContent extends StatelessWidget {
                 hint: 'Куда поедем?',
                 mapText: 'Карта',
                 onMapTap: onChange7,
+                onChanged: onSearchChanged,
               ),
             ),
             const SizedBox(height: 8),
@@ -199,11 +205,13 @@ class _SearchBar extends StatelessWidget {
   final String hint;
   final String mapText;
   final VoidCallback onMapTap;
+  final ValueChanged<String> onChanged;
 
   const _SearchBar({
     required this.hint,
     required this.mapText,
     required this.onMapTap,
+    required this.onChanged,
   });
 
   @override
@@ -222,6 +230,8 @@ class _SearchBar extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
+              autofocus: true,
+              onChanged: onChanged,
               decoration: InputDecoration(
                 hintText: hint,
                 hintStyle: GoogleFonts.roboto(

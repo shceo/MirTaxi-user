@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
-import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/stack/stack_six_content.dart';
 
 class StackSixWidget extends StatelessWidget {
@@ -118,50 +117,6 @@ class StackSixWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                )
-              else if (dropaddress == true)
-                Container(
-                  padding: EdgeInsets.fromLTRB(
-                    media.width * 0.03,
-                    media.width * 0.01,
-                    media.width * 0.03,
-                    media.width * 0,
-                  ),
-                  height: media.width *
-                      ((dropaddress == true && bottom == 1) ? 0.1 : 0.16),
-                  width: media.width * 0.9,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey.withValues(alpha: 0.5),
-                      width: 1.5,
-                    ),
-                    borderRadius: BorderRadius.circular(media.width * 0.02),
-                    color: Colors.grey.withValues(alpha: 0.5),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      SizedBox(width: media.width * 0.02),
-                      Expanded(
-                        child: TextField(
-                          autofocus: true,
-                          decoration: InputDecoration(
-                            contentPadding: (languageDirection == 'rtl')
-                                ? EdgeInsets.only(bottom: media.width * 0.035)
-                                : EdgeInsets.only(bottom: media.width * 0.047),
-                            border: InputBorder.none,
-                            hintText: context.l10n.text_4lettersforautofill,
-                            hintStyle: GoogleFonts.roboto(
-                              fontSize: media.width * twelve,
-                              color: hintColor,
-                            ),
-                          ),
-                          maxLines: 1,
-                          onChanged: (val) => onChange3(val),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               Expanded(
                 child: (bottom == 0)
@@ -173,6 +128,7 @@ class StackSixWidget extends StatelessWidget {
                     : StackSixExpandedContent(
                         pickaddress: pickaddress,
                         dropaddress: dropaddress,
+                        onSearchChanged: onChange3,
                         onChange4: onChange4,
                         onChange5: onChange5,
                         onChange6: onChange6,

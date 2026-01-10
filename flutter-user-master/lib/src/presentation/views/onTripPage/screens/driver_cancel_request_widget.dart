@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
+
 import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
 import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';

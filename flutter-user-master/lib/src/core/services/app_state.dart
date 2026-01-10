@@ -17,7 +17,7 @@ String complaintDesc = '';
 dynamic selectedHistory;
 
 // Map/location
-Point center = const Point(latitude: 41.4219057, longitude: -102.0840772);
+Point center = const Point(latitude: 41.2995, longitude: 69.2401);
 Point? currentLocation;
 String mapStyle = '';
 List<PlacemarkMapObject> myMarkers = [];

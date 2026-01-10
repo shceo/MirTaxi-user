@@ -59,7 +59,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   Location location = Location();
   bool _locationDenied = false;
   bool _isLoading = false;
-  Point _center = const Point(latitude: 41.4219057, longitude: -102.0840772);
+  Point _center = const Point(latitude: 41.2995, longitude: 69.2401);
   dynamic pinLocationIcon;
   dynamic pinLocationIcon2;
   dynamic animationController;

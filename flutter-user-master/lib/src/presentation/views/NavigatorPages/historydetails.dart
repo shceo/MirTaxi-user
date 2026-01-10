@@ -21,7 +21,7 @@ class HistoryDetails extends StatefulWidget {
 class _HistoryDetailsState extends State<HistoryDetails> {
   dynamic mapPadding = 0.0;
   List<PlacemarkMapObject> myMarker = [];
-  Point center = const Point(latitude: 41.4219057, longitude: -102.0840772);
+  Point center = const Point(latitude: 41.2995, longitude: 69.2401);
 
   dynamic pickicon;
   dynamic dropicon;

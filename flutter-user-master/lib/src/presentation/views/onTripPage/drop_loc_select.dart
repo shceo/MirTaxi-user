@@ -31,9 +31,9 @@ class _DropLocationState extends State<DropLocation>
   String _state = '';
   bool _isLoading = false;
   String sessionToken = const Uuid().v4();
-  Point _center = const Point(latitude: 41.4219057, longitude: -102.0840772);
+  Point _center = const Point(latitude: 41.2995, longitude: 69.2401);
   Point _centerLocation =
-      const Point(latitude: 41.4219057, longitude: -102.0840772);
+      const Point(latitude: 41.2995, longitude: 69.2401);
   TextEditingController search = TextEditingController();
   String favNameText = '';
   bool _locationDenied = false;
