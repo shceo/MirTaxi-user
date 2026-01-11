@@ -317,6 +317,21 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                             }
                           }
                         }
+                        final bookingList =
+                            (widget.type != 1) ? etaDetails : rentalOption;
+                        final showBookingPanel = addressList.isNotEmpty &&
+                            bookingList.isNotEmpty &&
+                            userRequestData.isEmpty &&
+                            noDriverFound == false &&
+                            tripReqError == false &&
+                            lowWalletBalance == false;
+                        final bookingButtonsBottom = media.width * 0.8 + 12;
+                        final floatingButtonsBottom = showBookingPanel
+                            ? bookingButtonsBottom
+                            : (widget.type != 1)
+                                ? media.width * 1.1
+                                : media.width * 1.15;
+
                         return Stack(
                           alignment: Alignment.center,
                           children: [
@@ -350,60 +365,31 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                               ),
                             ),
                             (userRequestData['accepted_at'] == null)
-                                ? Positioned(
-                                    top: MediaQuery.of(context).padding.top +
-                                        12.5,
-                                    child: SizedBox(
-                                      width: media.width * 0.9,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              addressList.removeWhere(
-                                                  (element) =>
-                                                      element.id == 'drop');
-                                              etaDetails.clear();
-                                              promoKey.clear();
-                                              promoStatus = null;
+                                ? buildTopBackButton(
+                                    media,
+                                    bottom: showBookingPanel
+                                        ? bookingButtonsBottom
+                                        : null,
+                                    onTap: () {
+                                      addressList.removeWhere(
+                                          (element) => element.id == 'drop');
+                                      etaDetails.clear();
+                                      promoKey.clear();
+                                      promoStatus = null;
 
-                                              _rideLaterSuccess = false;
-                                              myMarker.clear();
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const Maps()),
-                                                  (route) => false);
-                                            },
-                                            child: Container(
-                                              height: media.width * 0.1,
-                                              width: media.width * 0.1,
-                                              decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.2),
-                                                        spreadRadius: 2,
-                                                        blurRadius: 2)
-                                                  ],
-                                                  color: page),
-                                              alignment: Alignment.center,
-                                              child:
-                                                  const Icon(Icons.arrow_back),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                      _rideLaterSuccess = false;
+                                      myMarker.clear();
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const Maps()),
+                                          (route) => false);
+                                    },
                                   )
                                 : Container(),
                             Positioned(
-                              bottom: (widget.type != 1)
-                                  ? media.width * 1.1
-                                  : media.width * 1.15,
+                              bottom: floatingButtonsBottom,
                               child: SizedBox(
                                 width: media.width * 0.9,
                                 child: Column(
@@ -449,7 +435,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                     SizedBox(
                                       height: media.width * 0.05,
                                     ),
-                                    (etaDetails.isNotEmpty ||
+                                    (bookingList.isNotEmpty ||
                                             userRequestData.isNotEmpty)
                                         ? InkWell(
                                             onTap: () async {
@@ -516,7 +502,9 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                             ),
 
                             //show bottom nav bar for choosing ride type and vehicles
-                            buildChooseMethodPanel(media, fdb),
+                            showBookingPanel
+                                ? buildBookingBottomPanel(media)
+                                : Container(),
                             //show vehicle info
                             buildVehicleInfoModal(media),
                             //no driver found

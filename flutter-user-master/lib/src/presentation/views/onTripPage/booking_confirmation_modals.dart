@@ -1,14 +1,15 @@
 part of 'booking_confirmation.dart';
 
 extension _BookingConfirmationModals on _BookingConfirmationState {
-  Widget buildTopBackButton(Size media) {
+  Widget buildTopBackButton(Size media, {double? bottom, VoidCallback? onTap}) {
     final top = MediaQuery.of(context).padding.top;
     return Positioned(
-      top: top + 12,
+      top: bottom == null ? top + 12 : null,
+      bottom: bottom,
       left: 12,
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
-        onTap: () => Navigator.maybePop(context),
+        onTap: onTap ?? () => Navigator.maybePop(context),
         child: Container(
           height: 44,
           width: 44,
@@ -33,7 +34,7 @@ extension _BookingConfirmationModals on _BookingConfirmationState {
   Widget buildBookingBottomPanel(Size media) {
     final list = (widget.type != 1) ? etaDetails : rentalOption;
 
-    final pick = _bcShort(_bcAddressById('pick'));
+    final pick = _bcShort(_bcAddressById('pickup'));
     final drop = _bcShort(_bcAddressById('drop'));
     final routeText = (pick.isNotEmpty && drop.isNotEmpty) ? '$pick > $drop' : (pick.isNotEmpty ? pick : (drop.isNotEmpty ? drop : '—'));
 
