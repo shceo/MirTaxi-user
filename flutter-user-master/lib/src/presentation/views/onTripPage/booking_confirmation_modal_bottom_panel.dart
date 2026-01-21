@@ -36,7 +36,9 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
 
     final pick = _bcShort(_bcAddressById('pickup'));
     final drop = _bcShort(_bcAddressById('drop'));
-    final routeText = (pick.isNotEmpty && drop.isNotEmpty) ? '$pick > $drop' : (pick.isNotEmpty ? pick : (drop.isNotEmpty ? drop : '—'));
+    final routeText = (pick.isNotEmpty && drop.isNotEmpty)
+        ? '$pick > $drop'
+        : (pick.isNotEmpty ? pick : (drop.isNotEmpty ? drop : '—'));
 
     return Positioned(
       left: 0,
@@ -61,10 +63,12 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
             mainAxisSize: MainAxisSize.min,
             children: [
               _BcRow(
-                leading: const Icon(Icons.radio_button_unchecked, size: 18, color: Colors.black),
+                leading: const Icon(Icons.radio_button_unchecked,
+                    size: 18, color: Colors.black),
                 title: pick.isNotEmpty ? pick : '—',
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEFF2F5),
                     borderRadius: BorderRadius.circular(10),
@@ -83,7 +87,8 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
               const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB)),
               const SizedBox(height: 10),
               _BcRow(
-                leading: const Icon(Icons.alt_route_rounded, size: 20, color: Colors.black),
+                leading: const Icon(Icons.alt_route_rounded,
+                    size: 20, color: Colors.black),
                 title: routeText,
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -108,7 +113,8 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         alignment: Alignment.center,
-                        child: const Icon(Icons.add, size: 18, color: Colors.black),
+                        child: const Icon(Icons.add,
+                            size: 18, color: Colors.black),
                       ),
                     ),
                   ],
@@ -152,7 +158,8 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                       height: 48,
                       width: 48,
                       child: Center(
-                        child: Icon(Icons.account_balance_wallet_rounded, size: 26, color: Color(0xFF22C55E)),
+                        child: Icon(Icons.account_balance_wallet_rounded,
+                            size: 26, color: Color(0xFF22C55E)),
                       ),
                     ),
                   ),
@@ -206,7 +213,8 @@ class _BcRow extends StatelessWidget {
   final String title;
   final Widget trailing;
 
-  const _BcRow({required this.leading, required this.title, required this.trailing});
+  const _BcRow(
+      {required this.leading, required this.title, required this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -282,14 +290,18 @@ class _BcVehicleCard extends StatelessWidget {
               children: [
                 if (etaText.isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF3F4F6),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       etaText,
-                      style: GoogleFonts.roboto(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black),
+                      style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black),
                     ),
                   )
                 else
@@ -301,7 +313,8 @@ class _BcVehicleCard extends StatelessWidget {
                   child: const SizedBox(
                     height: 24,
                     width: 24,
-                    child: Icon(Icons.info_outline, size: 18, color: Colors.black54),
+                    child: Icon(Icons.info_outline,
+                        size: 18, color: Colors.black54),
                   ),
                 ),
               ],
@@ -313,7 +326,10 @@ class _BcVehicleCard extends StatelessWidget {
               name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black),
+              style: GoogleFonts.roboto(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black),
             ),
             const SizedBox(height: 2),
             Row(
@@ -325,7 +341,10 @@ class _BcVehicleCard extends StatelessWidget {
                     price,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black),
+                    style: GoogleFonts.roboto(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black),
                   ),
                 ),
               ],
