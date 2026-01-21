@@ -36,7 +36,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
 
     final pick = _bcShort(_bcAddressById('pickup'));
     final drop = _bcShort(_bcAddressById('drop'));
-    final routeText = (pick.isNotEmpty && drop.isNotEmpty) ? '$pick > $drop' : (pick.isNotEmpty ? pick : (drop.isNotEmpty ? drop : '¢?"'));
+    final routeText = (pick.isNotEmpty && drop.isNotEmpty) ? '$pick > $drop' : (pick.isNotEmpty ? pick : (drop.isNotEmpty ? drop : '—'));
 
     return Positioned(
       left: 0,
@@ -62,7 +62,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
             children: [
               _BcRow(
                 leading: const Icon(Icons.radio_button_unchecked, size: 18, color: Colors.black),
-                title: pick.isNotEmpty ? pick : '¢?"',
+                title: pick.isNotEmpty ? pick : '—',
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -70,7 +70,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    '???‘?çú?',
+                    context.l10n.text_pick_up_location,
                     style: GoogleFonts.roboto(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -163,17 +163,17 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                       onTap: () => _updateState(() => _choosePayment = true),
                       child: Container(
                         height: 48,
-                        decoration: BoxDecoration(
-                          color: const Color.fromRGBO(255, 220, 113, 1),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          '-øóøúø‘'‘?',
-                          style: GoogleFonts.roboto(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(255, 220, 113, 1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        context.l10n.text_ridenow,
+                        style: GoogleFonts.roboto(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
                           ),
                         ),
                       ),

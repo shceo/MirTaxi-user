@@ -23,13 +23,13 @@ extension _BookingConfirmationModalHelpers on _BookingConfirmationState {
     try {
       final data = (widget.type != 1) ? etaDetails[choosenVehicle] : rentalOption[choosenVehicle];
       final v = data['trip_eta'] ?? data['eta'] ?? data['eta_minutes'] ?? data['time'] ?? data['duration'];
-      if (v == null) return 'в?"';
-      if (v is num) return '${v.round()} Р?РёР?';
+      if (v == null) return '—';
+      if (v is num) return '${v.round()} мин';
       final s = v.toString().trim();
-      if (s.isEmpty) return 'в?"';
-      return s.contains('Р?РёР?') ? s : '$s Р?РёР?';
+      if (s.isEmpty) return '—';
+      return s.contains('мин') ? s : '$s мин';
     } catch (_) {
-      return '5 Р?РёР?';
+      return '5 мин';
     }
   }
 
@@ -37,10 +37,10 @@ extension _BookingConfirmationModalHelpers on _BookingConfirmationState {
     try {
       final v = item['eta'] ?? item['eta_minutes'] ?? item['time'] ?? item['duration'] ?? item['trip_eta'];
       if (v == null) return '';
-      if (v is num) return '${v.round()} Р?РёР?';
+      if (v is num) return '${v.round()} мин';
       final s = v.toString().trim();
       if (s.isEmpty) return '';
-      return s.contains('Р?РёР?') ? s : '$s Р?РёР?';
+      return s.contains('мин') ? s : '$s мин';
     } catch (_) {
       return '';
     }
@@ -49,9 +49,9 @@ extension _BookingConfirmationModalHelpers on _BookingConfirmationState {
   String _bcVehicleName(dynamic item) {
     try {
       final s = (item['name'] ?? item['vehicle_type'] ?? item['title'] ?? '').toString().trim();
-      return s.isEmpty ? 'в?"' : s;
+      return s.isEmpty ? '—' : s;
     } catch (_) {
-      return 'в?"';
+      return '—';
     }
   }
 
