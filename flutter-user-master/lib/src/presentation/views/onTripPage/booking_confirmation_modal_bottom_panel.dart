@@ -167,7 +167,33 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                   Expanded(
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: () => _updateState(() => _choosePayment = true),
+                      onTap: () async {
+                        _updateState(() {
+                          _isLoading = true;
+                        });
+                        dynamic result;
+                        if (choosenVehicle != null) {
+                          if (widget.type != 1) {
+                            if (etaDetails[choosenVehicle]['has_discount'] == false) {
+                              result = await createRequest();
+                            } else {
+                              result = await createRequestWithPromo();
+                            }
+                          } else {
+                            if (rentalOption[choosenVehicle]['has_discount'] == false) {
+                              result = await createRentalRequest();
+                            } else {
+                              result = await createRentalRequestWithPromo();
+                            }
+                          }
+                        }
+                        if (result == 'success') {
+                          timer();
+                        }
+                        _updateState(() {
+                          _isLoading = false;
+                        });
+                      },
                       child: Container(
                         height: 48,
                         decoration: BoxDecoration(
