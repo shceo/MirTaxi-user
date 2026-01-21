@@ -124,7 +124,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
               const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB)),
               const SizedBox(height: 10),
               SizedBox(
-                height: 150,
+                height: 180,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -262,12 +262,13 @@ class _BcVehicleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cardPadding = isSelected ? 9.4 : 10.0;
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: onTap,
       child: Container(
         width: 112,
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.all(cardPadding),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
