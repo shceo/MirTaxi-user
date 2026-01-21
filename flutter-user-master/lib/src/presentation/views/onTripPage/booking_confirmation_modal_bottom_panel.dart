@@ -118,7 +118,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
               const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB)),
               const SizedBox(height: 10),
               SizedBox(
-                height: 92,
+                height: 120,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -163,17 +163,17 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                       onTap: () => _updateState(() => _choosePayment = true),
                       child: Container(
                         height: 48,
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(255, 220, 113, 1),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        context.l10n.text_ridenow,
-                        style: GoogleFonts.roboto(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                        decoration: BoxDecoration(
+                          color: const Color.fromRGBO(255, 220, 113, 1),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          context.l10n.text_ridenow,
+                          style: GoogleFonts.roboto(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
                           ),
                         ),
                       ),

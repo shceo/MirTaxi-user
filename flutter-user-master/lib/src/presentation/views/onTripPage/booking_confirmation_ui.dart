@@ -75,7 +75,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
               ? ui.TextDirection.rtl
               : ui.TextDirection.ltr,
           child: Container(
-            height: media.height * 0.5,
+            height: media.height * 0.5 + 32,
             width: media.width * 1,
             color: page,
             child: ValueListenableBuilder(
