@@ -38,7 +38,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
     final drop = _bcShort(_bcAddressById('drop'));
     final routeText = (pick.isNotEmpty && drop.isNotEmpty)
         ? '$pick > $drop'
-        : (pick.isNotEmpty ? pick : (drop.isNotEmpty ? drop : '—'));
+        : (pick.isNotEmpty ? pick : (drop.isNotEmpty ? drop : 'вЂ”'));
 
     return Positioned(
       left: 0,
@@ -65,7 +65,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
               _BcRow(
                 leading: const Icon(Icons.radio_button_unchecked,
                     size: 18, color: Colors.black),
-                title: pick.isNotEmpty ? pick : '—',
+                title: pick.isNotEmpty ? pick : 'вЂ”',
                 trailing: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -124,7 +124,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
               const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB)),
               const SizedBox(height: 10),
               SizedBox(
-                height: 120,
+                height: 150,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
