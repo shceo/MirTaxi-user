@@ -44,10 +44,10 @@ class _SendSuccessScreenState extends State<SendSuccessScreen> {
                 ),
               ],
             ),
-            child: Center(
+            child: const Center(
               child: Text(
-                widget.desc,
-                style: const TextStyle(
+                '"Благодарим за обращение в MIR TAXI! Заявка на детскую перевозку успешно зарегистрирована. Ожидайте звонка от нашего оператора для подтверждения и уточнения информации. Мы обеспечим комфорт и безопасность для вашего ребенка."',
+                style: TextStyle(
                   color: Colors.black,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
