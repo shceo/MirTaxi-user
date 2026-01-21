@@ -31,7 +31,14 @@ import 'package:geolocator/geolocator.dart' as geolocs;
 
 part 'booking_confirmation_logic.dart';
 part 'booking_confirmation_panels.dart';
-part 'booking_confirmation_modals.dart';
+part 'booking_confirmation_modal_helpers.dart';
+part 'booking_confirmation_modal_bottom_panel.dart';
+part 'booking_confirmation_modal_vehicle_info.dart';
+part 'booking_confirmation_modal_payment.dart';
+part 'booking_confirmation_modal_cancel.dart';
+part 'booking_confirmation_modal_ride_later.dart';
+part 'booking_confirmation_modal_sos.dart';
+part 'booking_confirmation_modal_location_status.dart';
 part 'booking_confirmation_ui.dart';
 
 // ignore: must_be_immutable
