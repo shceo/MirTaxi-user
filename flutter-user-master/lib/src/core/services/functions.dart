@@ -36,8 +36,8 @@ bool internet = true;
 List<AddressModel> lastAddress = [];
 
 //base url
-String url =
-    'https://mirtaxi.mdtaxi.uz/'; //please add '/' at the end of the url as 'https://yourwebsite.com/'
+// Base API URL — must match the driver app, otherwise заявки уходят на другой бэкенд.
+String url = 'https://uzch.uz/'; //please add '/' at the end of the url as 'https://yourwebsite.com/'
 // Google Maps key (disabled; switched to Yandex MapKit)
 // String mapkey = 'AIzaSyCe7XyWJbAkb1Fw6RNc8vlzPPcxx7X4ImM';
 const String yandexMapkitKey =

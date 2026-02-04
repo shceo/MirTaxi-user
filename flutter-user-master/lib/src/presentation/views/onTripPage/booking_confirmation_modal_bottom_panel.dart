@@ -288,7 +288,7 @@ class _BcVehicleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardPadding = isSelected ? 9.4 : 10.0;
+    final cardPadding = isSelected ? 8.8 : 9.4;
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: onTap,
