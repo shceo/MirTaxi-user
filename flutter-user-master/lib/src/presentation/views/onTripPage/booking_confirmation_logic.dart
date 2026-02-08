@@ -39,6 +39,30 @@ extension _BookingConfirmationLogic on _BookingConfirmationState {
     animationController?.dispose();
   }
 
+  void _backToMaps() {
+    if (_navigatingBackToMaps) return;
+    _navigatingBackToMaps = true;
+
+    addressList.removeWhere((element) => element.id == 'drop');
+    etaDetails.clear();
+    promoKey.clear();
+    promoStatus = null;
+    _rideLaterSuccess = false;
+    myMarker.clear();
+    polyline = null;
+    polyList.clear();
+
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Maps()),
+        (route) => false,
+      );
+    });
+  }
+
 //running timer
   timer() {
     timing = userRequestData['maximum_time_for_find_drivers_for_regular_ride'];

@@ -54,20 +54,10 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
 
     var media = MediaQuery.of(context).size;
     return PopScope(
-      canPop: userRequestData.isEmpty ? true : false,
-      onPopInvokedWithResult: (s, d) async {
-        if (userRequestData.isEmpty) {
-          etaDetails.clear();
-          promoKey.clear();
-          promoStatus = null;
-          _rideLaterSuccess = false;
-          // addressList.clear();
-          myMarker.clear();
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const Maps()),
-              (route) => false);
-        }
+      canPop: false,
+      onPopInvokedWithResult: (_, __) {
+        if (!userRequestData.isEmpty) return;
+        _backToMaps();
       },
       child: Material(
         child: Directionality(
@@ -371,20 +361,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                         ? bookingButtonsBottom
                                         : null,
                                     onTap: () {
-                                      addressList.removeWhere(
-                                          (element) => element.id == 'drop');
-                                      etaDetails.clear();
-                                      promoKey.clear();
-                                      promoStatus = null;
-
-                                      _rideLaterSuccess = false;
-                                      myMarker.clear();
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Maps()),
-                                          (route) => false);
+                                      _backToMaps();
                                     },
                                   )
                                 : Container(),

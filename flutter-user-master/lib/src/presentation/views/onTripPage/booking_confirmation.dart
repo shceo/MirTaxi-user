@@ -83,6 +83,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   bool _bottomChooseMethod = false;
   bool _dateTimePicker = false;
   bool _rideLaterSuccess = false;
+  bool _navigatingBackToMaps = false;
   bool _confirmRideLater = false;
   bool showSos = false;
   bool notifyCompleted = false;
