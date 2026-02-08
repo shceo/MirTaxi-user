@@ -124,12 +124,15 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
               const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB)),
               const SizedBox(height: 10),
               SizedBox(
-                height: 180,
+                // Keep this close to the card height (plus shadow) to avoid empty space.
+                height: 124,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
+                  clipBehavior: Clip.none,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
                   physics: const BouncingScrollPhysics(),
                   itemCount: list.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
                   itemBuilder: (context, i) {
                     final item = list[i];
                     final isSelected = i == choosenVehicle;
@@ -288,12 +291,12 @@ class _BcVehicleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardPadding = isSelected ? 8.8 : 9.4;
+    final cardPadding = isSelected ? 8.0 : 8.6;
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: onTap,
       child: Container(
-        width: 112,
+        width: 104,
         padding: EdgeInsets.all(cardPadding),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -304,8 +307,8 @@ class _BcVehicleCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              offset: const Offset(0, 6),
-              blurRadius: 12,
+              offset: const Offset(0, 5),
+              blurRadius: 10,
               color: Colors.black.withOpacity(0.06),
             ),
           ],
@@ -315,25 +318,31 @@ class _BcVehicleCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                if (etaText.isNotEmpty)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF3F4F6),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      etaText,
-                      style: GoogleFonts.roboto(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black),
-                    ),
-                  )
-                else
-                  const SizedBox(height: 20),
-                const Spacer(),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: (etaText.isNotEmpty)
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              etaText,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                              style: GoogleFonts.roboto(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black),
+                            ),
+                          )
+                        : const SizedBox(height: 20),
+                  ),
+                ),
                 InkWell(
                   borderRadius: BorderRadius.circular(10),
                   onTap: onInfo,
@@ -346,9 +355,9 @@ class _BcVehicleCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
-            SizedBox(height: 26, child: Center(child: image)),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
+            SizedBox(height: 24, child: Center(child: image)),
+            const SizedBox(height: 4),
             Text(
               name,
               maxLines: 1,
