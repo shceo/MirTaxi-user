@@ -811,7 +811,7 @@ abstract class AppLocalizations {
   /// No description provided for @text_4lettersforautofill.
   ///
   /// In en, this message translates to:
-  /// **'Enter 4 letters to search'**
+  /// **'Enter an address'**
   String get text_4lettersforautofill;
 
   /// No description provided for @text_availablerides.
