@@ -32,6 +32,7 @@ import 'package:geolocator/geolocator.dart' as geolocs;
 part 'booking_confirmation_logic.dart';
 part 'booking_confirmation_panels.dart';
 part 'booking_confirmation_finding_driver_panel.dart';
+part 'booking_confirmation_on_trip_panel.dart';
 part 'booking_confirmation_modal_helpers.dart';
 part 'booking_confirmation_modal_bottom_panel.dart';
 part 'booking_confirmation_modal_vehicle_info.dart';
