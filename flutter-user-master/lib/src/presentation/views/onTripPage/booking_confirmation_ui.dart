@@ -348,7 +348,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                       PolylineMapObject(
                                         mapId: const MapObjectId('route'),
                                         polyline: polyline!,
-                                        strokeColor: const Color(0xffFD9898),
+                                        strokeColor: const Color(0xff34C759),
                                         strokeWidth: 4,
                                       ),
                                   ];
