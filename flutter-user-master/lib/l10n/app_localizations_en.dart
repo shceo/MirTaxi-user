@@ -373,7 +373,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get text_chooseonmap => 'Locate on Map';
 
   @override
-  String get text_4lettersforautofill => 'Enter 4 letters to search';
+  String get text_4lettersforautofill => 'Enter an address';
 
   @override
   String get text_availablerides => 'Available Rides';

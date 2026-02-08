@@ -374,7 +374,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get text_chooseonmap => 'Найти на карте';
 
   @override
-  String get text_4lettersforautofill => 'Введите 4 буквы для поиска';
+  String get text_4lettersforautofill => 'Введите адрес';
 
   @override
   String get text_availablerides => 'Доступные поездки';

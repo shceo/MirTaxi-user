@@ -144,10 +144,16 @@ class StackSixExpandedContent extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB)),
-            _AddressList(
-              maxItems: 4,
-              onTap: onChange6,
-            ),
+            if (addAutoFill.isNotEmpty)
+              StackSixAutoFillList(
+                onChange4: onChange4,
+                onChange5: onChange5,
+              )
+            else
+              _AddressList(
+                maxItems: 4,
+                onTap: onChange6,
+              ),
           ],
         ),
       ),
@@ -388,11 +394,21 @@ class StackSixAutoFillList extends StatelessWidget {
 
         if (i >= 5) return const SizedBox.shrink();
 
+        final title = (addAutoFill[i]['title'] ?? addAutoFill[i]['description'] ?? '')
+            .toString();
+        final subtitle = (addAutoFill[i]['subtitle'] ?? '').toString();
+        final typeRaw = addAutoFill[i]['type'];
+        final type = typeRaw is int ? typeRaw : int.tryParse(typeRaw?.toString() ?? '');
+        final icon = switch (type) {
+          2 => Icons.store_mall_directory_outlined,
+          3 => Icons.directions_transit_outlined,
+          _ => Icons.location_on_outlined,
+        };
+
         return Container(
           padding:
               EdgeInsets.fromLTRB(0, media.width * 0.04, 0, media.width * 0.04),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
                 height: media.width * 0.1,
@@ -401,19 +417,39 @@ class StackSixAutoFillList extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.grey[200],
                 ),
-                child: const Icon(Icons.access_time),
+                child: Icon(icon, size: media.width * 0.05),
               ),
-              InkWell(
-                onTap: () => onChange4(i),
-                child: SizedBox(
-                  width: media.width * 0.7,
-                  child: Text(
-                    addAutoFill[i]['description'],
-                    style: GoogleFonts.roboto(
-                      fontSize: media.width * twelve,
-                      color: textColor,
-                    ),
-                    maxLines: 2,
+              const SizedBox(width: 12),
+              Expanded(
+                child: InkWell(
+                  onTap: () => onChange4(i),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: GoogleFonts.roboto(
+                          fontSize: media.width * twelve,
+                          color: textColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (subtitle.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          style: GoogleFonts.roboto(
+                            fontSize: media.width * ten,
+                            color: hintColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),

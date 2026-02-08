@@ -46,6 +46,7 @@ class _MapsState extends State<Maps>
 
   dynamic animationController;
   dynamic _sessionToken;
+  Timer? _autoAddressDebounce;
   bool _loading = false;
   bool _pickaddress = false;
   bool _dropaddress = false;
@@ -115,9 +116,25 @@ class _MapsState extends State<Maps>
   @override
   void dispose() {
     animationController?.dispose();
+    _autoAddressDebounce?.cancel();
     _dropAddressNotifier.dispose();
 
     super.dispose();
+  }
+
+  void _onAutoAddressQueryChanged(String rawQuery) {
+    final query = rawQuery.trim();
+    _autoAddressDebounce?.cancel();
+    if (query.isEmpty) {
+      setState(() {
+        addAutoFill.clear();
+      });
+      return;
+    }
+    _autoAddressDebounce = Timer(const Duration(milliseconds: 250), () {
+      _sessionToken ??= const Uuid().v4();
+      getAutoAddress(query, _sessionToken, center.latitude, center.longitude);
+    });
   }
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
@@ -667,24 +684,14 @@ class _MapsState extends State<Maps>
                                             }
                                             _bottom = 0;
                                             setState(() {});
-                                          },
-                                          onChange3: (val) {
-                                            if (val.length >= 4) {
-                                              getAutoAddress(
-                                                  val,
-                                                  _sessionToken,
-                                                  center.latitude,
-                                                  center.longitude);
-                                            } else {
-                                              setState(() {
-                                                addAutoFill.clear();
-                                              });
-                                            }
-                                          },
-                                          onChange2: () {
-                                              if (addressList
-                                                  .where((element) =>
-                                                      element.id == 'pickup')
+                                           },
+                                           onChange3: (val) {
+                                            _onAutoAddressQueryChanged(val);
+                                           },
+                                           onChange2: () {
+                                               if (addressList
+                                                   .where((element) =>
+                                                       element.id == 'pickup')
                                                   .isNotEmpty) {
                                               setState(() {
                                                 _pickaddress = false;
@@ -808,19 +815,9 @@ class _MapsState extends State<Maps>
                                               _centerLocation = d.target;
                                             });
                                           },
-                                          addDirections: (val) {
-                                            if (val.length >= 4) {
-                                              getAutoAddress(
-                                                  val,
-                                                  _sessionToken,
-                                                  center.latitude,
-                                                  center.longitude);
-                                            } else {
-                                              setState(() {
-                                                addAutoFill.clear();
-                                              });
-                                            }
-                                          },
+                                           addDirections: (val) {
+                                            _onAutoAddressQueryChanged(val);
+                                           },
                                           changePosition: () {
                                             setState(() {
                                               _bottom = 1;

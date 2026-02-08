@@ -377,7 +377,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get text_chooseonmap => 'Xaritada toping';
 
   @override
-  String get text_4lettersforautofill => 'Qidirish uchun 4 ta harf kiriting';
+  String get text_4lettersforautofill => 'Manzil kiriting';
 
   @override
   String get text_availablerides => 'Mavjud sayohatlar';

@@ -859,28 +859,65 @@ getlangid() async {
 
 List addAutoFill = [];
 
+int _autoAddressRequestId = 0;
+String _autoAddressLastQuery = '';
+
 getAutoAddress(input, sessionToken, lat, lng) async {
+  final query = input?.toString().trim() ?? '';
+  if (query.isEmpty) {
+    addAutoFill.clear();
+    valueNotifierHome.incrementNotifier();
+    return;
+  }
+  _autoAddressLastQuery = query;
+  final requestId = ++_autoAddressRequestId;
   try {
     final centerPoint = Point(latitude: lat, longitude: lng);
     final bounds = _suggestBoundingBox(centerPoint);
     final (session, resultFuture) = await YandexSuggest.getSuggestions(
-      text: input,
+      text: query,
       boundingBox: bounds,
       suggestOptions: SuggestOptions(
-        suggestType: SuggestType.geo,
+        // Let the backend decide the best suggestion types (geo/biz/transit).
+        suggestType: SuggestType.unspecified,
         userPosition: centerPoint,
       ),
     );
     final response = await resultFuture;
     await session.close();
-    addAutoFill = (response.items ?? [])
-        .map((item) => {
-              'description':
-                  item.displayText.isNotEmpty ? item.displayText : item.title,
-              'place_id': item.center ?? item.searchText,
-              'search_text': item.searchText,
-            })
+    if (requestId != _autoAddressRequestId ||
+        query != _autoAddressLastQuery) {
+      // A newer request completed while this one was in flight.
+      return;
+    }
+    final items = (response.items ?? [])
+        // Transit suggestions are often noisy for taxi address picking.
+        .where((item) => item.type != SuggestItemType.transit)
         .toList();
+
+    final seen = <String>{};
+    addAutoFill = items.map((item) {
+      final title = item.title.trim();
+      final subtitle = (item.subtitle ?? '').trim();
+      final displayText = item.displayText.trim();
+      final description = subtitle.isNotEmpty
+          ? '$title, $subtitle'
+          : (displayText.isNotEmpty ? displayText : title);
+      final key = description.toLowerCase();
+      if (seen.contains(key)) {
+        return null;
+      }
+      seen.add(key);
+      return {
+        'title': title.isNotEmpty ? title : displayText,
+        'subtitle': subtitle,
+        'description': description,
+        'place_id': item.center ?? item.searchText,
+        'search_text': item.searchText,
+        'type': item.type.index,
+        'tags': item.tags,
+      };
+    }).whereType<Map>().toList();
     valueNotifierHome.incrementNotifier();
   } catch (e) {
     if (e is SocketException) {

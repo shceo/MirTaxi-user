@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
@@ -29,6 +30,7 @@ class _DropLocationState extends State<DropLocation>
   String _state = '';
   bool _isLoading = false;
   String sessionToken = const Uuid().v4();
+  Timer? _autoAddressDebounce;
   Point _center = const Point(latitude: 41.2995, longitude: 69.2401);
   Point _centerLocation =
       const Point(latitude: 41.2995, longitude: 69.2401);
@@ -51,6 +53,27 @@ class _DropLocationState extends State<DropLocation>
     WidgetsBinding.instance.addObserver(this);
     getLocs();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _autoAddressDebounce?.cancel();
+    search.dispose();
+    super.dispose();
+  }
+
+  void _onAutoAddressQueryChanged(String rawQuery) {
+    final query = rawQuery.trim();
+    _autoAddressDebounce?.cancel();
+    if (query.isEmpty) {
+      setState(() {
+        addAutoFill.clear();
+      });
+      return;
+    }
+    _autoAddressDebounce = Timer(const Duration(milliseconds: 250), () {
+      getAutoAddress(query, sessionToken, _center.latitude, _center.longitude);
+    });
   }
 
   @override
@@ -505,17 +528,7 @@ class _DropLocationState extends State<DropLocation>
                                                 color: hintColor)),
                                         maxLines: 1,
                                         onChanged: (val) {
-                                          if (val.length >= 4) {
-                                            getAutoAddress(
-                                                val,
-                                                sessionToken,
-                                                _center.latitude,
-                                                _center.longitude);
-                                          } else if (val.isEmpty) {
-                                            setState(() {
-                                              addAutoFill.clear();
-                                            });
-                                          }
+                                          _onAutoAddressQueryChanged(val);
                                         }),
                                   )
                                 ],
