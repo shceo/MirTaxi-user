@@ -1020,15 +1020,275 @@ List<Point> polyList = [];
 Polyline? polyline;
 Color routeTrafficColor = const Color(0xff34C759);
 
+class RouteSegment {
+  const RouteSegment({
+    required this.polyline,
+    required this.color,
+  });
+
+  final Polyline polyline;
+  final Color color;
+}
+
+List<RouteSegment> routeSegments = [];
+
+int _routeSegmentsBuildToken = 0;
+
+// Clears current route segments and invalidates any in-flight segment builds.
+void clearRouteSegments() {
+  _routeSegmentsBuildToken++;
+  routeSegments.clear();
+}
+
+const Color _kRouteGreen = Color(0xff34C759);
+const Color _kRouteYellow = Color(0xffFFCC00);
+const Color _kRouteRed = Color(0xffFF3B30);
+
+double _degToRad(double deg) => deg * (math.pi / 180.0);
+
+double _bearingDegrees(Point a, Point b) {
+  // Initial bearing (azimuth) from A to B in degrees [0..360).
+  final lat1 = _degToRad(a.latitude);
+  final lat2 = _degToRad(b.latitude);
+  final dLon = _degToRad(b.longitude - a.longitude);
+
+  final y = math.sin(dLon) * math.cos(lat2);
+  final x = math.cos(lat1) * math.sin(lat2) -
+      math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
+  final brng = math.atan2(y, x) * (180.0 / math.pi);
+  return (brng + 360.0) % 360.0;
+}
+
+double _distanceMeters(Point a, Point b) {
+  // Haversine formula (good enough for segmenting the route).
+  const earthRadius = 6371000.0;
+  final lat1 = _degToRad(a.latitude);
+  final lat2 = _degToRad(b.latitude);
+  final dLat = lat2 - lat1;
+  final dLon = _degToRad(b.longitude - a.longitude);
+
+  final sinDLat = math.sin(dLat / 2.0);
+  final sinDLon = math.sin(dLon / 2.0);
+  final h = sinDLat * sinDLat +
+      math.cos(lat1) * math.cos(lat2) * sinDLon * sinDLon;
+
+  return 2.0 * earthRadius * math.asin(math.min(1.0, math.sqrt(h)));
+}
+
+List<double> _buildCumulativeDistance(List<Point> points) {
+  final cum = List<double>.filled(points.length, 0.0);
+  for (var i = 1; i < points.length; i++) {
+    cum[i] = cum[i - 1] + _distanceMeters(points[i - 1], points[i]);
+  }
+  return cum;
+}
+
+int _lowerBound(List<double> arr, double target) {
+  var lo = 0;
+  var hi = arr.length;
+  while (lo < hi) {
+    final mid = lo + ((hi - lo) >> 1);
+    if (arr[mid] < target) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+  return lo;
+}
+
+int _segmentCountForDistance(double totalMeters) {
+  if (totalMeters <= 0) return 0;
+  // More segments = more точная раскраска, but also more routing requests.
+  // Target: ~500m per segment; clamp to keep performance reasonable.
+  final count = (totalMeters / 500.0).ceil();
+  return count.clamp(8, 30);
+}
+
+Color _segmentTrafficColorFromWeight({
+  required double? time,
+  required double? timeWithTraffic,
+  required double segmentMeters,
+}) {
+  // More sensitive than the whole-route thresholds: we want per-segment colors.
+  // Note: slowdown ratio is noisy on very short segments, so we mainly use delay/km.
+  if (time == null ||
+      timeWithTraffic == null ||
+      time <= 0 ||
+      timeWithTraffic <= 0 ||
+      segmentMeters <= 0) {
+    return _kRouteGreen;
+  }
+
+  final delay = timeWithTraffic - time; // seconds (SI)
+  if (delay <= 0) return _kRouteGreen;
+
+  final km = segmentMeters / 1000.0;
+  final delayPerKm = (km >= 0.2) ? (delay / km) : (delay / 0.2);
+  final slowdown = timeWithTraffic / time; // >= 1.0 (can be noisy on small time)
+
+  // Red: heavy traffic on this part of the route.
+  if (delayPerKm >= 120 || delay >= 60 || (time >= 180 && slowdown >= 1.25)) {
+    return _kRouteRed;
+  }
+
+  // Yellow: noticeable slowdown.
+  if (delayPerKm >= 35 || delay >= 20 || (time >= 180 && slowdown >= 1.10)) {
+    return _kRouteYellow;
+  }
+
+  return _kRouteGreen;
+}
+
+Future<(double? time, double? timeWithTraffic)> _requestSegmentTimes({
+  required Point start,
+  required Point end,
+  List<Point> viaPoints = const [],
+  double? initialAzimuth,
+}) async {
+  DrivingSession? session;
+  try {
+    final points = <RequestPoint>[
+      RequestPoint(point: start, requestPointType: RequestPointType.wayPoint),
+      ...viaPoints.map(
+        (p) => RequestPoint(point: p, requestPointType: RequestPointType.viaPoint),
+      ),
+      RequestPoint(point: end, requestPointType: RequestPointType.wayPoint),
+    ];
+
+    final (createdSession, resultFuture) = await YandexDriving.requestRoutes(
+      points: points,
+      drivingOptions: DrivingOptions(routesCount: 1, initialAzimuth: initialAzimuth),
+    );
+    session = createdSession;
+    final response = await resultFuture;
+
+    final route = (response.routes != null && response.routes!.isNotEmpty)
+        ? response.routes!.first
+        : null;
+    if (route == null) return (null, null);
+
+    final weight = route.metadata.weight;
+    return (weight.time.value, weight.timeWithTraffic.value);
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+    return (null, null);
+  } finally {
+    try {
+      await session?.close();
+    } catch (_) {}
+  }
+}
+
+Future<List<RouteSegment>> _buildTrafficSegmentsFromRoutePoints(List<Point> points) async {
+  if (points.length < 2) return const [];
+
+  final cum = _buildCumulativeDistance(points);
+  final total = cum.last;
+  final segmentCount = _segmentCountForDistance(total);
+  if (segmentCount <= 0) return const [];
+
+  // Choose split indices by distance so segments are roughly equal-length.
+  final split = <int>[0];
+  for (var s = 1; s < segmentCount; s++) {
+    final target = total * (s / segmentCount);
+    var idx = _lowerBound(cum, target);
+    if (idx <= split.last) {
+      idx = split.last + 1;
+    }
+    if (idx >= points.length - 1) {
+      break;
+    }
+    split.add(idx);
+  }
+  if (split.last != points.length - 1) {
+    split.add(points.length - 1);
+  }
+
+  // Build segment definitions first so we can fetch timings concurrently.
+  final segmentPointsList = <List<Point>>[];
+  final segmentMetersList = <double>[];
+  for (var i = 0; i < split.length - 1; i++) {
+    final startIdx = split[i];
+    final endIdx = split[i + 1];
+    if (endIdx - startIdx < 1) continue;
+
+    segmentPointsList.add(points.sublist(startIdx, endIdx + 1));
+    segmentMetersList.add(cum[endIdx] - cum[startIdx]);
+  }
+  if (segmentPointsList.isEmpty) return const [];
+
+  List<Point> pickViaPoints(List<Point> segmentPoints) {
+    if (segmentPoints.length < 3) return const [];
+    if (segmentPoints.length < 7) {
+      return <Point>[segmentPoints[segmentPoints.length ~/ 2]];
+    }
+    final idxs = <int>{
+      segmentPoints.length ~/ 4,
+      segmentPoints.length ~/ 2,
+      (segmentPoints.length * 3) ~/ 4,
+    };
+    idxs.remove(0);
+    idxs.remove(segmentPoints.length - 1);
+    final sorted = idxs.toList()..sort();
+    return <Point>[for (final idx in sorted) segmentPoints[idx]];
+  }
+
+  final results = List<RouteSegment?>.filled(segmentPointsList.length, null);
+  var cursor = 0;
+  const concurrency = 4;
+
+  Future<void> worker() async {
+    while (true) {
+      final i = cursor++;
+      if (i >= segmentPointsList.length) return;
+
+      final segmentPoints = segmentPointsList[i];
+      final start = segmentPoints.first;
+      final end = segmentPoints.last;
+      final initialAzimuth = segmentPoints.length >= 2
+          ? _bearingDegrees(segmentPoints[0], segmentPoints[1])
+          : null;
+
+      final (time, timeWithTraffic) = await _requestSegmentTimes(
+        start: start,
+        end: end,
+        viaPoints: pickViaPoints(segmentPoints),
+        initialAzimuth: initialAzimuth,
+      );
+
+      results[i] = RouteSegment(
+        polyline: Polyline(points: segmentPoints),
+        color: _segmentTrafficColorFromWeight(
+          time: time,
+          timeWithTraffic: timeWithTraffic,
+          segmentMeters: segmentMetersList[i],
+        ),
+      );
+    }
+  }
+
+  await Future.wait(
+    List.generate(
+      math.min(concurrency, segmentPointsList.length),
+      (_) => worker(),
+    ),
+  );
+
+  return results.whereType<RouteSegment>().toList();
+}
+
 Color _routeTrafficColorFromWeight(double? time, double? timeWithTraffic) {
   // If we can't calculate traffic delay, keep route green.
   if (time == null || timeWithTraffic == null || time <= 0) {
-    return const Color(0xff34C759);
+    return _kRouteGreen;
   }
 
   final delay = timeWithTraffic - time;
   if (delay <= 0) {
-    return const Color(0xff34C759);
+    return _kRouteGreen;
   }
 
   // MapKit returns durations in SI units (seconds). We map traffic to a single
@@ -1038,25 +1298,26 @@ Color _routeTrafficColorFromWeight(double? time, double? timeWithTraffic) {
   // yellow: >= 5 min delay
   // red: > 10 min delay
   if (delay > 600) {
-    return const Color(0xffFF3B30);
+    return _kRouteRed;
   }
   if (delay >= 300) {
-    return const Color(0xffFFCC00);
+    return _kRouteYellow;
   }
-  return const Color(0xff34C759);
+  return _kRouteGreen;
 }
 
 Future<List<Point>> _buildRoutePoints(Point start, Point end) async {
+  DrivingSession? session;
   try {
-    final (session, resultFuture) = await YandexDriving.requestRoutes(
+    final (createdSession, resultFuture) = await YandexDriving.requestRoutes(
       points: [
         RequestPoint(point: start, requestPointType: RequestPointType.wayPoint),
         RequestPoint(point: end, requestPointType: RequestPointType.wayPoint),
       ],
       drivingOptions: const DrivingOptions(routesCount: 1),
     );
+    session = createdSession;
     final response = await resultFuture;
-    await session.close();
     if (response.routes != null && response.routes!.isNotEmpty) {
       final route = response.routes!.first;
       final weight = route.metadata.weight;
@@ -1070,13 +1331,20 @@ Future<List<Point>> _buildRoutePoints(Point start, Point end) async {
     if (e is SocketException) {
       internet = false;
     }
+  } finally {
+    try {
+      await session?.close();
+    } catch (_) {}
   }
   return [];
 }
 
 getPolylines() async {
   polyList.clear();
-  routeTrafficColor = const Color(0xff34C759);
+  polyline = null;
+  routeTrafficColor = _kRouteGreen;
+  clearRouteSegments();
+  final buildToken = _routeSegmentsBuildToken;
   Point? pickPoint;
   Point? dropPoint;
   if (userRequestData.isEmpty) {
@@ -1095,18 +1363,46 @@ getPolylines() async {
     );
   }
 
-  if (pickPoint != null && dropPoint != null) {
-    polyList = await _buildRoutePoints(pickPoint, dropPoint);
-  }
+  final newPolyList = (pickPoint != null && dropPoint != null)
+      ? await _buildRoutePoints(pickPoint, dropPoint)
+      : <Point>[];
 
+  if (buildToken != _routeSegmentsBuildToken) return newPolyList;
+
+  polyList = newPolyList;
   polyline = polyList.isNotEmpty ? Polyline(points: polyList) : null;
+
+  // Show the route immediately (green), then refine with per-segment traffic.
+  if (polyline != null) {
+    routeSegments = <RouteSegment>[
+      RouteSegment(polyline: polyline!, color: _kRouteGreen),
+    ];
+  }
+  valueNotifierBook.incrementNotifier();
+
+  if (polyList.isEmpty) return polyList;
+
+  final detailedSegments = await _buildTrafficSegmentsFromRoutePoints(polyList);
+  if (buildToken != _routeSegmentsBuildToken) return polyList;
+
+  if (detailedSegments.isNotEmpty) {
+    routeSegments = detailedSegments;
+  } else if (polyline != null) {
+    // Fallback to whole-route traffic if we failed to split.
+    routeSegments = <RouteSegment>[
+      RouteSegment(polyline: polyline!, color: routeTrafficColor),
+    ];
+  }
   valueNotifierBook.incrementNotifier();
   return polyList;
 }
 
 getPolylineshistory({pickLat, pickLng, dropLat, dropLng}) async {
   polyList.clear();
-  routeTrafficColor = const Color(0xff34C759);
+  polyline = null;
+  routeTrafficColor = _kRouteGreen;
+  clearRouteSegments();
+  final buildToken = _routeSegmentsBuildToken;
   final pickPoint = Point(
     latitude: double.parse(pickLat.toString()),
     longitude: double.parse(pickLng.toString()),
@@ -1115,8 +1411,32 @@ getPolylineshistory({pickLat, pickLng, dropLat, dropLng}) async {
     latitude: double.parse(dropLat.toString()),
     longitude: double.parse(dropLng.toString()),
   );
-  polyList = await _buildRoutePoints(pickPoint, dropPoint);
+  final newPolyList = await _buildRoutePoints(pickPoint, dropPoint);
+
+  if (buildToken != _routeSegmentsBuildToken) return newPolyList;
+
+  polyList = newPolyList;
   polyline = polyList.isNotEmpty ? Polyline(points: polyList) : null;
+
+  if (polyline != null) {
+    routeSegments = <RouteSegment>[
+      RouteSegment(polyline: polyline!, color: _kRouteGreen),
+    ];
+  }
+  valueNotifierBook.incrementNotifier();
+
+  if (polyList.isEmpty) return polyList;
+
+  final detailedSegments = await _buildTrafficSegmentsFromRoutePoints(polyList);
+  if (buildToken != _routeSegmentsBuildToken) return polyList;
+
+  if (detailedSegments.isNotEmpty) {
+    routeSegments = detailedSegments;
+  } else if (polyline != null) {
+    routeSegments = <RouteSegment>[
+      RouteSegment(polyline: polyline!, color: routeTrafficColor),
+    ];
+  }
   valueNotifierBook.incrementNotifier();
   return polyList;
 }

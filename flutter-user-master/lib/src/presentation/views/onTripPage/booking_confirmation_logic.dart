@@ -51,6 +51,7 @@ extension _BookingConfirmationLogic on _BookingConfirmationState {
     myMarker.clear();
     polyline = null;
     polyList.clear();
+    clearRouteSegments();
 
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {

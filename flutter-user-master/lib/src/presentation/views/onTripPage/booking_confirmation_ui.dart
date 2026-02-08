@@ -79,6 +79,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                   myMarker.clear();
                   polyline = null;
                   polyList.clear();
+                  clearRouteSegments();
                   addressList.removeWhere((element) => element.id == 'drop');
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     Navigator.pushAndRemoveUntil(
@@ -334,13 +335,24 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                 builder: (context, snapshot) {
                                   final mapObjects = <MapObject>[
                                     ...myMarker,
-                                    if (polyline != null)
+                                    if (routeSegments.isNotEmpty)
+                                      ...routeSegments.asMap().entries.map(
+                                            (e) => PolylineMapObject(
+                                              mapId: MapObjectId(
+                                                  'route_seg_${e.key}'),
+                                               polyline: e.value.polyline,
+                                               strokeColor: e.value.color,
+                                               strokeWidth: 7,
+                                             ),
+                                           ),
+                                     if (routeSegments.isEmpty &&
+                                         polyline != null)
                                       PolylineMapObject(
-                                        mapId: const MapObjectId('route'),
-                                        polyline: polyline!,
-                                        strokeColor: routeTrafficColor,
-                                        strokeWidth: 6,
-                                      ),
+                                         mapId: const MapObjectId('route'),
+                                         polyline: polyline!,
+                                         strokeColor: routeTrafficColor,
+                                         strokeWidth: 7,
+                                       ),
                                   ];
                                   return YandexMap(
                                     mapType: MapType.vector,

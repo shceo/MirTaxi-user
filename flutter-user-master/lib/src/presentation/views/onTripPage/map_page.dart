@@ -226,6 +226,7 @@ class _MapsState extends State<Maps>
     serviceEnabled = await location.serviceEnabled();
     polyline = null;
     polyList.clear();
+    clearRouteSegments();
     final Uint8List markerIcon =
         await getBytesFromAsset('assets/images/top-taxi.png', 40);
     final Uint8List bikeIcons =
