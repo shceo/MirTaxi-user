@@ -31,6 +31,7 @@ import 'package:geolocator/geolocator.dart' as geolocs;
 
 part 'booking_confirmation_logic.dart';
 part 'booking_confirmation_panels.dart';
+part 'booking_confirmation_finding_driver_panel.dart';
 part 'booking_confirmation_modal_helpers.dart';
 part 'booking_confirmation_modal_bottom_panel.dart';
 part 'booking_confirmation_modal_vehicle_info.dart';
@@ -77,6 +78,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   dynamic animationController;
   bool _ontripBottom = false;
   bool _cancelling = false;
+  bool _cancelModalFromFindingDriver = false;
   bool _choosePayment = false;
   String _cancelCustomReason = '';
   dynamic timers;
@@ -96,11 +98,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
   final _mapMarkerSC = StreamController<List<PlacemarkMapObject>>();
 
-  StreamSink<List<PlacemarkMapObject>> get _mapMarkerSink =>
-      _mapMarkerSC.sink;
+  StreamSink<List<PlacemarkMapObject>> get _mapMarkerSink => _mapMarkerSC.sink;
 
-  Stream<List<PlacemarkMapObject>> get mapMarkerStream =>
-      _mapMarkerSC.stream;
+  Stream<List<PlacemarkMapObject>> get mapMarkerStream => _mapMarkerSC.stream;
 
   // final _distSC = StreamController();
   // // StreamSink get _distSCSink => _distSC.sink;
@@ -131,5 +131,4 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   Widget build(BuildContext context) {
     return buildBookingConfirmationView(context);
   }
-
 }
