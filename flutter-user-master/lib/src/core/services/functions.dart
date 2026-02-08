@@ -1018,6 +1018,33 @@ geoCodingForLatLng(placeid) async {
 
 List<Point> polyList = [];
 Polyline? polyline;
+Color routeTrafficColor = const Color(0xff34C759);
+
+Color _routeTrafficColorFromWeight(double? time, double? timeWithTraffic) {
+  // If we can't calculate traffic delay, keep route green.
+  if (time == null || timeWithTraffic == null || time <= 0) {
+    return const Color(0xff34C759);
+  }
+
+  final delay = timeWithTraffic - time;
+  if (delay <= 0) {
+    return const Color(0xff34C759);
+  }
+
+  // MapKit returns durations in SI units (seconds). We map traffic to a single
+  // route color (green/yellow/red) since we don't have per-segment jam data.
+  //
+  // green: < 5 min delay
+  // yellow: >= 5 min delay
+  // red: > 10 min delay
+  if (delay > 600) {
+    return const Color(0xffFF3B30);
+  }
+  if (delay >= 300) {
+    return const Color(0xffFFCC00);
+  }
+  return const Color(0xff34C759);
+}
 
 Future<List<Point>> _buildRoutePoints(Point start, Point end) async {
   try {
@@ -1031,7 +1058,13 @@ Future<List<Point>> _buildRoutePoints(Point start, Point end) async {
     final response = await resultFuture;
     await session.close();
     if (response.routes != null && response.routes!.isNotEmpty) {
-      return response.routes!.first.geometry.points;
+      final route = response.routes!.first;
+      final weight = route.metadata.weight;
+      routeTrafficColor = _routeTrafficColorFromWeight(
+        weight.time.value,
+        weight.timeWithTraffic.value,
+      );
+      return route.geometry.points;
     }
   } catch (e) {
     if (e is SocketException) {
@@ -1043,6 +1076,7 @@ Future<List<Point>> _buildRoutePoints(Point start, Point end) async {
 
 getPolylines() async {
   polyList.clear();
+  routeTrafficColor = const Color(0xff34C759);
   Point? pickPoint;
   Point? dropPoint;
   if (userRequestData.isEmpty) {
@@ -1072,6 +1106,7 @@ getPolylines() async {
 
 getPolylineshistory({pickLat, pickLng, dropLat, dropLng}) async {
   polyList.clear();
+  routeTrafficColor = const Color(0xff34C759);
   final pickPoint = Point(
     latitude: double.parse(pickLat.toString()),
     longitude: double.parse(pickLng.toString()),

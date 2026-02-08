@@ -221,8 +221,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                               PolylineMapObject(
                                 mapId: const MapObjectId('route'),
                                 polyline: polyline!,
-                                strokeColor: const Color(0xff34C759),
-                                strokeWidth: 4,
+                                strokeColor: routeTrafficColor,
+                                strokeWidth: 6,
                               ),
                           ],
                         ),
