@@ -192,12 +192,10 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                               } else {
                                 if (myMarker
                                     .where((element) =>
-                                        element.mapId.value ==
-                                        'car${e['id']}')
+                                        element.mapId.value == 'car${e['id']}')
                                     .isNotEmpty) {
                                   myMarker.removeWhere((element) =>
-                                      element.mapId.value ==
-                                      'car${e['id']}');
+                                      element.mapId.value == 'car${e['id']}');
                                 }
                               }
                             });
@@ -220,8 +218,8 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                             if (userRequestData['accepted_at'] != null) {
                               driversData.clear();
                               if (myMarker.length > 3) {
-                                myMarker.removeWhere(
-                                    (element) => element.mapId.value.contains('car'));
+                                myMarker.removeWhere((element) =>
+                                    element.mapId.value.contains('car'));
                               }
 
                               DataSnapshot snapshots = event.data!.snapshot;
@@ -239,8 +237,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                     _dist = double.parse(
                                         (distCalc / 1000).toString());
                                   }
-                                  final markerId =
-                                      'car${driverData['id']}';
+                                  final markerId = 'car${driverData['id']}';
                                   final existingIndex = myMarker.indexWhere(
                                       (element) =>
                                           element.mapId.value == markerId);
@@ -340,19 +337,19 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                             (e) => PolylineMapObject(
                                               mapId: MapObjectId(
                                                   'route_seg_${e.key}'),
-                                               polyline: e.value.polyline,
-                                               strokeColor: e.value.color,
-                                               strokeWidth: 9,
-                                             ),
-                                           ),
-                                     if (routeSegments.isEmpty &&
-                                         polyline != null)
+                                              polyline: e.value.polyline,
+                                              strokeColor: e.value.color,
+                                              strokeWidth: 9,
+                                            ),
+                                          ),
+                                    if (routeSegments.isEmpty &&
+                                        polyline != null)
                                       PolylineMapObject(
-                                         mapId: const MapObjectId('route'),
-                                         polyline: polyline!,
-                                         strokeColor: routeTrafficColor,
-                                         strokeWidth: 9,
-                                       ),
+                                        mapId: const MapObjectId('route'),
+                                        polyline: polyline!,
+                                        strokeColor: routeTrafficColor,
+                                        strokeWidth: 9,
+                                      ),
                                   ];
                                   return YandexMap(
                                     mapType: MapType.vector,
@@ -504,8 +501,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                             buildServiceNotAvailablePanel(media),
                             //choose payment method
                             buildChoosePaymentModal(media),
-                            //bottom nav bar after request accepted
-                            buildAcceptedStatusBanner(media),
+
                             //finding driver panel
                             buildFindingDriverPanel(media),
                             //on trip panel
@@ -711,7 +707,8 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                                               .start,
                                                       children: [
                                                         Text(
-                                                          context.l10n.text_droppoint,
+                                                          context.l10n
+                                                              .text_droppoint,
                                                           style: GoogleFonts.roboto(
                                                               fontSize:
                                                                   media.width *
@@ -803,5 +800,4 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
       ),
     );
   }
-
 }
