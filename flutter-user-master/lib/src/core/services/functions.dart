@@ -37,7 +37,8 @@ List<AddressModel> lastAddress = [];
 
 //base url
 // Base API URL — must match the driver app, otherwise заявки уходят на другой бэкенд.
-String url = 'https://uzch.uz/'; //please add '/' at the end of the url as 'https://yourwebsite.com/'
+String url =
+    'https://uzch.uz/'; //please add '/' at the end of the url as 'https://yourwebsite.com/'
 // Google Maps key (disabled; switched to Yandex MapKit)
 // String mapkey = 'AIzaSyCe7XyWJbAkb1Fw6RNc8vlzPPcxx7X4ImM';
 const String yandexMapkitKey =
@@ -138,8 +139,9 @@ validateEmail() async {
 
 getLastAddress() async {
   try {
-    HttpResult response = await ApiProvider().getRequest('${url}api/v1/user/latest-addresses?limit=10');
-    if(response.isSuccess){
+    HttpResult response = await ApiProvider()
+        .getRequest('${url}api/v1/user/latest-addresses?limit=10');
+    if (response.isSuccess) {
       lastAddress = LastAddressModel.fromJson(response.result).data;
       valueNotifierHome.incrementNotifier();
     }
@@ -154,6 +156,8 @@ getLastAddress() async {
 var choosenLanguage = '';
 var languageDirection = '';
 String phnumber = '';
+// UUID returned by `send-otp`. Some backends require it when calling `verify-otp`.
+String otpUuid = '';
 
 List languagesCode = [
   {'name': 'English', 'code': 'en'},
@@ -251,9 +255,10 @@ getLocalData() async {
   internet = _hasConnection(connectivityResult);
   try {
     choosenLanguage = pref.getString('choosenLanguage') ?? '';
-    languageDirection =
-        pref.getString('languageDirection') ?? (_isRtlLanguage(choosenLanguage) ? 'rtl' : 'ltr');
-    localeNotifier.value = Locale(choosenLanguage.isNotEmpty ? choosenLanguage : 'en');
+    languageDirection = pref.getString('languageDirection') ??
+        (_isRtlLanguage(choosenLanguage) ? 'rtl' : 'ltr');
+    localeNotifier.value =
+        Locale(choosenLanguage.isNotEmpty ? choosenLanguage : 'en');
 
     if (choosenLanguage.isNotEmpty) {
       if (pref.containsKey('Bearer')) {
@@ -377,9 +382,25 @@ updateReferral() async {
 
 Future<HttpResult> otpCall(String number) async {
   try {
-    var data = {'mobile': number};
+    // Reset UUID on each new OTP request.
+    otpUuid = '';
+    var data = {'mobile': number, 'role': 'user'};
     HttpResult result = await ApiProvider()
         .postRequest('${url}api/v1/user/login/send-otp', data);
+
+    // Persist uuid for the subsequent `verify-otp` call.
+    try {
+      final res = result.result;
+      if (result.isSuccess && res is Map) {
+        final data = res['data'];
+        if (data is Map && data['uuid'] != null) {
+          otpUuid = data['uuid'].toString();
+        }
+      }
+    } catch (_) {
+      // Ignore parsing issues; fallback to verifying without uuid.
+    }
+
     return result;
   } catch (e) {
     if (e is SocketException) {
@@ -484,7 +505,12 @@ sharewalletfun({mobile, role, amount}) async {
 
 Future<HttpResult> verifyNumber(String number, String code) async {
   try {
-    var data = {'mobile': number, 'code': code, 'role': 'user'};
+    final data = <String, dynamic>{
+      'mobile': number,
+      'code': code,
+      'role': 'user',
+      if (otpUuid.isNotEmpty) 'uuid': otpUuid,
+    };
     HttpResult result = await ApiProvider()
         .postRequest('${url}api/v1/user/login/verify-otp', data);
     return result;
@@ -497,29 +523,48 @@ Future<HttpResult> verifyNumber(String number, String code) async {
   return HttpResult(isSuccess: false, result: 1, status: 1);
 }
 
+Future<bool?> validateMobileForLogin(String number) async {
+  try {
+    var response = await http.post(
+      Uri.parse('${url}api/v1/user/validate-mobile-for-login'),
+      body: {"mobile": number},
+    );
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      final success = decoded['success'];
+      if (success is bool) {
+        return success;
+      }
+      return success?.toString().toLowerCase() == 'true';
+    }
+
+    debugPrint(response.body);
+    return null;
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+  return null;
+}
+
 verifyUser(String number) async {
   dynamic val;
   try {
-    var response = await http.post(
-        Uri.parse('${url}api/v1/user/validate-mobile-for-login'),
-        body: {"mobile": number});
+    val = await validateMobileForLogin(number);
 
-    if (response.statusCode == 200) {
-      val = jsonDecode(response.body)['success'];
-
-      if (val == true) {
-        var check = await userLogin();
-        if (check == true) {
-          var uCheck = await getUserDetails();
-          val = uCheck;
-        } else {
-          val = check;
-        }
+    if (val == true) {
+      var check = await userLogin();
+      if (check == true) {
+        var uCheck = await getUserDetails();
+        val = uCheck;
       } else {
-        val = false;
+        val = check;
       }
+    } else if (val == false) {
+      val = false;
     } else {
-      debugPrint(response.body);
       val = false;
     }
     return val;
@@ -803,8 +848,7 @@ geoCoding(double lat, double lng) async {
     await session.close();
     if (response.items != null && response.items!.isNotEmpty) {
       final item = response.items!.first;
-      result =
-          item.toponymMetadata?.address.formattedAddress ?? item.name;
+      result = item.toponymMetadata?.address.formattedAddress ?? item.name;
     } else {
       result = '';
     }
@@ -885,8 +929,7 @@ getAutoAddress(input, sessionToken, lat, lng) async {
     );
     final response = await resultFuture;
     await session.close();
-    if (requestId != _autoAddressRequestId ||
-        query != _autoAddressLastQuery) {
+    if (requestId != _autoAddressRequestId || query != _autoAddressLastQuery) {
       // A newer request completed while this one was in flight.
       return;
     }
@@ -896,28 +939,31 @@ getAutoAddress(input, sessionToken, lat, lng) async {
         .toList();
 
     final seen = <String>{};
-    addAutoFill = items.map((item) {
-      final title = item.title.trim();
-      final subtitle = (item.subtitle ?? '').trim();
-      final displayText = item.displayText.trim();
-      final description = subtitle.isNotEmpty
-          ? '$title, $subtitle'
-          : (displayText.isNotEmpty ? displayText : title);
-      final key = description.toLowerCase();
-      if (seen.contains(key)) {
-        return null;
-      }
-      seen.add(key);
-      return {
-        'title': title.isNotEmpty ? title : displayText,
-        'subtitle': subtitle,
-        'description': description,
-        'place_id': item.center ?? item.searchText,
-        'search_text': item.searchText,
-        'type': item.type.index,
-        'tags': item.tags,
-      };
-    }).whereType<Map>().toList();
+    addAutoFill = items
+        .map((item) {
+          final title = item.title.trim();
+          final subtitle = (item.subtitle ?? '').trim();
+          final displayText = item.displayText.trim();
+          final description = subtitle.isNotEmpty
+              ? '$title, $subtitle'
+              : (displayText.isNotEmpty ? displayText : title);
+          final key = description.toLowerCase();
+          if (seen.contains(key)) {
+            return null;
+          }
+          seen.add(key);
+          return {
+            'title': title.isNotEmpty ? title : displayText,
+            'subtitle': subtitle,
+            'description': description,
+            'place_id': item.center ?? item.searchText,
+            'search_text': item.searchText,
+            'type': item.type.index,
+            'tags': item.tags,
+          };
+        })
+        .whereType<Map>()
+        .toList();
     valueNotifierHome.incrementNotifier();
   } catch (e) {
     if (e is SocketException) {
@@ -1000,12 +1046,10 @@ getPolylines() async {
   Point? pickPoint;
   Point? dropPoint;
   if (userRequestData.isEmpty) {
-    pickPoint = addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng;
-    dropPoint = addressList
-        .firstWhere((element) => element.id == 'drop')
-        .latlng;
+    pickPoint =
+        addressList.firstWhere((element) => element.id == 'pickup').latlng;
+    dropPoint =
+        addressList.firstWhere((element) => element.id == 'drop').latlng;
   } else {
     pickPoint = Point(
       latitude: double.parse(userRequestData['pick_lat'].toString()),

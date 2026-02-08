@@ -78,7 +78,18 @@ class AuthViewModel extends ChangeNotifier {
 
     final verification = await verifyNumber(phnumber, code);
     if (!verification.isSuccess) {
-      errorMessage = verification.result.toString();
+      final formattedError = _formatApiError(verification.result);
+      if (formattedError == 'These credentials do not match our records.') {
+        final exists = await validateMobileForLogin(phnumber);
+        if (exists == false) {
+          isLoading = false;
+          notifyListeners();
+          return const AuthVerificationResult(
+            destination: AuthDestination.getStarted,
+          );
+        }
+      }
+      errorMessage = formattedError;
       isLoading = false;
       notifyListeners();
       return AuthVerificationResult(error: errorMessage);
@@ -91,9 +102,33 @@ class AuthViewModel extends ChangeNotifier {
       return AuthVerificationResult(destination: _resolveDestination());
     }
     if (userCheck == false) {
-      return const AuthVerificationResult(destination: AuthDestination.getStarted);
+      return const AuthVerificationResult(
+          destination: AuthDestination.getStarted);
     }
     return AuthVerificationResult(error: userCheck?.toString());
+  }
+
+  String _formatApiError(dynamic result) {
+    if (result is Map) {
+      final errors = result['errors'];
+      if (errors is Map && errors.isNotEmpty) {
+        final first = errors.values.first;
+        if (first is List && first.isNotEmpty) {
+          return first.first.toString();
+        }
+        if (first != null) {
+          return first.toString();
+        }
+      }
+      final message = result['message'];
+      if (message != null && message.toString().trim().isNotEmpty) {
+        return message.toString();
+      }
+    }
+    if (result != null && result.toString().trim().isNotEmpty) {
+      return result.toString();
+    }
+    return 'Server error';
   }
 
   AuthDestination _resolveDestination() {

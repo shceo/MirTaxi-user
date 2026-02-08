@@ -6,9 +6,9 @@ import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
 import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:tagyourtaxi_driver/src/presentation/viewmodels/auth_view_model.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/src/presentation/views/login/get_started.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/login/otp_page.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -39,7 +39,8 @@ class _LoginState extends State<Login> {
   }
 
   void _navigateToOtp() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const Otp()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const Otp()));
   }
 
   String _langShort(String code) {
@@ -56,7 +57,9 @@ class _LoginState extends State<Login> {
 
     return Material(
       child: Directionality(
-        textDirection: (languageDirection == 'rtl') ? TextDirection.rtl : TextDirection.ltr,
+        textDirection: (languageDirection == 'rtl')
+            ? TextDirection.rtl
+            : TextDirection.ltr,
         child: AnimatedBuilder(
           animation: Listenable.merge([_viewModel, controller]),
           builder: (context, _) {
@@ -67,7 +70,8 @@ class _LoginState extends State<Login> {
                 if (_viewModel.hasCountries)
                   Container(
                     color: const Color(0xFFF3F4F6),
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top),
                     width: media.width,
                     height: media.height,
                     child: LayoutBuilder(
@@ -75,10 +79,12 @@ class _LoginState extends State<Login> {
                         return SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
                           child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                            constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight),
                             child: IntrinsicHeight(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 14),
                                 child: Column(
                                   children: [
                                     const SizedBox(height: 10),
@@ -94,10 +100,13 @@ class _LoginState extends State<Login> {
                                       child: Align(
                                         alignment: Alignment.bottomCenter,
                                         child: ConstrainedBox(
-                                          constraints: const BoxConstraints(maxWidth: 430),
+                                          constraints: const BoxConstraints(
+                                              maxWidth: 430),
                                           child: _LoginCard(
-                                            titlePhone: context.l10n.text_phone_number,
-                                            titleLang: context.l10n.text_choose_language,
+                                            titlePhone:
+                                                context.l10n.text_phone_number,
+                                            titleLang: context
+                                                .l10n.text_choose_language,
                                             buttonText: context.l10n.text_login,
                                             canSubmit: canSubmit,
                                             selectedLanguage: _selectedLanguage,
@@ -110,9 +119,30 @@ class _LoginState extends State<Login> {
                                             phoneController: controller,
                                             langShort: _langShort,
                                             onSubmit: () async {
-                                              FocusManager.instance.primaryFocus?.unfocus();
-                                              updateAppLanguage(_selectedLanguage);
-                                              HttpResult val = await _viewModel.requestOtp(controller.text);
+                                              FocusManager.instance.primaryFocus
+                                                  ?.unfocus();
+                                              updateAppLanguage(
+                                                  _selectedLanguage);
+                                              phnumber = controller.text;
+                                              final exists =
+                                                  await validateMobileForLogin(
+                                                      controller.text);
+                                              if (!context.mounted) return;
+                                              if (exists == false) {
+                                                // New user on this backend. Skip OTP and go straight to registration.
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const GetStarted(),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+
+                                              HttpResult val = await _viewModel
+                                                  .requestOtp(controller.text);
+                                              if (!context.mounted) return;
                                               if (val.isSuccess) {
                                                 phoneAuthCheck = false;
                                                 _navigateToOtp();
@@ -150,7 +180,8 @@ class _LoginState extends State<Login> {
                       )
                     : const SizedBox.shrink(),
                 (_viewModel.isLoading == true)
-                    ? const Positioned(top: 0, left: 0, right: 0, child: Loading())
+                    ? const Positioned(
+                        top: 0, left: 0, right: 0, child: Loading())
                     : const SizedBox.shrink(),
               ],
             );
@@ -197,7 +228,8 @@ class _LoginCard extends StatelessWidget {
       color: const Color(0xFF6B7280),
     );
 
-    final divider = const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB));
+    final divider =
+        const Divider(height: 1, thickness: 1, color: Color(0xFFE5E7EB));
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -236,8 +268,10 @@ class _LoginCard extends StatelessWidget {
                     _LanguageRow(
                       title: languagesCode[i]['name'].toString(),
                       subtitle: langShort(languagesCode[i]['code'].toString()),
-                      selected: selectedLanguage == languagesCode[i]['code'].toString(),
-                      onTap: () => onSelectLanguage(languagesCode[i]['code'].toString()),
+                      selected: selectedLanguage ==
+                          languagesCode[i]['code'].toString(),
+                      onTap: () =>
+                          onSelectLanguage(languagesCode[i]['code'].toString()),
                     ),
                     if (i != languagesCode.length - 1) divider,
                   ]
@@ -319,7 +353,8 @@ class _PhoneField extends StatelessWidget {
               controller: controller,
               onChanged: (val) {
                 phnumber = controller.text;
-                if (controller.text.length == countries[phcode]['dial_max_length']) {
+                if (controller.text.length ==
+                    countries[phcode]['dial_max_length']) {
                   FocusManager.instance.primaryFocus?.unfocus();
                 }
               },
@@ -402,7 +437,9 @@ class _LanguageRow extends StatelessWidget {
               width: 26,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: selected ? const Color(0xFF22C55E) : const Color(0xFFE5E7EB),
+                color: selected
+                    ? const Color(0xFF22C55E)
+                    : const Color(0xFFE5E7EB),
               ),
               alignment: Alignment.center,
               child: selected

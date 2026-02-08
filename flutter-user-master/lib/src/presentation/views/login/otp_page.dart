@@ -42,22 +42,32 @@ class _OtpState extends State<Otp> {
     switch (destination) {
       case AuthDestination.invoice:
         Navigator.pushAndRemoveUntil(
-            context, MaterialPageRoute(builder: (context) => const Invoice()), (route) => false);
+            context,
+            MaterialPageRoute(builder: (context) => const Invoice()),
+            (route) => false);
         break;
       case AuthDestination.bookingConfirmationRental:
         Navigator.pushAndRemoveUntil(
-            context, MaterialPageRoute(builder: (context) => BookingConfirmation(type: 1)), (route) => false);
+            context,
+            MaterialPageRoute(
+                builder: (context) => BookingConfirmation(type: 1)),
+            (route) => false);
         break;
       case AuthDestination.bookingConfirmation:
         Navigator.pushAndRemoveUntil(
-            context, MaterialPageRoute(builder: (context) => BookingConfirmation()), (route) => false);
+            context,
+            MaterialPageRoute(builder: (context) => BookingConfirmation()),
+            (route) => false);
         break;
       case AuthDestination.selectTask:
         Navigator.pushAndRemoveUntil(
-            context, MaterialPageRoute(builder: (context) => const SelectTaskScreen()), (route) => false);
+            context,
+            MaterialPageRoute(builder: (context) => const SelectTaskScreen()),
+            (route) => false);
         break;
       case AuthDestination.getStarted:
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const GetStarted()));
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const GetStarted()));
         break;
     }
   }
@@ -83,7 +93,9 @@ class _OtpState extends State<Otp> {
     final media = MediaQuery.of(context).size;
     return Material(
       child: Directionality(
-        textDirection: (languageDirection == 'rtl') ? TextDirection.rtl : TextDirection.ltr,
+        textDirection: (languageDirection == 'rtl')
+            ? TextDirection.rtl
+            : TextDirection.ltr,
         child: ValueListenableBuilder(
           valueListenable: valueNotifierHome.value,
           builder: (context, value, child) {
@@ -102,7 +114,8 @@ class _OtpState extends State<Otp> {
                 return Stack(
                   children: [
                     Container(
-                      padding: EdgeInsets.only(left: media.width * 0.08, right: media.width * 0.08),
+                      padding: EdgeInsets.only(
+                          left: media.width * 0.08, right: media.width * 0.08),
                       color: page,
                       height: media.height * 1,
                       width: media.width * 1,
@@ -144,7 +157,8 @@ class _OtpState extends State<Otp> {
                                 Text(
                                   context.l10n.text_enter_otp,
                                   style: GoogleFonts.roboto(
-                                      fontSize: media.width * sixteen, color: textColor.withValues(alpha: 0.3)),
+                                      fontSize: media.width * sixteen,
+                                      color: textColor.withValues(alpha: 0.3)),
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
@@ -163,23 +177,28 @@ class _OtpState extends State<Otp> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
                                     color: page,
-                                    border: Border.all(color: borderLines, width: 1.2),
+                                    border: Border.all(
+                                        color: borderLines, width: 1.2),
                                   ),
                                   child: TextField(
                                     controller: otpController,
-                                    autofocus: (phoneAuthCheck == false) ? false : true,
+                                    autofocus: (phoneAuthCheck == false)
+                                        ? false
+                                        : true,
                                     onChanged: (val) {
                                       setState(() {
                                         _error = '';
                                       });
                                       if (val.length == 6) {
-                                        FocusManager.instance.primaryFocus?.unfocus();
+                                        FocusManager.instance.primaryFocus
+                                            ?.unfocus();
                                       }
                                     },
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       counterText: '',
-                                      hintText: context.l10n.text_enter_otp_login,
+                                      hintText:
+                                          context.l10n.text_enter_otp_login,
                                     ),
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.roboto(
@@ -194,11 +213,16 @@ class _OtpState extends State<Otp> {
                                 if (_error.isNotEmpty)
                                   Container(
                                     alignment: Alignment.center,
-                                    margin: EdgeInsets.only(top: media.height * 0.02),
+                                    margin: EdgeInsets.only(
+                                        top: media.height * 0.02),
                                     child: Text(
                                       _error,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
                                       style: GoogleFonts.roboto(
-                                          fontSize: media.width * sixteen, color: Colors.red),
+                                          fontSize: media.width * sixteen,
+                                          color: Colors.red),
                                     ),
                                   ),
                                 SizedBox(height: media.height * 0.05),
@@ -215,7 +239,8 @@ class _OtpState extends State<Otp> {
                                     },
                                     text: buttonText,
                                     color: isButtonDisabled ? underline : null,
-                                    borcolor: isButtonDisabled ? underline : null,
+                                    borcolor:
+                                        isButtonDisabled ? underline : null,
                                   ),
                                 ),
                               ],
