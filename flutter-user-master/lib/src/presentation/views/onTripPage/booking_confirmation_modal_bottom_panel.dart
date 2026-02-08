@@ -74,7 +74,7 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    context.l10n.text_pick_up_location,
+                    'Подъезд',
                     style: GoogleFonts.roboto(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -177,13 +177,15 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                         dynamic result;
                         if (choosenVehicle != null) {
                           if (widget.type != 1) {
-                            if (etaDetails[choosenVehicle]['has_discount'] == false) {
+                            if (etaDetails[choosenVehicle]['has_discount'] ==
+                                false) {
                               result = await createRequest();
                             } else {
                               result = await createRequestWithPromo();
                             }
                           } else {
-                            if (rentalOption[choosenVehicle]['has_discount'] == false) {
+                            if (rentalOption[choosenVehicle]['has_discount'] ==
+                                false) {
                               result = await createRentalRequest();
                             } else {
                               result = await createRentalRequestWithPromo();
@@ -335,7 +337,7 @@ class _BcVehicleCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               softWrap: false,
                               style: GoogleFonts.roboto(
-                                  fontSize: 11,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.black),
                             ),
