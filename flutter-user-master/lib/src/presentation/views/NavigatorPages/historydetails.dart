@@ -223,7 +223,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                       mapId: MapObjectId('route_seg_${e.key}'),
                                       polyline: e.value.polyline,
                                       strokeColor: e.value.color,
-                                      strokeWidth: 7,
+                                      strokeWidth: 9,
                                     ),
                                   ),
                             if (routeSegments.isEmpty && polyline != null)
@@ -231,7 +231,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 mapId: const MapObjectId('route'),
                                 polyline: polyline!,
                                 strokeColor: routeTrafficColor,
-                                strokeWidth: 7,
+                                strokeWidth: 9,
                               ),
                           ],
                         ),

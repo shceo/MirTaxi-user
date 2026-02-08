@@ -342,7 +342,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                                   'route_seg_${e.key}'),
                                                polyline: e.value.polyline,
                                                strokeColor: e.value.color,
-                                               strokeWidth: 7,
+                                               strokeWidth: 9,
                                              ),
                                            ),
                                      if (routeSegments.isEmpty &&
@@ -351,7 +351,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                          mapId: const MapObjectId('route'),
                                          polyline: polyline!,
                                          strokeColor: routeTrafficColor,
-                                         strokeWidth: 7,
+                                         strokeWidth: 9,
                                        ),
                                   ];
                                   return YandexMap(
