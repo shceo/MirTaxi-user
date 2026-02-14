@@ -654,7 +654,7 @@ getUserDetails() async {
       sosData = userDetails['sos']['data'];
       if (userDetails['onTripRequest'] != null) {
         if (userRequestData != userDetails['onTripRequest']['data']) {
-          audioPlayers.play(UrlSource(audio));
+          audioPlayers.play(AssetSource(audio));
         }
         userRequestData = userDetails['onTripRequest']['data'];
         if (userRequestData['accepted_at'] != null) {
@@ -712,7 +712,7 @@ getUserDetails() async {
         valueNotifierBook.incrementNotifier();
       } else {
         if (userRequestData.isNotEmpty) {
-          audioPlayers.play(UrlSource(audio));
+          audioPlayers.play(AssetSource(audio));
         }
         chatList.clear();
         userRequestData = {};
@@ -2623,7 +2623,7 @@ getCurrentMessages() async {
             jsonDecode(response.body)['data']
                 .where((element) => element['from_type'] == 2)
                 .length) {
-          audioPlayers.play(UrlSource(audio));
+          audioPlayers.play(AssetSource(audio));
         }
         chatList = jsonDecode(response.body)['data'];
         valueNotifierBook.incrementNotifier();

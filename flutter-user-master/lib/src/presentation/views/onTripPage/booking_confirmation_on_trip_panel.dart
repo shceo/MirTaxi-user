@@ -30,6 +30,9 @@ extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
     // ETA
     final int etaMin =
         (_dist != null) ? (double.tryParse((_dist * 2).toString())?.round() ?? 5) : 5;
+    final bool isDriverArrived = userRequestData['arrived_at'] != null ||
+        userRequestData['is_driver_arrived'] == 1 ||
+        userRequestData['is_driver_arrived'] == true;
 
     // API fields
     final String carColor = (driverData['car_color'] ?? '').toString();
@@ -117,7 +120,9 @@ extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Через ≈ ${etaMin}мин приедет>',
+                        isDriverArrived
+                            ? context.l10n.text_arrived
+                            : '${context.l10n.text_arrive_eta} ~$etaMin ${context.l10n.text_mins}',
                         style: GoogleFonts.roboto(
                           fontSize: media.width * 0.048,
                           fontWeight: FontWeight.w700,
