@@ -236,6 +236,17 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                                         driverData['l'][1]);
                                     _dist = double.parse(
                                         (distCalc / 1000).toString());
+                                  } else if ((userRequestData['is_trip_start'] == 1 ||
+                                          userRequestData['is_trip_start'] == true) &&
+                                      userRequestData['drop_lat'] != null &&
+                                      userRequestData['drop_lng'] != null) {
+                                    var distCalc = calculateDistance(
+                                        userRequestData['drop_lat'],
+                                        userRequestData['drop_lng'],
+                                        driverData['l'][0],
+                                        driverData['l'][1]);
+                                    _dist = double.parse(
+                                        (distCalc / 1000).toString());
                                   }
                                   final markerId = 'car${driverData['id']}';
                                   final existingIndex = myMarker.indexWhere(

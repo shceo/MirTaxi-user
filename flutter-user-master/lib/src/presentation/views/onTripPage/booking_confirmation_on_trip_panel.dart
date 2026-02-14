@@ -35,10 +35,17 @@ extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
     final bool isDriverArrived = userRequestData['arrived_at'] != null ||
         userRequestData['is_driver_arrived'] == 1 ||
         userRequestData['is_driver_arrived'] == true;
+    final bool isTripStarted =
+        userRequestData['is_trip_start'] == 1 || userRequestData['is_trip_start'] == true;
+    final bool isTripCompleted =
+        userRequestData['is_completed'] == 1 || userRequestData['is_completed'] == true;
+    final bool isTripInProgress = isTripStarted && !isTripCompleted;
     final bool isDriverWaiting = _shouldShowArrivalWaitingTimer();
 
     final String statusTitle = isDriverWaiting
         ? 'Водитель вас ожидает ${_formatArrivalWaitMmSs(_arrivalWaitingSeconds)}'
+        : isTripInProgress
+            ? 'Ехать примерно $etaMin мин'
         : isDriverArrived
             ? context.l10n.text_arrived
             : '${context.l10n.text_arrive_eta} ~$etaMin ${context.l10n.text_mins}';
