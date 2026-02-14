@@ -170,7 +170,6 @@ extension _BookingConfirmationLogic on _BookingConfirmationState {
 
     addressList.removeWhere((element) => element.id == 'drop');
     etaDetails.clear();
-    promoKey.clear();
     promoStatus = null;
     _rideLaterSuccess = false;
     myMarker.clear();

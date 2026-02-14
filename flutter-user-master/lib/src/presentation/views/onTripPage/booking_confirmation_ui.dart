@@ -510,8 +510,6 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                             buildTripRequestErrorPanel(media),
                             //service not available
                             buildServiceNotAvailablePanel(media),
-                            //choose payment method
-                            buildChoosePaymentModal(media),
 
                             //finding driver panel
                             buildFindingDriverPanel(media),

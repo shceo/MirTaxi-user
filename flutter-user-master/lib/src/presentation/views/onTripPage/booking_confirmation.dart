@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/app_state.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/core/utils/geohash.dart';
+import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/booking_confirmation_payment_bottom_sheet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/invoice.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/map_page.dart';
@@ -63,7 +64,6 @@ Animation<double>? _animation;
 
 class _BookingConfirmationState extends State<BookingConfirmation>
     with WidgetsBindingObserver, TickerProviderStateMixin {
-  TextEditingController promoKey = TextEditingController();
   final Map minutes = {};
   List<PlacemarkMapObject> myMarker = [];
   Map myBearings = {};
@@ -80,7 +80,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   bool _ontripBottom = false;
   bool _cancelling = false;
   bool _cancelModalFromFindingDriver = false;
-  bool _choosePayment = false;
   String _cancelCustomReason = '';
   dynamic timers;
   Timer? _arrivalWaitingTimer;

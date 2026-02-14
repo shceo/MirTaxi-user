@@ -156,7 +156,9 @@ extension _BookingConfirmationBottomPanel on _BookingConfirmationState {
                 children: [
                   InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    onTap: () => _updateState(() => _choosePayment = true),
+                    onTap: () {
+                      openChoosePaymentBottomSheet();
+                    },
                     child: const SizedBox(
                       height: 48,
                       width: 48,
