@@ -83,6 +83,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   bool _choosePayment = false;
   String _cancelCustomReason = '';
   dynamic timers;
+  Timer? _arrivalWaitingTimer;
+  int _arrivalWaitingSeconds = 0;
+  DateTime? _arrivalWaitingStartTime;
   bool _bottomChooseMethod = false;
   bool _dateTimePicker = false;
   bool _rideLaterSuccess = false;

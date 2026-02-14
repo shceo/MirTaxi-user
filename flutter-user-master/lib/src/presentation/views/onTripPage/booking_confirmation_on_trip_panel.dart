@@ -2,6 +2,8 @@ part of 'booking_confirmation.dart';
 
 extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
   Widget buildOnTripPanel(Size media) {
+    _syncArrivalWaitingTimer();
+
     if (userRequestData.isEmpty || userRequestData['accepted_at'] == null) {
       return const SizedBox.shrink();
     }
@@ -33,6 +35,13 @@ extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
     final bool isDriverArrived = userRequestData['arrived_at'] != null ||
         userRequestData['is_driver_arrived'] == 1 ||
         userRequestData['is_driver_arrived'] == true;
+    final bool isDriverWaiting = _shouldShowArrivalWaitingTimer();
+
+    final String statusTitle = isDriverWaiting
+        ? 'Водитель вас ожидает ${_formatArrivalWaitMmSs(_arrivalWaitingSeconds)}'
+        : isDriverArrived
+            ? context.l10n.text_arrived
+            : '${context.l10n.text_arrive_eta} ~$etaMin ${context.l10n.text_mins}';
 
     // API fields
     final String carColor = (driverData['car_color'] ?? '').toString();
@@ -120,9 +129,7 @@ extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isDriverArrived
-                            ? context.l10n.text_arrived
-                            : '${context.l10n.text_arrive_eta} ~$etaMin ${context.l10n.text_mins}',
+                        statusTitle,
                         style: GoogleFonts.roboto(
                           fontSize: media.width * 0.048,
                           fontWeight: FontWeight.w700,

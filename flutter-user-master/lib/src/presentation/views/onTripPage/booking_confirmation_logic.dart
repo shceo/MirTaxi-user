@@ -12,6 +12,7 @@ extension _BookingConfirmationLogic on _BookingConfirmationState {
     noDriverFound = false;
     etaDetails.clear();
     getLocs();
+    _syncArrivalWaitingTimer();
   }
 
   void onBookingConfirmationLifecycle(AppLifecycleState state) {
@@ -19,7 +20,7 @@ extension _BookingConfirmationLogic on _BookingConfirmationState {
       if (_controller != null && mapStyle.isNotEmpty) {
         _controller?.setMapStyle(mapStyle);
       }
-      getUserDetails();
+      getUserDetails().whenComplete(_syncArrivalWaitingTimer);
       if (timers == null &&
           userRequestData.isNotEmpty &&
           userRequestData['accepted_at'] == null) {
@@ -35,8 +36,132 @@ extension _BookingConfirmationLogic on _BookingConfirmationState {
     if (timers != null) {
       timers.cancel;
     }
+    _arrivalWaitingTimer?.cancel();
+    _arrivalWaitingTimer = null;
 
     animationController?.dispose();
+  }
+
+  DateTime? _parseRequestDateTime(dynamic raw) {
+    if (raw == null) {
+      return null;
+    }
+    if (raw is DateTime) {
+      return raw.toLocal();
+    }
+    if (raw is num) {
+      final value = raw.toInt();
+      if (value <= 0) {
+        return null;
+      }
+      final isMilliseconds = value > 1000000000000;
+      final millis = isMilliseconds ? value : value * 1000;
+      return DateTime.fromMillisecondsSinceEpoch(millis).toLocal();
+    }
+    final text = raw.toString().trim();
+    if (text.isEmpty) {
+      return null;
+    }
+    final parsed = DateTime.tryParse(text);
+    if (parsed != null) {
+      return parsed.toLocal();
+    }
+    final normalized = DateTime.tryParse(text.replaceFirst(' ', 'T'));
+    return normalized?.toLocal();
+  }
+
+  bool _isTripStartedNow() {
+    final value = userRequestData['is_trip_start'];
+    return value == 1 || value == true;
+  }
+
+  bool _isTripCompletedNow() {
+    final value = userRequestData['is_completed'];
+    return value == 1 || value == true;
+  }
+
+  bool _isDriverArrivedNow() {
+    if (userRequestData.isEmpty || userRequestData['accepted_at'] == null) {
+      return false;
+    }
+    return userRequestData['arrived_at'] != null ||
+        userRequestData['is_driver_arrived'] == 1 ||
+        userRequestData['is_driver_arrived'] == true;
+  }
+
+  bool _shouldShowArrivalWaitingTimer() {
+    if (!_isDriverArrivedNow()) {
+      return false;
+    }
+    if (_isTripStartedNow() || _isTripCompletedNow()) {
+      return false;
+    }
+    return true;
+  }
+
+  int _currentArrivalWaitingSeconds() {
+    final parsedFromRequest = _parseRequestDateTime(userRequestData['arrived_at']) ??
+        _parseRequestDateTime(userRequestData['driver_arrived_at']);
+    if (parsedFromRequest != null) {
+      _arrivalWaitingStartTime = parsedFromRequest;
+    } else {
+      _arrivalWaitingStartTime ??= DateTime.now();
+    }
+    final start = _arrivalWaitingStartTime;
+    if (start == null) {
+      return 0;
+    }
+    final seconds = DateTime.now().difference(start).inSeconds;
+    return seconds < 0 ? 0 : seconds;
+  }
+
+  String _formatArrivalWaitMmSs(int totalSeconds) {
+    final safeSeconds = totalSeconds < 0 ? 0 : totalSeconds;
+    final mm = (safeSeconds ~/ 60).toString().padLeft(2, '0');
+    final ss = (safeSeconds % 60).toString().padLeft(2, '0');
+    return '$mm:$ss';
+  }
+
+  void _syncArrivalWaitingTimer() {
+    final shouldRun = _shouldShowArrivalWaitingTimer();
+
+    if (!shouldRun) {
+      _arrivalWaitingTimer?.cancel();
+      _arrivalWaitingTimer = null;
+      _arrivalWaitingStartTime = null;
+      _arrivalWaitingSeconds = 0;
+      return;
+    }
+
+    _arrivalWaitingSeconds = _currentArrivalWaitingSeconds();
+
+    if (_arrivalWaitingTimer != null) {
+      return;
+    }
+
+    _arrivalWaitingTimer =
+        Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      if (!mounted) {
+        timer.cancel();
+        _arrivalWaitingTimer = null;
+        return;
+      }
+
+      if (!_shouldShowArrivalWaitingTimer()) {
+        timer.cancel();
+        _arrivalWaitingTimer = null;
+        _arrivalWaitingStartTime = null;
+        _updateState(() {
+          _arrivalWaitingSeconds = 0;
+        });
+        return;
+      }
+
+      final next = _currentArrivalWaitingSeconds();
+      _updateState(() {
+        _arrivalWaitingSeconds = next;
+      });
+    });
   }
 
   void _backToMaps() {
