@@ -371,5 +371,11 @@
   "text_name_hint": "Sizga qanday murojaat qilaylik",
   "text_comment_hint": "Nima kerakligini yozing",
   "text_request_sent": "Ariza yuborildi",
-  "text_request_sent_desc": "Tafsilotlarni aniqlashtirish uchun operator tez orada siz bilan bog‘lanadi"
+  "text_request_sent_desc": "Tafsilotlarni aniqlashtirish uchun operator tez orada siz bilan bog‘lanadi",
+  "text_pickup": "Yetib kelish",
+  "text_where_to": "Qayerga boramiz?",
+  "text_map": "Xarita",
+  "text_your_address": "Sizning manzilingiz",
+  "text_address_not_found": "Manzil topilmadi",
+  "text_minutes_short": "{count} daq"
 }

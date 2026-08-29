@@ -1608,7 +1608,7 @@ class _DropLocationSheet extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Точка назначения',
+                  context.l10n.text_droppoint,
                   style: GoogleFonts.roboto(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -1624,7 +1624,9 @@ class _DropLocationSheet extends StatelessWidget {
               valueListenable: addressListenable,
               builder: (context, address, child) {
                 final displayText =
-                    address.isNotEmpty ? address : 'Адрес не найден';
+                    address.isNotEmpty
+                        ? address
+                        : context.l10n.text_address_not_found;
                 return Row(
                   children: [
                     const Icon(Icons.circle, size: 8, color: Color(0xFF111827)),
@@ -1648,7 +1650,7 @@ class _DropLocationSheet extends StatelessWidget {
             const SizedBox(height: 16),
             Button(
               onTap: onDone,
-              text: 'Готово',
+              text: context.l10n.text_done,
             ),
           ],
         ),

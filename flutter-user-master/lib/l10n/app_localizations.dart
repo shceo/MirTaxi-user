@@ -2337,6 +2337,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Our operator will call you shortly to confirm the details'**
   String get text_request_sent_desc;
+
+  /// No description provided for @text_pickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup'**
+  String get text_pickup;
+
+  /// No description provided for @text_where_to.
+  ///
+  /// In en, this message translates to:
+  /// **'Where to?'**
+  String get text_where_to;
+
+  /// No description provided for @text_map.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get text_map;
+
+  /// No description provided for @text_your_address.
+  ///
+  /// In en, this message translates to:
+  /// **'Your address'**
+  String get text_your_address;
+
+  /// No description provided for @text_address_not_found.
+  ///
+  /// In en, this message translates to:
+  /// **'Address not found'**
+  String get text_address_not_found;
+
+  /// No description provided for @text_minutes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String text_minutes_short(int count);
 }
 
 class _AppLocalizationsDelegate

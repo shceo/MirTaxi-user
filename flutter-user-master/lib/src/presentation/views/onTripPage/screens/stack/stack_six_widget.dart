@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
@@ -102,7 +103,7 @@ class StackSixWidget extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          'Куда едем?',
+                          context.l10n.text_where_to,
                           style: GoogleFonts.roboto(
                             fontSize: media.width * twenty,
                             color: const Color.fromRGBO(0, 0, 0, 1),

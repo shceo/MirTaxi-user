@@ -1174,4 +1174,24 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get text_request_sent_desc =>
       'Оператор свяжется с вами в ближайшее время, чтобы уточнить детали';
+
+  @override
+  String get text_pickup => 'Подача';
+
+  @override
+  String get text_where_to => 'Куда едем?';
+
+  @override
+  String get text_map => 'Карта';
+
+  @override
+  String get text_your_address => 'Ваш адрес';
+
+  @override
+  String get text_address_not_found => 'Адрес не найден';
+
+  @override
+  String text_minutes_short(int count) {
+    return '$count мин';
+  }
 }

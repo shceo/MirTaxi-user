@@ -1178,4 +1178,24 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get text_request_sent_desc =>
       'Tafsilotlarni aniqlashtirish uchun operator tez orada siz bilan bog‘lanadi';
+
+  @override
+  String get text_pickup => 'Yetib kelish';
+
+  @override
+  String get text_where_to => 'Qayerga boramiz?';
+
+  @override
+  String get text_map => 'Xarita';
+
+  @override
+  String get text_your_address => 'Sizning manzilingiz';
+
+  @override
+  String get text_address_not_found => 'Manzil topilmadi';
+
+  @override
+  String text_minutes_short(int count) {
+    return '$count daq';
+  }
 }

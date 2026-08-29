@@ -1158,4 +1158,24 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get text_request_sent_desc =>
       'Our operator will call you shortly to confirm the details';
+
+  @override
+  String get text_pickup => 'Pickup';
+
+  @override
+  String get text_where_to => 'Where to?';
+
+  @override
+  String get text_map => 'Map';
+
+  @override
+  String get text_your_address => 'Your address';
+
+  @override
+  String get text_address_not_found => 'Address not found';
+
+  @override
+  String text_minutes_short(int count) {
+    return '$count min';
+  }
 }

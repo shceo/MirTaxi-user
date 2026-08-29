@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 
 class StackTwoWidget extends StatelessWidget {
   final bool dropLocationMap;
 
-  const StackTwoWidget({super.key, required this.dropLocationMap});
+  /// Время подачи в минутах. Раньше на пине стояла константа «5 мин»: она
+  /// показывалась всегда — и когда рядом стоит машина, и когда в радиусе нет
+  /// ни одного водителя. Пока реальной оценки нет, время не показываем вовсе.
+  final int? etaMinutes;
+
+  const StackTwoWidget({
+    super.key,
+    required this.dropLocationMap,
+    this.etaMinutes,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +31,7 @@ class StackTwoWidget extends StatelessWidget {
             offset: Offset(0, -10 * scale),
             child: dropLocationMap
                 ? _DropPoint(scale: scale)
-                : _PickupPoint(scale: scale),
+                : _PickupPoint(scale: scale, etaMinutes: etaMinutes),
           ),
         ),
       ),
@@ -30,8 +40,9 @@ class StackTwoWidget extends StatelessWidget {
 }
 
 class _PickupPoint extends StatelessWidget {
-  const _PickupPoint({required this.scale});
+  const _PickupPoint({required this.scale, this.etaMinutes});
   final double scale;
+  final int? etaMinutes;
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +161,7 @@ class _PickupPoint extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Подача',
+                        context.l10n.text_pickup,
                         style: TextStyle(
                           fontSize: 26 * s,
                           fontWeight: FontWeight.w800,
@@ -158,36 +169,38 @@ class _PickupPoint extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 6 * s),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 34 * s,
-                            height: 34 * s,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
+                      if (etaMinutes != null) ...[
+                        SizedBox(height: 6 * s),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 34 * s,
+                              height: 34 * s,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Icons.access_time_rounded,
+                                size: 20 * s,
+                                color: const Color(0xFF0B0B0B),
+                              ),
                             ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.access_time_rounded,
-                              size: 20 * s,
-                              color: const Color(0xFF0B0B0B),
+                            SizedBox(width: 10 * s),
+                            Text(
+                              context.l10n.text_minutes_short(etaMinutes!),
+                              style: TextStyle(
+                                fontSize: 26 * s,
+                                fontWeight: FontWeight.w800,
+                                height: 1.0,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 10 * s),
-                          Text(
-                            '5 мин',
-                            style: TextStyle(
-                              fontSize: 26 * s,
-                              fontWeight: FontWeight.w800,
-                              height: 1.0,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ],

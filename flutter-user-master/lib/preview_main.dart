@@ -14,6 +14,7 @@ import 'src/presentation/views/login/login.dart';
 import 'src/presentation/views/login/otp_page.dart';
 import 'src/presentation/views/login/create_task_screen.dart';
 import 'src/presentation/views/login/select_task_screen.dart';
+import 'src/presentation/views/login/send_success_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,7 @@ Future<void> main() async {
     {'dial_code': '+998', 'dial_max_length': 9, 'name': 'Uzbekistan'}
   ];
   phcode = 0;
+  userDetails = {'name': 'Фаррух', 'mobile': '94 555 77 77'};
 
   runApp(const _PreviewApp());
 }
@@ -64,6 +66,7 @@ class _PreviewIndex extends StatefulWidget {
     'Ввод кода из SMS': (_) => const Otp(),
     'Выбор услуги': (_) => const SelectTaskScreen(),
     'Форма заявки': (_) => const CreateTaskScreen(id: 2),
+    'Заявка отправлена': (_) => const SendSuccessScreen(desc: ''),
   };
 
   @override

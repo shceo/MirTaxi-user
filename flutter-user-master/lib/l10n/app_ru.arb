@@ -371,5 +371,11 @@
   "text_name_hint": "Как к вам обращаться",
   "text_comment_hint": "Опишите, что нужно",
   "text_request_sent": "Заявка отправлена",
-  "text_request_sent_desc": "Оператор свяжется с вами в ближайшее время, чтобы уточнить детали"
+  "text_request_sent_desc": "Оператор свяжется с вами в ближайшее время, чтобы уточнить детали",
+  "text_pickup": "Подача",
+  "text_where_to": "Куда едем?",
+  "text_map": "Карта",
+  "text_your_address": "Ваш адрес",
+  "text_address_not_found": "Адрес не найден",
+  "text_minutes_short": "{count} мин"
 }

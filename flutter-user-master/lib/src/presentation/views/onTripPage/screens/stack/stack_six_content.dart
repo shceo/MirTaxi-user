@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/app_state.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
@@ -136,8 +137,8 @@ class StackSixExpandedContent extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: _SearchBar(
-                hint: 'Куда едем?',
-                mapText: 'Карта',
+                hint: context.l10n.text_where_to,
+                mapText: context.l10n.text_map,
                 onMapTap: onChange7,
                 onChanged: onSearchChanged,
               ),
@@ -299,9 +300,13 @@ class _AddressList extends StatelessWidget {
     return Column(
       children: List.generate(count, (i) {
         final title = lastAddress[i].dropAddress;
+        // Город раньше был константой «Ташкент» — все прошлые поездки
+        // помечались Ташкентом, включая Самарканд и Бухару. Города в данных
+        // адреса нет, поэтому подзаголовок не показываем вовсе: пусто честнее
+        // выдуманного.
         return _AddressTile(
           title: title,
-          subtitle: 'Ташкент',
+          subtitle: null,
           onTap: () => onTap(i),
         );
       }),
@@ -311,7 +316,7 @@ class _AddressList extends StatelessWidget {
 
 class _AddressTile extends StatelessWidget {
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final VoidCallback onTap;
 
   const _AddressTile({
@@ -350,15 +355,17 @@ class _AddressTile extends StatelessWidget {
                       color: const Color(0xFF111827),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.roboto(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9CA3AF),
+                  if (subtitle != null && subtitle!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
+                      style: GoogleFonts.roboto(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF9CA3AF),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

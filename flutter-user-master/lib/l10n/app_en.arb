@@ -381,5 +381,18 @@
   "text_name_hint": "How should we address you",
   "text_comment_hint": "Describe what you need",
   "text_request_sent": "Request sent",
-  "text_request_sent_desc": "Our operator will call you shortly to confirm the details"
+  "text_request_sent_desc": "Our operator will call you shortly to confirm the details",
+  "text_pickup": "Pickup",
+  "text_where_to": "Where to?",
+  "text_map": "Map",
+  "text_your_address": "Your address",
+  "text_address_not_found": "Address not found",
+  "text_minutes_short": "{count} min",
+  "@text_minutes_short": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

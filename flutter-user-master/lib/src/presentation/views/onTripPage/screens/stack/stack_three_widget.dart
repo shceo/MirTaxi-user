@@ -69,7 +69,7 @@ class StackThreeWidget extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      'Ваш адрес >',
+                      context.l10n.text_your_address,
                       style: GoogleFonts.roboto(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
