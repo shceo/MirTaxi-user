@@ -161,7 +161,10 @@ class MtTheme {
       colorScheme: scheme,
       fontFamily: _fontFamily,
       textTheme: text,
-      scaffoldBackgroundColor: scheme.surfaceContainerLow,
+      // На тон глубже, чем поверхности: белые поля и карточки должны
+      // отделяться от подложки. При surfaceContainerLow разница составляла
+      // два процента яркости и поля визуально сливались с фоном.
+      scaffoldBackgroundColor: scheme.surfaceContainer,
       splashFactory:
           Platform.isIOS ? NoSplash.splashFactory : InkSparkle.splashFactory,
 
@@ -215,7 +218,8 @@ class MtTheme {
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainerLow,
+        // Поля светлее подложки экрана, иначе сливаются с ней.
+        fillColor: scheme.surface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: MtSpace.lg,
           vertical: MtSpace.lg,

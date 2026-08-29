@@ -353,6 +353,8 @@ class _MapsState extends State<Maps>
     // Сессия протухла (401) — уводим на экран входа без обращения к серверу.
     if (sessionExpired) {
       sessionExpired = false;
+      final messenger = ScaffoldMessenger.of(context);
+      final message = context.l10n.text_session_expired;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         Navigator.pushAndRemoveUntil(
@@ -360,6 +362,9 @@ class _MapsState extends State<Maps>
             MaterialPageRoute(builder: (context) => const Login()),
             (route) => false);
         userDetails.clear();
+        // Раньше пользователя просто телепортировало на ввод номера без
+        // единого слова о причине.
+        messenger.showSnackBar(SnackBar(content: Text(message)));
       });
     }
 

@@ -2247,6 +2247,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'By continuing, you agree to the {terms} and {privacy}'**
   String text_agree_terms_privacy(String terms, String privacy);
+
+  /// No description provided for @text_choose_service.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a service'**
+  String get text_choose_service;
+
+  /// No description provided for @text_service_child.
+  ///
+  /// In en, this message translates to:
+  /// **'Child transport'**
+  String get text_service_child;
+
+  /// No description provided for @text_service_corporate.
+  ///
+  /// In en, this message translates to:
+  /// **'For business'**
+  String get text_service_corporate;
+
+  /// No description provided for @text_service_taxi.
+  ///
+  /// In en, this message translates to:
+  /// **'Taxi'**
+  String get text_service_taxi;
+
+  /// No description provided for @text_session_expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired. Please sign in again'**
+  String get text_session_expired;
+
+  /// No description provided for @text_request_form.
+  ///
+  /// In en, this message translates to:
+  /// **'Request form'**
+  String get text_request_form;
+
+  /// No description provided for @text_edit_photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a photo'**
+  String get text_edit_photo;
+
+  /// No description provided for @text_phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get text_phone;
+
+  /// No description provided for @text_comment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get text_comment;
+
+  /// No description provided for @text_send_request.
+  ///
+  /// In en, this message translates to:
+  /// **'Send request'**
+  String get text_send_request;
+
+  /// No description provided for @text_photo_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach a photo so the operator can see the details'**
+  String get text_photo_hint;
 }
 
 class _AppLocalizationsDelegate

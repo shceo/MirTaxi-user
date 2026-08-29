@@ -366,5 +366,16 @@
         "type": "String"
       }
     }
-  }
+  },
+  "text_choose_service": "Choose a service",
+  "text_service_child": "Child transport",
+  "text_service_corporate": "For business",
+  "text_service_taxi": "Taxi",
+  "text_session_expired": "Session expired. Please sign in again",
+  "text_request_form": "Request form",
+  "text_edit_photo": "Add a photo",
+  "text_phone": "Phone",
+  "text_comment": "Comment",
+  "text_send_request": "Send request",
+  "text_photo_hint": "Attach a photo so the operator can see the details"
 }

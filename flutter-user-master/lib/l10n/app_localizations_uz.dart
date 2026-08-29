@@ -1131,4 +1131,38 @@ class AppLocalizationsUz extends AppLocalizations {
   String text_agree_terms_privacy(String terms, String privacy) {
     return 'Davom etish orqali siz $terms va $privacy shartlariga rozilik bildirasiz';
   }
+
+  @override
+  String get text_choose_service => 'Xizmatni tanlang';
+
+  @override
+  String get text_service_child => 'Bolalarni tashish';
+
+  @override
+  String get text_service_corporate => 'Korporativ mijozlarga';
+
+  @override
+  String get text_service_taxi => 'Taksi';
+
+  @override
+  String get text_session_expired => 'Sessiya tugadi. Qaytadan kiring';
+
+  @override
+  String get text_request_form => 'Ariza';
+
+  @override
+  String get text_edit_photo => 'Rasm qo‘shish';
+
+  @override
+  String get text_phone => 'Telefon';
+
+  @override
+  String get text_comment => 'Izoh';
+
+  @override
+  String get text_send_request => 'Ariza yuborish';
+
+  @override
+  String get text_photo_hint =>
+      'Operator tafsilotlarni ko‘rishi uchun rasm biriktiring';
 }

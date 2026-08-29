@@ -356,5 +356,16 @@
   "text_approval_waiting": "Tekshirish kutilmoqda",
   "text_enter_vehicle_color": "Avtomobilingiz Rangini Kiriting",
   "text_login_subtitle": "Raqamni tasdiqlash uchun SMS orqali kod yuboramiz",
-  "text_agree_terms_privacy": "Davom etish orqali siz {terms} va {privacy} shartlariga rozilik bildirasiz"
+  "text_agree_terms_privacy": "Davom etish orqali siz {terms} va {privacy} shartlariga rozilik bildirasiz",
+  "text_choose_service": "Xizmatni tanlang",
+  "text_service_child": "Bolalarni tashish",
+  "text_service_corporate": "Korporativ mijozlarga",
+  "text_service_taxi": "Taksi",
+  "text_session_expired": "Sessiya tugadi. Qaytadan kiring",
+  "text_request_form": "Ariza",
+  "text_edit_photo": "Rasm qo‘shish",
+  "text_phone": "Telefon",
+  "text_comment": "Izoh",
+  "text_send_request": "Ariza yuborish",
+  "text_photo_hint": "Operator tafsilotlarni ko‘rishi uchun rasm biriktiring"
 }

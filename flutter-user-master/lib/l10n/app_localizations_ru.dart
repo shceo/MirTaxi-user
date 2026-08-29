@@ -1128,4 +1128,37 @@ class AppLocalizationsRu extends AppLocalizations {
   String text_agree_terms_privacy(String terms, String privacy) {
     return 'Продолжая, вы принимаете $terms и $privacy';
   }
+
+  @override
+  String get text_choose_service => 'Выберите услугу';
+
+  @override
+  String get text_service_child => 'Перевозка детей';
+
+  @override
+  String get text_service_corporate => 'Корпоративным клиентам';
+
+  @override
+  String get text_service_taxi => 'Такси';
+
+  @override
+  String get text_session_expired => 'Сессия истекла. Войдите заново';
+
+  @override
+  String get text_request_form => 'Заявка';
+
+  @override
+  String get text_edit_photo => 'Добавить фото';
+
+  @override
+  String get text_phone => 'Телефон';
+
+  @override
+  String get text_comment => 'Комментарий';
+
+  @override
+  String get text_send_request => 'Отправить заявку';
+
+  @override
+  String get text_photo_hint => 'Приложите фото, чтобы оператор увидел детали';
 }

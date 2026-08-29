@@ -155,9 +155,9 @@ class _OtpState extends State<Otp> {
     final scheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: scheme.surfaceContainerLow,
+      backgroundColor: scheme.surfaceContainer,
       appBar: AppBar(
-        backgroundColor: scheme.surfaceContainerLow,
+        backgroundColor: scheme.surfaceContainer,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),

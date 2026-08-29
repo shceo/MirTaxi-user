@@ -80,7 +80,7 @@ class _LoginState extends State<Login> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surfaceContainerLow,
+      backgroundColor: theme.colorScheme.surfaceContainer,
       body: Directionality(
         textDirection: (languageDirection == 'rtl')
             ? TextDirection.rtl

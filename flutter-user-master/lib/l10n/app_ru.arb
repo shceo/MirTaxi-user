@@ -356,5 +356,16 @@
   "withdrawn_from_wallet": "Withdrawn From Wallet",
   "text_enter_vehicle_color": "Введите цвет вашего автомобиля",
   "text_login_subtitle": "Отправим код в SMS, чтобы подтвердить номер",
-  "text_agree_terms_privacy": "Продолжая, вы принимаете {terms} и {privacy}"
+  "text_agree_terms_privacy": "Продолжая, вы принимаете {terms} и {privacy}",
+  "text_choose_service": "Выберите услугу",
+  "text_service_child": "Перевозка детей",
+  "text_service_corporate": "Корпоративным клиентам",
+  "text_service_taxi": "Такси",
+  "text_session_expired": "Сессия истекла. Войдите заново",
+  "text_request_form": "Заявка",
+  "text_edit_photo": "Добавить фото",
+  "text_phone": "Телефон",
+  "text_comment": "Комментарий",
+  "text_send_request": "Отправить заявку",
+  "text_photo_hint": "Приложите фото, чтобы оператор увидел детали"
 }

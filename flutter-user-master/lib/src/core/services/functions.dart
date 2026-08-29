@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -86,9 +87,29 @@ getDetailsOfDevice() async {
     fcm = token;
     pref = await SharedPreferences.getInstance();
   } catch (e) {
+    logDebug('FCM token unavailable: $e');
     if (e is SocketException) {
       internet = false;
     }
+  }
+  pref ??= await SharedPreferences.getInstance();
+
+  // Бэкенд требует device_token обязательным полем при логине. Если FCM-токен
+  // получить не удалось (симулятор без APNs, отказ от уведомлений, отсутствие
+  // Play Services), запрос уходил с null и логин падал с 422 — пользователь
+  // видел «неверный код», хотя код был верный.
+  //
+  // В debug подставляем стабильный локальный идентификатор, чтобы можно было
+  // тестировать. В release этого не делаем: там нужно, чтобы бэкенд разрешил
+  // device_token быть пустым, иначе часть пользователей не сможет войти вообще.
+  if ((fcm == null || fcm.toString().isEmpty) && kDebugMode) {
+    var stub = pref.getString('debug_device_token');
+    if (stub == null || stub.toString().isEmpty) {
+      stub = 'debug-no-fcm-${const Uuid().v4()}';
+      await pref.setString('debug_device_token', stub);
+    }
+    fcm = stub;
+    logDebug('device_token подставлен заглушкой для отладки: $stub');
   }
 }
 

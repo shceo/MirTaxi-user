@@ -219,9 +219,12 @@ class ApiProvider {
       );
     } else if (response.statusCode == 401) {
       var result = json.decode(utf8.decode(response.bodyBytes));
-      // Токен протух — раньше это молча возвращалось наверх и пользователь
-      // залипал на пустых экранах без разлогина.
-      handleUnauthorized();
+      // Сбрасываем сессию только если токен у нас вообще был. Иначе 401 от
+      // эндпоинта, вызванного до авторизации, выкидывал пользователя на экран
+      // входа прямо посреди работы.
+      if (authToken.isNotEmpty) {
+        handleUnauthorized();
+      }
       return HttpResult(
         isSuccess: false,
         status: status,

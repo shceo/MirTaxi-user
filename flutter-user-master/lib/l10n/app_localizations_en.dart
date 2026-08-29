@@ -1111,4 +1111,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String text_agree_terms_privacy(String terms, String privacy) {
     return 'By continuing, you agree to the $terms and $privacy';
   }
+
+  @override
+  String get text_choose_service => 'Choose a service';
+
+  @override
+  String get text_service_child => 'Child transport';
+
+  @override
+  String get text_service_corporate => 'For business';
+
+  @override
+  String get text_service_taxi => 'Taxi';
+
+  @override
+  String get text_session_expired => 'Session expired. Please sign in again';
+
+  @override
+  String get text_request_form => 'Request form';
+
+  @override
+  String get text_edit_photo => 'Add a photo';
+
+  @override
+  String get text_phone => 'Phone';
+
+  @override
+  String get text_comment => 'Comment';
+
+  @override
+  String get text_send_request => 'Send request';
+
+  @override
+  String get text_photo_hint =>
+      'Attach a photo so the operator can see the details';
 }

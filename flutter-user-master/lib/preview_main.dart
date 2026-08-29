@@ -12,6 +12,8 @@ import 'src/presentation/design/app_theme.dart';
 import 'src/presentation/design/tokens.dart';
 import 'src/presentation/views/login/login.dart';
 import 'src/presentation/views/login/otp_page.dart';
+import 'src/presentation/views/login/create_task_screen.dart';
+import 'src/presentation/views/login/select_task_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,13 +56,39 @@ class _PreviewApp extends StatelessWidget {
 
 /// Оглавление: экраны открываются поверх него, поэтому «назад» возвращает сюда,
 /// а не в пустоту, как было бы, открывай мы экран сразу корневым.
-class _PreviewIndex extends StatelessWidget {
+class _PreviewIndex extends StatefulWidget {
   const _PreviewIndex();
 
-  static final _screens = <String, WidgetBuilder>{
+  static final screens = <String, WidgetBuilder>{
     'Вход': (_) => const Login(),
     'Ввод кода из SMS': (_) => const Otp(),
+    'Выбор услуги': (_) => const SelectTaskScreen(),
+    'Форма заявки': (_) => const CreateTaskScreen(id: 2),
   };
+
+  @override
+  State<_PreviewIndex> createState() => _PreviewIndexState();
+}
+
+class _PreviewIndexState extends State<_PreviewIndex> {
+  /// Автооткрытие экрана по номеру: --dart-define=SCREEN=2
+  /// Экран открывается поверх списка, поэтому «назад» продолжает работать.
+  static const int _autoOpen = int.fromEnvironment('SCREEN', defaultValue: -1);
+
+  @override
+  void initState() {
+    super.initState();
+    if (_autoOpen >= 0 && _autoOpen < _PreviewIndex.screens.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: _PreviewIndex.screens.values.elementAt(_autoOpen)),
+        );
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +98,10 @@ class _PreviewIndex extends StatelessWidget {
       appBar: AppBar(title: const Text('Экраны — предпросмотр')),
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: MtSpace.sm),
-        itemCount: _screens.length,
+        itemCount: _PreviewIndex.screens.length,
         separatorBuilder: (_, __) => const Divider(indent: MtSpace.screenX),
         itemBuilder: (context, i) {
-          final name = _screens.keys.elementAt(i);
+          final name = _PreviewIndex.screens.keys.elementAt(i);
           return ListTile(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: MtSpace.screenX,
@@ -83,7 +111,7 @@ class _PreviewIndex extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: _screens[name]!),
+              MaterialPageRoute(builder: _PreviewIndex.screens[name]!),
             ),
           );
         },
