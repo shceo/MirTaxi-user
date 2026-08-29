@@ -69,16 +69,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Fastest way to book Taxi without the hassle of waiting & haggling of price';
 
   @override
-  String get text_phone_verify => 'Phone Verification';
+  String get text_phone_verify => 'Confirm your number';
 
   @override
-  String get text_enter_otp => 'Please enter the 6-digit code send to you at';
+  String get text_enter_otp => 'Enter the 6-digit code we sent to';
 
   @override
-  String get text_resend_code => 'Resend Code';
+  String get text_resend_code => 'Send code again';
 
   @override
-  String get text_verify => 'Verify Now';
+  String get text_verify => 'Confirm';
 
   @override
   String get text_pick_up_location => 'Pick up Location';

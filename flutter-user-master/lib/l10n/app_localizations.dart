@@ -217,25 +217,25 @@ abstract class AppLocalizations {
   /// No description provided for @text_phone_verify.
   ///
   /// In en, this message translates to:
-  /// **'Phone Verification'**
+  /// **'Confirm your number'**
   String get text_phone_verify;
 
   /// No description provided for @text_enter_otp.
   ///
   /// In en, this message translates to:
-  /// **'Please enter the 6-digit code send to you at'**
+  /// **'Enter the 6-digit code we sent to'**
   String get text_enter_otp;
 
   /// No description provided for @text_resend_code.
   ///
   /// In en, this message translates to:
-  /// **'Resend Code'**
+  /// **'Send code again'**
   String get text_resend_code;
 
   /// No description provided for @text_verify.
   ///
   /// In en, this message translates to:
-  /// **'Verify Now'**
+  /// **'Confirm'**
   String get text_verify;
 
   /// No description provided for @text_pick_up_location.

@@ -70,17 +70,17 @@ class AppLocalizationsUz extends AppLocalizations {
       'Kutish va narx-navo savdolarisiz taksi bron qilishning eng tezkor usuli';
 
   @override
-  String get text_phone_verify => 'Telefon raqamni tekshirish';
+  String get text_phone_verify => 'Raqamni tasdiqlang';
 
   @override
   String get text_enter_otp =>
-      'Iltimos, sizga yuborilgan 6 xonali kodni kiriting';
+      'Quyidagi raqamga yuborilgan 6 xonali kodni kiriting';
 
   @override
   String get text_resend_code => 'Kodni qayta yuborish';
 
   @override
-  String get text_verify => 'Hozir tasdiqlang';
+  String get text_verify => 'Tasdiqlash';
 
   @override
   String get text_pick_up_location => 'Joylashuvni olish';

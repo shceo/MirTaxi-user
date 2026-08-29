@@ -26,6 +26,19 @@ class _OtpState extends State<Otp> {
   String _error = '';
   late final AuthViewModel _viewModel;
 
+  /// Последний текст поля. TextEditingController уведомляет слушателей и при
+  /// изменении выделения, а не только текста, — без этой проверки автопроверка
+  /// кода срабатывала повторно с тем же кодом.
+  String _lastText = '';
+
+  /// Код, который уже ушёл на проверку. Бэкенд гасит OTP после первой попытки,
+  /// поэтому повторная отправка того же кода всегда возвращает «неверный код».
+  String _submittedCode = '';
+
+  /// Защита от параллельных запросов: автопроверка и нажатие кнопки могли
+  /// уйти одновременно.
+  bool _verifying = false;
+
   @override
   void initState() {
     super.initState();
@@ -44,8 +57,12 @@ class _OtpState extends State<Otp> {
   }
 
   void _onCodeChanged() {
+    final text = otpController.text;
+    if (text == _lastText) return; // сменилось выделение, а не текст
+    _lastText = text;
+
     if (_error.isNotEmpty) setState(() => _error = '');
-    if (otpController.text.length == _otpLength) {
+    if (text.length == _otpLength) {
       _focus.unfocus();
       // Код введён полностью — проверяем сразу, не заставляя жать кнопку.
       _verifyOtp();
@@ -89,22 +106,36 @@ class _OtpState extends State<Otp> {
   }
 
   Future<void> _verifyOtp() async {
-    final result = await _viewModel.verifyOtp(otpController.text);
-    if (!mounted) return;
-    if (result.hasError) {
-      HapticFeedback.heavyImpact();
-      setState(() => _error = result.error ?? '');
-      return;
-    }
-    setState(() => _error = '');
-    if (result.destination != null) {
-      _navigate(result.destination!);
+    final code = otpController.text;
+    if (code.length != _otpLength) return;
+    if (_verifying) return;
+    // Тот же код второй раз отправлять бессмысленно: он уже погашен на бэкенде.
+    if (code == _submittedCode) return;
+
+    _verifying = true;
+    _submittedCode = code;
+    try {
+      final result = await _viewModel.verifyOtp(code);
+      if (!mounted) return;
+      if (result.hasError) {
+        HapticFeedback.heavyImpact();
+        setState(() => _error = result.error ?? '');
+        return;
+      }
+      setState(() => _error = '');
+      if (result.destination != null) {
+        _navigate(result.destination!);
+      }
+    } finally {
+      _verifying = false;
     }
   }
 
   Future<void> _resend() async {
     HapticFeedback.selectionClick();
     otpController.clear();
+    _lastText = '';
+    _submittedCode = '';
     await _viewModel.requestOtp(phnumber);
     _viewModel.startResendTimer();
   }
@@ -182,7 +213,7 @@ class _OtpState extends State<Otp> {
                                       ),
                                       const SizedBox(height: MtSpace.xs),
                                       Text(
-                                        '$_dialCode$phnumber',
+                                        '$_dialCode $phnumber',
                                         style: theme.textTheme.titleMedium
                                             ?.copyWith(
                                           fontFeatures: const [
@@ -237,7 +268,13 @@ class _OtpState extends State<Otp> {
                                         child: SizedBox(height: MtSpace.x3l),
                                       ),
                                       FilledButton(
-                                        onPressed: filled == _otpLength
+                                        // Гасим кнопку и для уже отправленного
+                                        // кода: иначе нажатие молча ничего не
+                                        // делало бы.
+                                        onPressed: (filled == _otpLength &&
+                                                !_verifying &&
+                                                otpController.text !=
+                                                    _submittedCode)
                                             ? _verifyOtp
                                             : null,
                                         child: Text(context.l10n.text_verify),

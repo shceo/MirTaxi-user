@@ -1,6 +1,6 @@
-// ВРЕМЕННАЯ точка входа только для просмотра отдельных экранов при редизайне.
+// ВРЕМЕННАЯ точка входа только для просмотра экранов при редизайне.
 // Запуск: flutter run -t lib/preview_main.dart
-// В сборку не попадает, main.dart не трогает. Удалить после редизайна.
+// В прод-сборку не попадает, main.dart не трогает. Удалить после редизайна.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -9,13 +9,15 @@ import 'package:tagyourtaxi_driver/l10n/app_localizations.dart';
 import 'src/core/services/cache_service.dart';
 import 'src/core/services/functions.dart';
 import 'src/presentation/design/app_theme.dart';
+import 'src/presentation/design/tokens.dart';
+import 'src/presentation/views/login/login.dart';
 import 'src/presentation/views/login/otp_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await CacheService.init();
 
-  // Подставляем данные, которые обычно приходят с экрана входа.
+  // Данные, которые в обычном потоке приезжают с предыдущих экранов.
   phnumber = '94 555 77 77';
   languageDirection = 'ltr';
   choosenLanguage = 'ru';
@@ -45,7 +47,47 @@ class _PreviewApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const Otp(),
+      home: const _PreviewIndex(),
+    );
+  }
+}
+
+/// Оглавление: экраны открываются поверх него, поэтому «назад» возвращает сюда,
+/// а не в пустоту, как было бы, открывай мы экран сразу корневым.
+class _PreviewIndex extends StatelessWidget {
+  const _PreviewIndex();
+
+  static final _screens = <String, WidgetBuilder>{
+    'Вход': (_) => const Login(),
+    'Ввод кода из SMS': (_) => const Otp(),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Экраны — предпросмотр')),
+      body: ListView.separated(
+        padding: const EdgeInsets.symmetric(vertical: MtSpace.sm),
+        itemCount: _screens.length,
+        separatorBuilder: (_, __) => const Divider(indent: MtSpace.screenX),
+        itemBuilder: (context, i) {
+          final name = _screens.keys.elementAt(i);
+          return ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: MtSpace.screenX,
+              vertical: MtSpace.xs,
+            ),
+            title: Text(name, style: theme.textTheme.bodyLarge),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: _screens[name]!),
+            ),
+          );
+        },
+      ),
     );
   }
 }

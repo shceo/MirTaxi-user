@@ -68,16 +68,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get text_fastest_way => 'Быстрый способ вызвать такси';
 
   @override
-  String get text_phone_verify => 'Верификация номера телефона';
+  String get text_phone_verify => 'Подтвердите номер';
 
   @override
-  String get text_enter_otp => 'Пожалуйста, введите 6-значный код';
+  String get text_enter_otp => 'Введите 6-значный код, отправленный на номер';
 
   @override
-  String get text_resend_code => 'Отправить код еще раз';
+  String get text_resend_code => 'Отправить код ещё раз';
 
   @override
-  String get text_verify => 'Проверить сейчас';
+  String get text_verify => 'Подтвердить';
 
   @override
   String get text_pick_up_location => 'Выбрать место';
