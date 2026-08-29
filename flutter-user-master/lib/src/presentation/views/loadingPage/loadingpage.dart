@@ -58,11 +58,13 @@ class _LoadingPageState extends State<LoadingPage> {
           break;
         case LoadingDestination.login:
           Future.delayed(const Duration(seconds: 2), () {
+            if (!mounted) return;
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
           });
           break;
         case LoadingDestination.chooseLanguage:
           Future.delayed(const Duration(seconds: 2), () {
+            if (!mounted) return;
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
           });
           break;

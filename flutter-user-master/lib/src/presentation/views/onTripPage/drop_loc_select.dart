@@ -57,6 +57,8 @@ class _DropLocationState extends State<DropLocation>
 
   @override
   void dispose() {
+    // addObserver есть в initState, removeObserver отсутствовал.
+    WidgetsBinding.instance.removeObserver(this);
     _autoAddressDebounce?.cancel();
     search.dispose();
     super.dispose();

@@ -39,6 +39,11 @@ extension _BookingConfirmationLogic on _BookingConfirmationState {
     _arrivalWaitingTimer?.cancel();
     _arrivalWaitingTimer = null;
 
+    // addObserver вызывается в initState, а removeObserver отсутствовал —
+    // observer продолжал жить после закрытия экрана. StreamController тоже
+    // не закрывался.
+    WidgetsBinding.instance.removeObserver(this);
+    _mapMarkerSC.close();
     animationController?.dispose();
   }
 

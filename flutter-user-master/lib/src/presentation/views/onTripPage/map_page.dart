@@ -395,6 +395,7 @@ class _MapsState extends State<Maps>
               Future.delayed(
                 const Duration(seconds: 2),
                 () {
+                  if (!context.mounted) return;
                   if (userRequestData['is_rental'] == true) {
                     Navigator.pushAndRemoveUntil(
                         context,

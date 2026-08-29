@@ -51,3 +51,6 @@ android/app/.cxx/
 
 # Temporary scratch scripts
 .tmp_*
+
+# Заглушка Firebase для локальной разработки — настоящий файл берётся из Firebase Console
+ios/Runner/GoogleService-Info.plist

@@ -197,6 +197,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
 
                               setState(() => isLoading = false);
 
+                              if (!context.mounted) return;
                               if (result.isSuccess) {
                                 Navigator.push(
                                   context,
