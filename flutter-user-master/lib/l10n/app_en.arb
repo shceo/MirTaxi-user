@@ -377,5 +377,9 @@
   "text_phone": "Phone",
   "text_comment": "Comment",
   "text_send_request": "Send request",
-  "text_photo_hint": "Attach a photo so the operator can see the details"
+  "text_photo_hint": "Attach a photo so the operator can see the details",
+  "text_name_hint": "How should we address you",
+  "text_comment_hint": "Describe what you need",
+  "text_request_sent": "Request sent",
+  "text_request_sent_desc": "Our operator will call you shortly to confirm the details"
 }

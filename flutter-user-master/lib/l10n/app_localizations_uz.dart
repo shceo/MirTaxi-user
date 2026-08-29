@@ -1165,4 +1165,17 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get text_photo_hint =>
       'Operator tafsilotlarni ko‘rishi uchun rasm biriktiring';
+
+  @override
+  String get text_name_hint => 'Sizga qanday murojaat qilaylik';
+
+  @override
+  String get text_comment_hint => 'Nima kerakligini yozing';
+
+  @override
+  String get text_request_sent => 'Ariza yuborildi';
+
+  @override
+  String get text_request_sent_desc =>
+      'Tafsilotlarni aniqlashtirish uchun operator tez orada siz bilan bog‘lanadi';
 }

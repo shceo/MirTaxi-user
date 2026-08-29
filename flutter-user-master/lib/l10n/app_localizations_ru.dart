@@ -1161,4 +1161,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get text_photo_hint => 'Приложите фото, чтобы оператор увидел детали';
+
+  @override
+  String get text_name_hint => 'Как к вам обращаться';
+
+  @override
+  String get text_comment_hint => 'Опишите, что нужно';
+
+  @override
+  String get text_request_sent => 'Заявка отправлена';
+
+  @override
+  String get text_request_sent_desc =>
+      'Оператор свяжется с вами в ближайшее время, чтобы уточнить детали';
 }

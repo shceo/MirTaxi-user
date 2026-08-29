@@ -85,8 +85,10 @@ class _EditProfileState extends State<EditProfile> {
   @override
   void initState() {
     imageFile = null;
-    name.text = userDetails['name'];
-    email.text = userDetails['email'];
+    // Присваивание null в String роняло экран у пользователей без имени
+    // или почты в профиле.
+    name.text = (userDetails['name'] ?? '').toString();
+    email.text = (userDetails['email'] ?? '').toString();
     super.initState();
   }
 

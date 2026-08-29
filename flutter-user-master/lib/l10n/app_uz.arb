@@ -367,5 +367,9 @@
   "text_phone": "Telefon",
   "text_comment": "Izoh",
   "text_send_request": "Ariza yuborish",
-  "text_photo_hint": "Operator tafsilotlarni ko‘rishi uchun rasm biriktiring"
+  "text_photo_hint": "Operator tafsilotlarni ko‘rishi uchun rasm biriktiring",
+  "text_name_hint": "Sizga qanday murojaat qilaylik",
+  "text_comment_hint": "Nima kerakligini yozing",
+  "text_request_sent": "Ariza yuborildi",
+  "text_request_sent_desc": "Tafsilotlarni aniqlashtirish uchun operator tez orada siz bilan bog‘lanadi"
 }

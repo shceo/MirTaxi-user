@@ -1145,4 +1145,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get text_photo_hint =>
       'Attach a photo so the operator can see the details';
+
+  @override
+  String get text_name_hint => 'How should we address you';
+
+  @override
+  String get text_comment_hint => 'Describe what you need';
+
+  @override
+  String get text_request_sent => 'Request sent';
+
+  @override
+  String get text_request_sent_desc =>
+      'Our operator will call you shortly to confirm the details';
 }

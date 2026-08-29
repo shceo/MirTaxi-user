@@ -80,6 +80,7 @@ class MtRadius {
   static const BorderRadius brLg = BorderRadius.all(Radius.circular(lg));
   static const BorderRadius brXl = BorderRadius.all(Radius.circular(xl));
   static const BorderRadius brXxl = BorderRadius.all(Radius.circular(xxl));
+  static const BorderRadius brPill = BorderRadius.all(Radius.circular(pill));
 
   /// Скругление верхних углов у нижних панелей и шторок.
   static const BorderRadius sheet = BorderRadius.only(

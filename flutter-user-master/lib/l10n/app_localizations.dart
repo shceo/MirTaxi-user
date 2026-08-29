@@ -2313,6 +2313,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Attach a photo so the operator can see the details'**
   String get text_photo_hint;
+
+  /// No description provided for @text_name_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'How should we address you'**
+  String get text_name_hint;
+
+  /// No description provided for @text_comment_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe what you need'**
+  String get text_comment_hint;
+
+  /// No description provided for @text_request_sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Request sent'**
+  String get text_request_sent;
+
+  /// No description provided for @text_request_sent_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Our operator will call you shortly to confirm the details'**
+  String get text_request_sent_desc;
 }
 
 class _AppLocalizationsDelegate

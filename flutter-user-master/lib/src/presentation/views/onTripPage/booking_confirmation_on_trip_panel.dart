@@ -53,21 +53,29 @@ extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
     // API fields
     final String carColor = (driverData['car_color'] ?? '').toString();
     final String carMake = (driverData['car_make_name'] ?? '').toString();
+    // Никаких правдоподобных заглушек: раньше при отсутствии данных пассажиру
+    // во время реальной поездки показывались выдуманные водитель «Eshmatboy»,
+    // номер «10S618UA», рейтинг «4.84» и машина «серый BVD». Человек искал бы
+    // несуществующий автомобиль. Пусто — значит прочерк.
+    const String noData = '—';
+
     final String carLine = ('${carColor.trim()} ${carMake.trim()}'.trim()).isNotEmpty
         ? ('${carColor.trim()} ${carMake.trim()}'.trim())
-        : 'серый BVD';
+        : noData;
 
     final String plate = (driverData['car_number'] ?? '').toString().trim().isNotEmpty
         ? driverData['car_number'].toString()
-        : '10S618UA';
+        : noData;
 
     final String driverName = (driverData['name'] ?? '').toString().trim().isNotEmpty
         ? driverData['name'].toString()
-        : 'Eshmatboy';
+        : noData;
 
+    // Рейтинг пустой строкой — виджет ниже прячет блок целиком, а не рисует
+    // выдуманное число.
     final String rating = (driverData['rating'] ?? '').toString().trim().isNotEmpty
         ? driverData['rating'].toString()
-        : '4.84';
+        : '';
 
     final String? avatarUrl =
         (driverData['profile_picture'] ?? driverData['profilePicture'])?.toString();
@@ -77,14 +85,14 @@ extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
             readNested(userRequestData, ['pick_address']) ??
             readNested(userRequestData, ['pickup', 'address']) ??
             readNested(userRequestData, ['start_address']) ??
-            'улица Богишамол, 1';
+            noData;
 
     final String dropoffAddress =
         readNested(userRequestData, ['dropoff_address']) ??
             readNested(userRequestData, ['drop_address']) ??
             readNested(userRequestData, ['dropoff', 'address']) ??
             readNested(userRequestData, ['destination_address']) ??
-            'проспект Амира Темура, 95А';
+            noData;
 
     // UI constants
     final double radius = media.width * 0.055; // чуть больше — как на iOS
@@ -216,7 +224,10 @@ extension _BookingConfirmationOnTripPanel on _BookingConfirmationState {
                           Positioned(
                             top: media.width * 0.015,
                             right: media.width * 0.03,
-                            child: Container(
+                            // Пустой рейтинг — не показываем плашку вовсе.
+                            child: rating.isEmpty
+                                ? const SizedBox.shrink()
+                                : Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Colors.white,
