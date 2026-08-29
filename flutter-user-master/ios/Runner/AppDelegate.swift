@@ -10,7 +10,12 @@ import Firebase
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     FirebaseApp.configure()
-    YMKMapKit.setApiKey("d91bb4f0-deaa-4b35-8764-1e08e6b8a38b")
+    // Ключ Yandex MapKit читаем из Info.plist (YandexMapsApiKey), чтобы он был
+    // в одном месте и подменялся через xcconfig без правки кода.
+    if let mapKitKey = Bundle.main.object(forInfoDictionaryKey: "YandexMapsApiKey") as? String,
+       !mapKitKey.isEmpty {
+      YMKMapKit.setApiKey(mapKitKey)
+    }
     YMKMapKit.sharedInstance()
     GeneratedPluginRegistrant.register(with: self)
  UIApplication.shared.beginReceivingRemoteControlEvents()

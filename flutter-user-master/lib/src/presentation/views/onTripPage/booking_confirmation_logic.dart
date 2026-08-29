@@ -34,7 +34,7 @@ extension _BookingConfirmationLogic on _BookingConfirmationState {
 
   void disposeBookingConfirmationState() {
     if (timers != null) {
-      timers.cancel;
+      timers.cancel();
     }
     _arrivalWaitingTimer?.cancel();
     _arrivalWaitingTimer = null;

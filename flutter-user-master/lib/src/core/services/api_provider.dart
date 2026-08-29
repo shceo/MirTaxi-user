@@ -61,14 +61,24 @@ class ApiProvider {
       log(request.fields.toString());
       log(request.files.toString());
     }
-    var response = await request.send();
-    var responseData = await http.Response.fromStream(response);
-    // .interceptWithAlice(alice);
-    if (kDebugMode) {
-      log(responseData.statusCode.toString());
-      log(responseData.body);
+    try {
+      // Раньше здесь не было ни таймаута, ни try/catch: запрос мог висеть
+      // бесконечно при плохой сети.
+      var response = await request.send().timeout(durationTimeout);
+      var responseData =
+          await http.Response.fromStream(response).timeout(durationTimeout);
+      if (kDebugMode) {
+        log(responseData.statusCode.toString());
+        log(responseData.body);
+      }
+      return result(responseData);
+    } on TimeoutException catch (_) {
+      return HttpResult(
+          isSuccess: false, status: -1, error: '', result: "Network");
+    } on SocketException catch (_) {
+      return HttpResult(
+          isSuccess: false, status: -1, error: '', result: "Network");
     }
-    return result(responseData);
   }
 
   Future<HttpResult> getRequest(url, {bool isHeader = true}) async {
@@ -209,6 +219,9 @@ class ApiProvider {
       );
     } else if (response.statusCode == 401) {
       var result = json.decode(utf8.decode(response.bodyBytes));
+      // Токен протух — раньше это молча возвращалось наверх и пользователь
+      // залипал на пустых экранах без разлогина.
+      handleUnauthorized();
       return HttpResult(
         isSuccess: false,
         status: status,
@@ -243,18 +256,21 @@ class ApiProvider {
   Map<String, String> header({
     bool isMultipart = false,
   }) {
-    final token = bearerToken.isNotEmpty ? bearerToken[0].token : '';
+    final token = authToken;
+    // Язык больше не захардкожен: приложение трёхъязычное, а бэкенд из-за
+    // "lang": "en" всегда отвечал по-английски.
+    final lang = choosenLanguage.isNotEmpty ? choosenLanguage : 'en';
     if (token.isEmpty) {
       return {
         "Accept": "application/json",
-        "lang": "en",
+        "lang": lang,
         'content-type': 'application/json; charset=utf-8',
       };
     }
     return {
       'content-type': isMultipart ? "multipart/form-data" : 'application/json',
       'Accept': isMultipart ? '*/*' : 'application/json',
-      "lang": "en",
+      "lang": lang,
       "Authorization": "Bearer $token",
     };
   }

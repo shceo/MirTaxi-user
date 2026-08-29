@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -35,14 +36,21 @@ var audio = 'audio/notification_sound.mp3';
 bool internet = true;
 List<AddressModel> lastAddress = [];
 
+// Логирование только в debug-сборке. debugPrint в release не вырезается,
+// а сюда уходят тела HTTP-ответов, в том числе с токенами.
+void logDebug(Object? message) {
+  if (kDebugMode) {
+    debugPrint(message.toString());
+  }
+}
+
 //base url
 // Base API URL — must match the driver app, otherwise заявки уходят на другой бэкенд.
-String url =
-    'https://uzch.uz/'; //please add '/' at the end of the url as 'https://yourwebsite.com/'
-// Google Maps key (disabled; switched to Yandex MapKit)
-// String mapkey = 'AIzaSyCe7XyWJbAkb1Fw6RNc8vlzPPcxx7X4ImM';
-const String yandexMapkitKey =
-    'd91bb4f0-deaa-4b35-8764-1e08e6b8a38b'; // Reference only; set natively.
+// Переопределяется без правки кода:
+//   flutter build apk --dart-define=API_BASE_URL=https://...
+String url = const String.fromEnvironment('API_BASE_URL',
+    defaultValue: 'https://uzch.uz/'); //обязательно '/' в конце
+// Ключи карт задаются нативно: Android — meta-data манифеста, iOS — Info.plist.
 
 bool _hasConnection(dynamic result) {
   if (result is List<ConnectivityResult>) {
@@ -66,7 +74,7 @@ checkInternetConnection() {
 
 // void printWrapped(String text) {
 //   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+//   pattern.allMatches(text).forEach((match) => logDebug(match.group(0)));
 // }
 
 getDetailsOfDevice() async {
@@ -114,11 +122,11 @@ validateEmail() async {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
       } else {
-        debugPrint(response.body);
+        logDebug(response.body);
         result = 'failed';
       }
     } else if (response.statusCode == 422) {
-      debugPrint(response.body);
+      logDebug(response.body);
       var error = jsonDecode(response.body)['errors'];
       result = error[error.keys.toList()[0]]
           .toString()
@@ -126,7 +134,7 @@ validateEmail() async {
           .replaceAll(']', '')
           .toString();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = jsonDecode(response.body)['message'];
     }
     return result;
@@ -197,7 +205,7 @@ getCountryCode() async {
           : 0;
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'error';
     }
   } catch (e) {
@@ -224,13 +232,12 @@ phoneAuth(String phone) async {
       phoneNumber: phone,
       verificationCompleted: (PhoneAuthCredential credential) async {
         credentials = credential;
-        print(credential.accessToken);
         valueNotifierHome.incrementNotifier();
       },
       forceResendingToken: resendTokenId,
       verificationFailed: (FirebaseAuthException e) {
         if (e.code == 'invalid-phone-number') {
-          debugPrint('The provided phone number is not valid.');
+          logDebug('The provided phone number is not valid.');
         }
       },
       codeSent: (String verificationId, int? resendToken) async {
@@ -250,7 +257,7 @@ phoneAuth(String phone) async {
 
 getLocalData() async {
   dynamic result;
-  bearerToken.clear;
+  bearerToken.clear();
   var connectivityResult = await Connectivity().checkConnectivity();
   internet = _hasConnection(connectivityResult);
   try {
@@ -324,11 +331,11 @@ registerUser() async {
       bearerToken.add(BearerClass(
           type: jsonVal['token_type'].toString(),
           token: jsonVal['access_token'].toString()));
-      pref.setString('Bearer', bearerToken[0].token);
+      pref.setString('Bearer', authToken);
       await getUserDetails();
       result = 'true';
     } else if (respon.statusCode == 422) {
-      debugPrint(respon.body);
+      logDebug(respon.body);
       var error = jsonDecode(respon.body)['errors'];
       result = error[error.keys.toList()[0]]
           .toString()
@@ -336,7 +343,7 @@ registerUser() async {
           .replaceAll(']', '')
           .toString();
     } else {
-      debugPrint(respon.body);
+      logDebug(respon.body);
       result = jsonDecode(respon.body)['message'];
     }
     return result;
@@ -355,7 +362,7 @@ updateReferral() async {
     var response =
         await http.post(Uri.parse('${url}api/v1/update/user/referral'),
             headers: {
-              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Authorization': 'Bearer $authToken',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({"refferal_code": referralCode}));
@@ -363,11 +370,11 @@ updateReferral() async {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'true';
       } else {
-        debugPrint(response.body);
+        logDebug(response.body);
         result = 'false';
       }
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'false';
     }
     return result;
@@ -421,14 +428,14 @@ getnotificationHistory() async {
   try {
     var response = await http.get(
         Uri.parse('${url}api/v1/notifications/get-notification'),
-        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+        headers: {'Authorization': 'Bearer $authToken'});
     if (response.statusCode == 200) {
       notificationHistory = jsonDecode(response.body)['data'];
       notificationHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
       valueNotifierHome.incrementNotifier();
     }
@@ -450,14 +457,14 @@ deleteNotification(id) async {
   try {
     var response = await http.get(
         Uri.parse('${url}api/v1/notifications/delete-notification/$id'),
-        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+        headers: {'Authorization': 'Bearer $authToken'});
     if (response.statusCode == 200) {
       // notificationHistory = jsonDecode(response.body)['data'];
       // notificationHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
       valueNotifierHome.incrementNotifier();
     }
@@ -479,18 +486,18 @@ sharewalletfun({mobile, role, amount}) async {
         Uri.parse('${url}api/v1/payment/wallet/transfer-money-from-wallet'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
         },
         body: jsonEncode({'mobile': mobile, 'role': role, 'amount': amount}));
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
       } else {
-        debugPrint(response.body);
+        logDebug(response.body);
         result = 'failed';
       }
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = jsonDecode(response.body)['message'];
     }
   } catch (e) {
@@ -539,7 +546,7 @@ Future<bool?> validateMobileForLogin(String number) async {
       return success?.toString().toLowerCase() == 'true';
     }
 
-    debugPrint(response.body);
+    logDebug(response.body);
     return null;
   } catch (e) {
     if (e is SocketException) {
@@ -608,9 +615,9 @@ userLogin() async {
           type: jsonVal['token_type'].toString(),
           token: jsonVal['access_token'].toString()));
       result = true;
-      pref.setString('Bearer', bearerToken[0].token);
+      pref.setString('Bearer', authToken);
     } else if (response.statusCode == 422) {
-      debugPrint(response.body);
+      logDebug(response.body);
       var error = jsonDecode(response.body)['errors'];
       result = error[error.keys.toList()[0]]
           .toString()
@@ -618,7 +625,7 @@ userLogin() async {
           .replaceAll(']', '')
           .toString();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = false;
     }
     return result;
@@ -640,7 +647,7 @@ getUserDetails() async {
       Uri.parse('${url}api/v1/user'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${bearerToken[0].token}'
+        'Authorization': 'Bearer $authToken'
       },
     );
     if (response.statusCode == 200) {
@@ -734,7 +741,7 @@ getUserDetails() async {
       }
       result = true;
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = false;
     }
   } catch (e) {
@@ -743,6 +750,41 @@ getUserDetails() async {
     }
   }
   return result;
+}
+
+/// Безопасный доступ к токену. Обращение по индексу `bearerToken[0]` кидало
+/// RangeError в каждом запросе, если список пуст (сессия сброшена, а экран
+/// ещё жив и продолжает дергать API).
+String get authToken => bearerToken.isNotEmpty ? bearerToken.first.token : '';
+
+/// Взводится при 401 — UI по нему уводит пользователя на экран входа.
+bool sessionExpired = false;
+
+/// Локальный сброс сессии при 401. Дергать logout бессмысленно: токен уже
+/// недействителен. Раньше 401 просто возвращался наверх, и пользователь
+/// оставался в приложении с молча пустыми экранами.
+void handleUnauthorized() {
+  if (sessionExpired) return;
+  sessionExpired = true;
+
+  requestStreamStart?.cancel();
+  requestStreamEnd?.cancel();
+  rideStreamStart?.cancel();
+  rideStreamUpdate?.cancel();
+  requestStreamStart = null;
+  requestStreamEnd = null;
+  rideStreamStart = null;
+  rideStreamUpdate = null;
+
+  bearerToken.clear();
+  userDetails.clear();
+  userRequestData.clear();
+  try {
+    pref?.remove('Bearer');
+  } catch (_) {
+    // pref мог быть ещё не инициализирован — не критично.
+  }
+  valueNotifierHome.incrementNotifier();
 }
 
 class BearerClass {
@@ -867,7 +909,7 @@ getlangid() async {
   try {
     var response = await http
         .post(Uri.parse('${url}api/v1/user/update-my-lang'), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
+      'Authorization': 'Bearer $authToken',
     }, body: {
       'lang': choosenLanguage,
     });
@@ -875,11 +917,11 @@ getlangid() async {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
       } else {
-        debugPrint(response.body);
+        logDebug(response.body);
         result = 'failed';
       }
     } else if (response.statusCode == 422) {
-      debugPrint(response.body);
+      logDebug(response.body);
       var error = jsonDecode(response.body)['errors'];
       result = error[error.keys.toList()[0]]
           .toString()
@@ -887,7 +929,7 @@ getlangid() async {
           .replaceAll(']', '')
           .toString();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = jsonDecode(response.body)['message'];
     }
   } catch (e) {
@@ -1481,7 +1523,7 @@ etaRequest() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/eta'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: (addressList.where((element) => element.id == 'drop').isNotEmpty)
@@ -1535,7 +1577,7 @@ etaRequest() async {
       result = true;
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] ==
           "service not available with this location") {
         serviceNotAvailable = true;
@@ -1556,7 +1598,7 @@ etaRequestWithPromo() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/eta'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1578,7 +1620,7 @@ etaRequestWithPromo() async {
       promoStatus = 1;
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       promoStatus = 2;
       promoCode = '';
       valueNotifierBook.incrementNotifier();
@@ -1601,7 +1643,7 @@ rentalEta() async {
     var response = await http.post(
         Uri.parse('${url}api/v1/request/list-packages'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1623,7 +1665,7 @@ rentalEta() async {
       result = true;
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = false;
     }
     return result;
@@ -1640,7 +1682,7 @@ rentalRequestWithPromo() async {
     var response = await http.post(
         Uri.parse('${url}api/v1/request/list-packages'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1660,7 +1702,7 @@ rentalRequestWithPromo() async {
       promoStatus = 1;
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       promoStatus = 2;
       promoCode = '';
       valueNotifierBook.incrementNotifier();
@@ -1698,7 +1740,7 @@ createRequest() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: (addressList.where((element) => element.id == 'drop').isNotEmpty)
@@ -1777,7 +1819,7 @@ createRequest() async {
 
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -1804,7 +1846,7 @@ createRequestWithPromo() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1843,7 +1885,7 @@ createRequestWithPromo() async {
       streamRequest();
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -1869,7 +1911,7 @@ createRequestLater() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1908,7 +1950,7 @@ createRequestLater() async {
       streamRequest();
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -1934,7 +1976,7 @@ createRequestLaterPromo() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1975,7 +2017,7 @@ createRequestLaterPromo() async {
       valueNotifierBook.incrementNotifier();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -2000,11 +2042,9 @@ createRequestLaterPromo() async {
 createRentalRequest() async {
   dynamic result;
   try {
-    print(Uri.parse('${url}api/v1/request/create'));
-    print(bearerToken[0].token);
     var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -2032,7 +2072,7 @@ createRentalRequest() async {
           'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
           'rental_pack_id': etaDetails[rentalChoosenOption]['id']
         }));
-    print(jsonEncode({
+    logDebug(jsonEncode({
       'pick_lat':
           addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
       'pick_lng':
@@ -2063,7 +2103,7 @@ createRentalRequest() async {
 
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -2088,7 +2128,7 @@ createRentalRequestWithPromo() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -2123,11 +2163,11 @@ createRentalRequestWithPromo() async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
-        debugPrint(response.body);
+        logDebug(response.body);
         tripReqError = true;
       }
 
@@ -2148,7 +2188,7 @@ createRentalRequestLater() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -2183,7 +2223,7 @@ createRentalRequestLater() async {
       streamRequest();
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -2207,7 +2247,7 @@ createRentalRequestLaterPromo() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -2244,11 +2284,11 @@ createRentalRequestLaterPromo() async {
       valueNotifierBook.incrementNotifier();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
-        debugPrint(response.body);
+        logDebug(response.body);
         tripReqError = true;
       }
 
@@ -2312,7 +2352,7 @@ cancelRequest() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({'request_id': userRequestData['id']}));
@@ -2333,7 +2373,7 @@ cancelRequest() async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -2348,7 +2388,7 @@ cancelLaterRequest(val) async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({'request_id': val}));
@@ -2363,7 +2403,7 @@ cancelLaterRequest(val) async {
       }
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -2378,7 +2418,7 @@ cancelRequestWithReason(reason) async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(
@@ -2398,7 +2438,7 @@ cancelRequestWithReason(reason) async {
       }
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -2427,7 +2467,7 @@ cancelReason(reason) async {
     var response = await http.get(
       Uri.parse('${url}api/v1/common/cancallation/reasons?arrived=$reason'),
       headers: {
-        'Authorization': 'Bearer ${bearerToken[0].token}',
+        'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json',
       },
     );
@@ -2436,7 +2476,7 @@ cancelReason(reason) async {
       cancelReasonsList = jsonDecode(response.body)['data'];
       result = true;
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = false;
     }
   } catch (e) {
@@ -2468,7 +2508,7 @@ userRating() async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/rating'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({
@@ -2480,7 +2520,7 @@ userRating() async {
       await getUserDetails();
       result = true;
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = false;
     }
   } catch (e) {
@@ -2526,7 +2566,7 @@ addFavLocation(lat, lng, add, name) async {
     var response = await http.post(
         Uri.parse('${url}api/v1/user/add-favourite-location'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({
@@ -2540,7 +2580,7 @@ addFavLocation(lat, lng, add, name) async {
       await getUserDetails();
       valueNotifierHome.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = false;
     }
     return result;
@@ -2560,7 +2600,7 @@ getSosData(lat, lng) async {
     var response = await http.get(
       Uri.parse('${url}api/v1/common/sos/list/$lat/$lng'),
       headers: {
-        'Authorization': 'Bearer ${bearerToken[0].token}',
+        'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json'
       },
     );
@@ -2570,7 +2610,7 @@ getSosData(lat, lng) async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2613,7 +2653,7 @@ getCurrentMessages() async {
     var response = await http.get(
       Uri.parse('${url}api/v1/request/chat-history/${userRequestData['id']}'),
       headers: {
-        'Authorization': 'Bearer ${bearerToken[0].token}',
+        'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json'
       },
     );
@@ -2629,7 +2669,7 @@ getCurrentMessages() async {
         valueNotifierBook.incrementNotifier();
       }
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -2644,7 +2684,7 @@ sendMessage(chat) async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/request/send'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body:
@@ -2655,7 +2695,7 @@ sendMessage(chat) async {
           .ref('requests/${userRequestData['id']}')
           .update({'message_by_user': chatList.length});
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -2669,14 +2709,14 @@ sendMessage(chat) async {
 messageSeen() async {
   var response = await http.post(Uri.parse('${url}api/v1/request/seen'),
       headers: {
-        'Authorization': 'Bearer ${bearerToken[0].token}',
+        'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json'
       },
       body: jsonEncode({'request_id': userRequestData['id']}));
   if (response.statusCode == 200) {
     getCurrentMessages();
   } else {
-    debugPrint(response.body);
+    logDebug(response.body);
   }
 }
 
@@ -2687,7 +2727,7 @@ addSos(name, number) async {
   try {
     var response = await http.post(Uri.parse('${url}api/v1/common/sos/store'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({'name': name, 'number': number}));
@@ -2696,7 +2736,7 @@ addSos(name, number) async {
       await getUserDetails();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2715,14 +2755,14 @@ deleteSos(id) async {
   try {
     var response = await http
         .post(Uri.parse('${url}api/v1/common/sos/delete/$id'), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
       await getUserDetails();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2752,7 +2792,7 @@ getFaqData(lat, lng) async {
   try {
     var response = await http
         .get(Uri.parse('${url}api/v1/common/faq/list/$lat/$lng'), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
@@ -2760,7 +2800,7 @@ getFaqData(lat, lng) async {
       valueNotifierBook.incrementNotifier();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2780,14 +2820,14 @@ removeFavAddress(id) async {
     var response = await http.get(
         Uri.parse('${url}api/v1/user/delete-favourite-location/$id'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         });
     if (response.statusCode == 200) {
       await getUserDetails();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2808,7 +2848,7 @@ getReferral() async {
   try {
     var response =
         await http.get(Uri.parse('${url}api/v1/get/referral'), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
@@ -2816,7 +2856,7 @@ getReferral() async {
       myReferralCode = jsonDecode(response.body)['data'];
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2834,7 +2874,7 @@ userLogout() async {
   dynamic result;
   try {
     var response = await http.post(Uri.parse('${url}api/v1/logout'), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
@@ -2842,7 +2882,7 @@ userLogout() async {
 
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2863,14 +2903,14 @@ getHistory(id) async {
 
   try {
     var response = await http.get(Uri.parse('${url}api/v1/request/history?$id'),
-        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+        headers: {'Authorization': 'Bearer $authToken'});
     if (response.statusCode == 200) {
       myHistory = jsonDecode(response.body)['data'];
       myHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
       valueNotifierBook.incrementNotifier();
     }
@@ -2890,7 +2930,7 @@ getHistoryPages(id) async {
 
   try {
     var response = await http.get(Uri.parse('${url}api/v1/request/history?$id'),
-        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+        headers: {'Authorization': 'Bearer $authToken'});
     if (response.statusCode == 200) {
       List list = jsonDecode(response.body)['data'];
       // ignore: avoid_function_literals_in_foreach_calls
@@ -2901,7 +2941,7 @@ getHistoryPages(id) async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
       valueNotifierBook.incrementNotifier();
     }
@@ -2927,7 +2967,7 @@ getWalletHistory() async {
   try {
     var response = await http.get(
         Uri.parse('${url}api/v1/payment/wallet/history'),
-        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+        headers: {'Authorization': 'Bearer $authToken'});
     if (response.statusCode == 200) {
       walletBalance = jsonDecode(response.body);
       walletHistory = walletBalance['wallet_history']['data'];
@@ -2935,7 +2975,7 @@ getWalletHistory() async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
       valueNotifierBook.incrementNotifier();
     }
@@ -2954,7 +2994,7 @@ getWalletHistoryPage(page) async {
   try {
     var response = await http.get(
         Uri.parse('${url}api/v1/payment/wallet/history?page=$page'),
-        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+        headers: {'Authorization': 'Bearer $authToken'});
     if (response.statusCode == 200) {
       walletBalance = jsonDecode(response.body);
       List list = walletBalance['wallet_history']['data'];
@@ -2966,7 +3006,7 @@ getWalletHistoryPage(page) async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
       valueNotifierBook.incrementNotifier();
     }
@@ -2987,11 +3027,11 @@ getClientToken() async {
   try {
     var response = await http.get(
         Uri.parse('${url}api/v1/payment/client/token'),
-        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+        headers: {'Authorization': 'Bearer $authToken'});
     if (response.statusCode == 200) {
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -3013,7 +3053,7 @@ getStripePayment(money) async {
     var response =
         await http.post(Uri.parse('${url}api/v1/payment/stripe/intent'),
             headers: {
-              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Authorization': 'Bearer $authToken',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({'amount': money}));
@@ -3021,7 +3061,7 @@ getStripePayment(money) async {
       results = 'success';
       stripeToken = jsonDecode(response.body)['data'];
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       results = 'failure';
     }
   } catch (e) {
@@ -3041,7 +3081,7 @@ addMoneyStripe(amount, nonce) async {
     var response = await http.post(
         Uri.parse('${url}api/v1/payment/stripe/add/money'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode(
@@ -3051,7 +3091,7 @@ addMoneyStripe(amount, nonce) async {
       await getUserDetails();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -3073,7 +3113,7 @@ getPaystackPayment(money) async {
     var response =
         await http.post(Uri.parse('${url}api/v1/payment/paystack/initialize'),
             headers: {
-              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Authorization': 'Bearer $authToken',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({'amount': money}));
@@ -3085,7 +3125,7 @@ getPaystackPayment(money) async {
         paystackCode = jsonDecode(response.body)['data'];
       }
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       results = jsonDecode(response.body)['message'];
     }
   } catch (e) {
@@ -3103,7 +3143,7 @@ addMoneyPaystack(amount, nonce) async {
     var response = await http.post(
         Uri.parse('${url}api/v1/payment/paystack/add-money'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode(
@@ -3114,7 +3154,7 @@ addMoneyPaystack(amount, nonce) async {
       paystackCode.clear();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -3134,7 +3174,7 @@ addMoneyFlutterwave(amount, nonce) async {
     var response = await http.post(
         Uri.parse('${url}api/v1/payment/flutter-wave/add-money'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode(
@@ -3144,7 +3184,7 @@ addMoneyFlutterwave(amount, nonce) async {
       await getUserDetails();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -3164,7 +3204,7 @@ addMoneyRazorpay(amount, nonce) async {
     var response = await http.post(
         Uri.parse('${url}api/v1/payment/razerpay/add-money'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode(
@@ -3174,7 +3214,7 @@ addMoneyRazorpay(amount, nonce) async {
       await getUserDetails();
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -3198,7 +3238,7 @@ getCfToken(money, currency) async {
     var response = await http.post(
         Uri.parse('${url}api/v1/payment/cashfree/generate-cftoken'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({'order_amount': money, 'order_currency': currency}));
@@ -3207,11 +3247,11 @@ getCfToken(money, currency) async {
         cftToken = jsonDecode(response.body);
         result = 'success';
       } else {
-        debugPrint(response.body);
+        logDebug(response.body);
         result = 'failure';
       }
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -3231,7 +3271,7 @@ cashFreePaymentSuccess() async {
     var response = await http.post(
         Uri.parse('${url}api/v1/payment/cashfree/add-money-to-wallet-webhooks'),
         headers: {
-          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({
@@ -3250,11 +3290,11 @@ cashFreePaymentSuccess() async {
         await getWalletHistory();
         await getUserDetails();
       } else {
-        debugPrint(response.body);
+        logDebug(response.body);
         result = 'failure';
       }
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -3276,7 +3316,7 @@ updateProfile(name, email) async {
       Uri.parse('${url}api/v1/user/profile'),
     );
     response.headers
-        .addAll({'Authorization': 'Bearer ${bearerToken[0].token}'});
+        .addAll({'Authorization': 'Bearer $authToken'});
     response.files
         .add(await http.MultipartFile.fromPath('profile_picture', imageFile));
     response.fields['email'] = email;
@@ -3290,7 +3330,7 @@ updateProfile(name, email) async {
         await getUserDetails();
       }
     } else {
-      debugPrint(val);
+      logDebug(val);
       result = 'failure';
     }
   } catch (e) {
@@ -3309,7 +3349,7 @@ updateProfileWithoutImage(name, email) async {
       Uri.parse('${url}api/v1/user/profile'),
     );
     response.headers
-        .addAll({'Authorization': 'Bearer ${bearerToken[0].token}'});
+        .addAll({'Authorization': 'Bearer $authToken'});
     response.fields['email'] = email;
     response.fields['name'] = name;
     var request = await response.send();
@@ -3321,7 +3361,7 @@ updateProfileWithoutImage(name, email) async {
         await getUserDetails();
       }
     } else {
-      debugPrint(val);
+      logDebug(val);
       result = 'failure';
     }
   } catch (e) {
@@ -3347,13 +3387,13 @@ getGeneralComplaint(type) async {
   try {
     var response = await http.get(
       Uri.parse('${url}api/v1/common/complaint-titles?complaint_type=$type'),
-      headers: {'Authorization': 'Bearer ${bearerToken[0].token}'},
+      headers: {'Authorization': 'Bearer $authToken'},
     );
     if (response.statusCode == 200) {
       generalComplaintList = jsonDecode(response.body)['data'];
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -3371,7 +3411,7 @@ makeGeneralComplaint() async {
     var response =
         await http.post(Uri.parse('${url}api/v1/common/make-complaint'),
             headers: {
-              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Authorization': 'Bearer $authToken',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({
@@ -3381,7 +3421,7 @@ makeGeneralComplaint() async {
     if (response.statusCode == 200) {
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -3399,7 +3439,7 @@ makeRequestComplaint() async {
     var response =
         await http.post(Uri.parse('${url}api/v1/common/make-complaint'),
             headers: {
-              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Authorization': 'Bearer $authToken',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({
@@ -3410,7 +3450,7 @@ makeRequestComplaint() async {
     if (response.statusCode == 200) {
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -3499,7 +3539,7 @@ userDelete() async {
   try {
     var response = await http
         .post(Uri.parse('${url}api/v1/user/delete-user-account'), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
@@ -3507,7 +3547,7 @@ userDelete() async {
 
       result = 'success';
     } else {
-      debugPrint(response.body);
+      logDebug(response.body);
       result = 'failure';
     }
   } catch (e) {

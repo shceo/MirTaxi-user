@@ -9,10 +9,6 @@ environment:
   sdk: '>=3.4.3 <4.0.0'
 
 
-
-dependency_overrides:
-  http: ^0.13.1
-
 dependencies:
   flutter:
     sdk: flutter

@@ -25,7 +25,6 @@
             android:windowSoftInputMode="adjustResize"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
-            android:usesCleartextTraffic="true"
             >
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
@@ -39,11 +38,9 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <!-- Google Maps API key (disabled; switched to Yandex MapKit) -->
-        <!--
-        <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyCe7XyWJbAkb1Fw6RNc8vlzPPcxx7X4ImM"/>
-        -->
+        <meta-data
+            android:name="com.yandex.maps.apikey"
+            android:value="${yandexMapsApiKey}" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

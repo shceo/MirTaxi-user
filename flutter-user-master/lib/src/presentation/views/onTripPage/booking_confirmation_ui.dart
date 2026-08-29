@@ -46,11 +46,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
     var lower = geo.encode(lowerLon, lowerLat);
     var higher = geo.encode(greaterLon, greaterLat);
 
-    var fdb = FirebaseDatabase.instance
-        .ref('drivers')
-        .orderByChild('g')
-        .startAt(lower)
-        .endAt(higher);
+    var fdb = _driversStreamFor(lower, higher);
 
     var media = MediaQuery.of(context).size;
     return PopScope(
@@ -105,7 +101,7 @@ extension _BookingConfirmationUi on _BookingConfirmationState {
                 return StreamBuilder<DatabaseEvent>(
                   stream: (userRequestData['driverDetail'] == null &&
                           pinLocationIcon != null)
-                      ? fdb.onValue
+                      ? fdb
                       : null,
                   builder: (context, AsyncSnapshot<DatabaseEvent> event) {
                     if (event.hasData) {

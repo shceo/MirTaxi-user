@@ -96,6 +96,30 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   dynamic _showInfoInt;
   dynamic _dist;
   String _cancellingError = '';
+  // Кэш потока ближайших водителей. Раньше Query собирался прямо в build(),
+  // а `onValue` отдаёт новый Stream на каждое обращение — StreamBuilder
+  // переподписывался на Realtime DB при каждом ребилде карты. Границы геохеша
+  // меняются при движении, поэтому пересоздаём поток только когда они изменились.
+  Stream<DatabaseEvent>? _driversStream;
+  String? _driversLower;
+  String? _driversHigher;
+
+  Stream<DatabaseEvent> _driversStreamFor(String lower, String higher) {
+    if (_driversStream == null ||
+        _driversLower != lower ||
+        _driversHigher != higher) {
+      _driversLower = lower;
+      _driversHigher = higher;
+      _driversStream = FirebaseDatabase.instance
+          .ref('drivers')
+          .orderByChild('g')
+          .startAt(lower)
+          .endAt(higher)
+          .onValue;
+    }
+    return _driversStream!;
+  }
+
   GlobalKey iconKey = GlobalKey();
   GlobalKey iconDropKey = GlobalKey();
 

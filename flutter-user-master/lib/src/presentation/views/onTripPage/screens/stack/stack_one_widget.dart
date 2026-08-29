@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
 
 class StackOneWidget extends StatelessWidget {
-  final Query fdb;
+  final Stream<DatabaseEvent> fdb;
   final List<PlacemarkMapObject> myMarkers;
   final Function(dynamic event) eventData;
   final Stream<List<PlacemarkMapObject>>? carMarkerStream;
@@ -33,7 +33,7 @@ class StackOneWidget extends StatelessWidget {
       height: media.height * 1,
       width: media.width * 1,
       child: StreamBuilder<DatabaseEvent>(
-        stream: fdb.onValue,
+        stream: fdb,
         builder: (context, AsyncSnapshot<DatabaseEvent> event) {
           if (event.hasData) {
             eventData(event);

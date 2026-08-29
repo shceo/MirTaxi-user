@@ -124,7 +124,7 @@ class LoadingViewModel extends ChangeNotifier {
             'https://play.google.com/store/apps/details?id=${_packageInfo!.packageName}');
       } else {
         final response = await http
-            .get(Uri.parse('http://itunes.apple.com/lookup?bundleId=${_packageInfo!.packageName}'));
+            .get(Uri.parse('https://itunes.apple.com/lookup?bundleId=${_packageInfo!.packageName}'));
         if (response.statusCode == 200) {
           final url = jsonDecode(response.body)['results'][0]['trackViewUrl'];
           await openBrowser(url);

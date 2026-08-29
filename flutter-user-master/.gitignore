@@ -44,3 +44,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Native build artifacts
+android/app/.cxx/
+.cxx/
+
+# Temporary scratch scripts
+.tmp_*

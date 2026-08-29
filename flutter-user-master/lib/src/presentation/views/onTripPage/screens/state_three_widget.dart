@@ -9,7 +9,7 @@ import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/sta
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/screens/stack/stack_two_widget.dart';
 
 class StateThreeWidget extends StatelessWidget {
-  final Query fdb;
+  final Stream<DatabaseEvent> fdb;
   final List<PlacemarkMapObject> myMarkers;
   final Function(dynamic event) eventData;
   final Stream<List<PlacemarkMapObject>>? carMarkerStream;

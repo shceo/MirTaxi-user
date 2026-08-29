@@ -68,6 +68,30 @@ class _MapsState extends State<Maps>
   dynamic userLocationIcon;
   bool favAddressAdd = false;
   bool contactus = false;
+  // Кэш потока ближайших водителей. Раньше Query собирался в build(), а
+  // `onValue` отдаёт новый Stream на каждое обращение — StreamBuilder
+  // переподписывался на Realtime DB при каждом ребилде карты. Границы геохеша
+  // меняются при движении, поэтому пересоздаём поток только при их изменении.
+  Stream<DatabaseEvent>? _driversStream;
+  String? _driversLower;
+  String? _driversHigher;
+
+  Stream<DatabaseEvent> _driversStreamFor(String lower, String higher) {
+    if (_driversStream == null ||
+        _driversLower != lower ||
+        _driversHigher != higher) {
+      _driversLower = lower;
+      _driversHigher = higher;
+      _driversStream = FirebaseDatabase.instance
+          .ref('drivers')
+          .orderByChild('g')
+          .startAt(lower)
+          .endAt(higher)
+          .onValue;
+    }
+    return _driversStream!;
+  }
+
   final _mapMarkerSC = StreamController<List<PlacemarkMapObject>>();
 
   StreamSink<List<PlacemarkMapObject>> get _mapMarkerSink =>
@@ -93,7 +117,6 @@ class _MapsState extends State<Maps>
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    print('++++++++++++');
 
     getLastAddress();
 
@@ -115,6 +138,10 @@ class _MapsState extends State<Maps>
 
   @override
   void dispose() {
+    // addObserver был в initState, а removeObserver отсутствовал — observer
+    // продолжал жить после закрытия экрана. StreamController тоже не закрывался.
+    WidgetsBinding.instance.removeObserver(this);
+    _mapMarkerSC.close();
     animationController?.dispose();
     _autoAddressDebounce?.cancel();
     _dropAddressNotifier.dispose();
@@ -221,7 +248,7 @@ class _MapsState extends State<Maps>
 
 //get location permission and location details
   getLocs() async {
-    myBearings.clear;
+    myBearings.clear();
     addressList.clear();
     serviceEnabled = await location.serviceEnabled();
     polyline = null;
@@ -305,9 +332,9 @@ class _MapsState extends State<Maps>
     if (serviceEnabled == false) {
       await location.requestService();
     }
-    if (permission == geolocs.LocationPermission.denied ||
-        permission == geolocs.LocationPermission.deniedForever) {
-      if (permission != geolocs.LocationPermission.deniedForever) {
+    if (permission == PermissionStatus.denied ||
+        permission == PermissionStatus.deniedForever) {
+      if (permission != PermissionStatus.deniedForever) {
         await perm.Permission.location.request();
       }
     }
@@ -323,6 +350,19 @@ class _MapsState extends State<Maps>
 
   @override
   Widget build(BuildContext context) {
+    // Сессия протухла (401) — уводим на экран входа без обращения к серверу.
+    if (sessionExpired) {
+      sessionExpired = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Login()),
+            (route) => false);
+        userDetails.clear();
+      });
+    }
+
     double lat = 0.0144927536231884;
     double lon = 0.0181818181818182;
     double lowerLat = center.latitude - (lat * 1.24);
@@ -332,11 +372,7 @@ class _MapsState extends State<Maps>
     var lower = geo.encode(lowerLon, lowerLat);
     var higher = geo.encode(greaterLon, greaterLat);
 
-    var fdb = FirebaseDatabase.instance
-        .ref('drivers')
-        .orderByChild('g')
-        .startAt(lower)
-        .endAt(higher);
+    var fdb = _driversStreamFor(lower, higher);
 
     var media = MediaQuery.of(context).size;
     return PopScope(
