@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
-import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
 import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
+import 'package:tagyourtaxi_driver/src/presentation/design/tokens.dart';
 import 'package:tagyourtaxi_driver/src/presentation/viewmodels/auth_view_model.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/login/get_started.dart';
@@ -10,7 +10,8 @@ import 'package:tagyourtaxi_driver/src/presentation/views/login/select_task_scre
 import 'package:tagyourtaxi_driver/src/presentation/views/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/src/presentation/views/onTripPage/invoice.dart';
-import 'package:tagyourtaxi_driver/src/presentation/widgets/widgets.dart';
+
+const int _otpLength = 6;
 
 class Otp extends StatefulWidget {
   const Otp({Key? key}) : super(key: key);
@@ -21,6 +22,7 @@ class Otp extends StatefulWidget {
 
 class _OtpState extends State<Otp> {
   final TextEditingController otpController = TextEditingController();
+  final FocusNode _focus = FocusNode();
   String _error = '';
   late final AuthViewModel _viewModel;
 
@@ -29,13 +31,27 @@ class _OtpState extends State<Otp> {
     super.initState();
     _viewModel = AuthViewModel();
     _viewModel.startResendTimer();
+    otpController.addListener(_onCodeChanged);
   }
 
   @override
   void dispose() {
+    otpController.removeListener(_onCodeChanged);
     _viewModel.dispose();
     otpController.dispose();
+    _focus.dispose();
     super.dispose();
+  }
+
+  void _onCodeChanged() {
+    if (_error.isNotEmpty) setState(() => _error = '');
+    if (otpController.text.length == _otpLength) {
+      _focus.unfocus();
+      // Код введён полностью — проверяем сразу, не заставляя жать кнопку.
+      _verifyOtp();
+    } else {
+      setState(() {});
+    }
   }
 
   void _navigate(AuthDestination destination) {
@@ -74,25 +90,50 @@ class _OtpState extends State<Otp> {
 
   Future<void> _verifyOtp() async {
     final result = await _viewModel.verifyOtp(otpController.text);
+    if (!mounted) return;
     if (result.hasError) {
-      setState(() {
-        _error = result.error ?? '';
-      });
+      HapticFeedback.heavyImpact();
+      setState(() => _error = result.error ?? '');
       return;
     }
-    setState(() {
-      _error = '';
-    });
+    setState(() => _error = '');
     if (result.destination != null) {
       _navigate(result.destination!);
     }
   }
 
+  Future<void> _resend() async {
+    HapticFeedback.selectionClick();
+    otpController.clear();
+    await _viewModel.requestOtp(phnumber);
+    _viewModel.startResendTimer();
+  }
+
+  /// Код страны берём безопасно: обращение `countries[phcode]` кидает
+  /// RangeError, если справочник ещё не загружен или пуст.
+  String get _dialCode {
+    if (phcode >= 0 && phcode < countries.length) {
+      return countries[phcode]['dial_code']?.toString() ?? '';
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context).size;
-    return Material(
-      child: Directionality(
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Scaffold(
+      backgroundColor: scheme.surfaceContainerLow,
+      appBar: AppBar(
+        backgroundColor: scheme.surfaceContainerLow,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        ),
+      ),
+      body: Directionality(
         textDirection: (languageDirection == 'rtl')
             ? TextDirection.rtl
             : TextDirection.ltr,
@@ -100,173 +141,128 @@ class _OtpState extends State<Otp> {
           valueListenable: valueNotifierHome.value,
           builder: (context, value, child) {
             return AnimatedBuilder(
-              animation: _viewModel,
+              animation: Listenable.merge([_viewModel, otpController]),
               builder: (context, _) {
                 final resendTime = _viewModel.resendSeconds;
-                final otpLength = otpController.text.length;
-                final buttonText = (otpLength == 6)
-                    ? context.l10n.text_verify
-                    : (resendTime == 0)
-                        ? context.l10n.text_resend_code
-                        : "${context.l10n.text_resend_code} $resendTime";
-                final isButtonDisabled = resendTime != 0 && otpLength != 6;
+                final filled = otpController.text.length;
 
                 return Stack(
                   children: [
-                    Container(
-                      padding: EdgeInsets.only(
-                          left: media.width * 0.08, right: media.width * 0.08),
-                      color: page,
-                      height: media.height * 1,
-                      width: media.width * 1,
-                      child: Column(
-                        children: [
-                          Container(
-                            height: media.height * 0.12,
-                            width: media.width * 1,
-                            color: topBar,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Icon(Icons.arrow_back),
-                                ),
-                              ],
+                    SafeArea(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return SingleChildScrollView(
+                            physics: const ClampingScrollPhysics(),
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
                             ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: media.height * 0.04),
-                                SizedBox(
-                                  width: media.width * 1,
-                                  child: Text(
-                                    context.l10n.text_phone_verify,
-                                    style: GoogleFonts.roboto(
-                                      fontSize: media.width * twentyeight,
-                                      fontWeight: FontWeight.bold,
-                                      color: textColor,
-                                    ),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight),
+                              child: IntrinsicHeight(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: MtSpace.screenX),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      const SizedBox(height: MtSpace.sm),
+                                      Text(
+                                        context.l10n.text_phone_verify,
+                                        style: theme.textTheme.headlineMedium,
+                                      ),
+                                      const SizedBox(height: MtSpace.sm),
+                                      Text(
+                                        context.l10n.text_enter_otp,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                                color:
+                                                    scheme.onSurfaceVariant),
+                                      ),
+                                      const SizedBox(height: MtSpace.xs),
+                                      Text(
+                                        '$_dialCode$phnumber',
+                                        style: theme.textTheme.titleMedium
+                                            ?.copyWith(
+                                          fontFeatures: const [
+                                            FontFeature.tabularFigures()
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: MtSpace.x4l),
+                                      _OtpBoxes(
+                                        controller: otpController,
+                                        focusNode: _focus,
+                                        hasError: _error.isNotEmpty,
+                                      ),
+                                      if (_error.isNotEmpty) ...[
+                                        const SizedBox(height: MtSpace.md),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Icon(Icons.error_outline,
+                                                size: MtSize.iconSm,
+                                                color: scheme.error),
+                                            const SizedBox(width: MtSpace.sm),
+                                            Expanded(
+                                              child: Text(
+                                                _error,
+                                                style: theme
+                                                    .textTheme.bodyMedium
+                                                    ?.copyWith(
+                                                        color: scheme.error),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                      const SizedBox(height: MtSpace.xxl),
+                                      // Повтор кода — отдельное второстепенное
+                                      // действие. Раньше оно делило одну кнопку
+                                      // с проверкой, и та меняла смысл на ходу.
+                                      Center(
+                                        child: TextButton(
+                                          onPressed:
+                                              resendTime == 0 ? _resend : null,
+                                          child: Text(
+                                            resendTime == 0
+                                                ? context.l10n.text_resend_code
+                                                : '${context.l10n.text_resend_code} · 0:${resendTime.toString().padLeft(2, '0')}',
+                                          ),
+                                        ),
+                                      ),
+                                      const Expanded(
+                                        child: SizedBox(height: MtSpace.x3l),
+                                      ),
+                                      FilledButton(
+                                        onPressed: filled == _otpLength
+                                            ? _verifyOtp
+                                            : null,
+                                        child: Text(context.l10n.text_verify),
+                                      ),
+                                      const SizedBox(height: MtSpace.lg),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  context.l10n.text_enter_otp,
-                                  style: GoogleFonts.roboto(
-                                      fontSize: media.width * sixteen,
-                                      color: textColor.withValues(alpha: 0.3)),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  countries[phcode]['dial_code'] + phnumber,
-                                  style: GoogleFonts.roboto(
-                                    fontSize: media.width * sixteen,
-                                    color: textColor,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                SizedBox(height: media.height * 0.1),
-                                Container(
-                                  height: media.width * 0.15,
-                                  width: media.width * 0.9,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: page,
-                                    border: Border.all(
-                                        color: borderLines, width: 1.2),
-                                  ),
-                                  child: TextField(
-                                    controller: otpController,
-                                    autofocus: (phoneAuthCheck == false)
-                                        ? false
-                                        : true,
-                                    onChanged: (val) {
-                                      setState(() {
-                                        _error = '';
-                                      });
-                                      if (val.length == 6) {
-                                        FocusManager.instance.primaryFocus
-                                            ?.unfocus();
-                                      }
-                                    },
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      counterText: '',
-                                      hintText:
-                                          context.l10n.text_enter_otp_login,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.roboto(
-                                      fontSize: media.width * twenty,
-                                      color: textColor,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    maxLength: 6,
-                                    keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                                if (_error.isNotEmpty)
-                                  Container(
-                                    alignment: Alignment.center,
-                                    margin: EdgeInsets.only(
-                                        top: media.height * 0.02),
-                                    child: Text(
-                                      _error,
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.roboto(
-                                          fontSize: media.width * sixteen,
-                                          color: Colors.red),
-                                    ),
-                                  ),
-                                SizedBox(height: media.height * 0.05),
-                                Container(
-                                  alignment: Alignment.center,
-                                  child: Button(
-                                    onTap: () async {
-                                      if (otpLength == 6) {
-                                        await _verifyOtp();
-                                      } else if (resendTime == 0) {
-                                        await _viewModel.requestOtp(phnumber);
-                                        _viewModel.startResendTimer();
-                                      }
-                                    },
-                                    text: buttonText,
-                                    color: isButtonDisabled ? underline : null,
-                                    borcolor:
-                                        isButtonDisabled ? underline : null,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          )
-                        ],
+                          );
+                        },
                       ),
                     ),
                     if (_viewModel.hasInternet == false)
                       Positioned(
                         top: 0,
-                        child: NoInternet(
-                          onTap: () {
-                            _viewModel.retryFetchCountries();
-                          },
-                        ),
+                        left: 0,
+                        right: 0,
+                        child:
+                            NoInternet(onTap: _viewModel.retryFetchCountries),
                       ),
                     if (_viewModel.isLoading == true)
-                      Positioned(
-                        top: 0,
-                        child: SizedBox(
-                          height: media.height * 1,
-                          width: media.width * 1,
-                          child: const Loading(),
-                        ),
-                      ),
+                      const Positioned(
+                          top: 0, left: 0, right: 0, child: Loading()),
                   ],
                 );
               },
@@ -274,6 +270,91 @@ class _OtpState extends State<Otp> {
           },
         ),
       ),
+    );
+  }
+}
+
+/// Шесть отдельных ячеек вместо одного поля с подсказкой «Enter Otp».
+///
+/// Под ячейками лежит невидимое поле ввода: оно даёт системную автоподстановку
+/// кода из SMS (`AutofillHints.oneTimeCode`) — раньше код приходилось
+/// перепечатывать вручную.
+class _OtpBoxes extends StatelessWidget {
+  const _OtpBoxes({
+    required this.controller,
+    required this.focusNode,
+    required this.hasError,
+  });
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool hasError;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final code = controller.text;
+
+    return Stack(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(_otpLength, (i) {
+            final filled = i < code.length;
+            final isNext = i == code.length && focusNode.hasFocus;
+            final borderColor = hasError
+                ? scheme.error
+                : isNext
+                    ? MtColors.brand400
+                    : scheme.outline;
+
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    right: i == _otpLength - 1 ? 0 : MtSpace.sm),
+                child: AnimatedContainer(
+                  duration: MtDuration.fast,
+                  curve: MtCurves.enter,
+                  height: 60,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: MtRadius.brMd,
+                    border: Border.all(
+                      color: borderColor,
+                      width: isNext || hasError ? 2 : 1,
+                    ),
+                  ),
+                  child: Text(
+                    filled ? code[i] : '',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+        // Прозрачное поле поверх ячеек — принимает ввод и автоподстановку.
+        Positioned.fill(
+          child: Opacity(
+            opacity: 0,
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              maxLength: _otpLength,
+              autofillHints: const [AutofillHints.oneTimeCode],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              showCursor: false,
+              decoration: const InputDecoration(counterText: ''),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -7,7 +7,7 @@
   "text_next": "next",
   "text_your_ride": "Your ride, on demand",
   "text_login": "Login",
-  "text_phone_number": "phone number",
+  "text_phone_number": "Phone number",
   "text_get_started": "Let's Get Started!",
   "text_fill_form": "Fill the form to continue.",
   "text_signup_social": "Sign up with Social of fill the form to continue.",
@@ -354,5 +354,17 @@
   "referral_commission": "Referral Commission",
   "spent_for_trip_request": "Spent For Trip Request",
   "withdrawn_from_wallet": "Withdrawn From Wallet",
-  "text_enter_vehicle_color": "Enter Your Vehicle Color"
+  "text_enter_vehicle_color": "Enter Your Vehicle Color",
+  "text_login_subtitle": "We'll text you a code to confirm it's you",
+  "text_agree_terms_privacy": "By continuing, you agree to the {terms} and {privacy}",
+  "@text_agree_terms_privacy": {
+    "placeholders": {
+      "terms": {
+        "type": "String"
+      },
+      "privacy": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -34,7 +34,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get text_login => 'Вход';
 
   @override
-  String get text_phone_number => 'номер телефона';
+  String get text_phone_number => 'Номер телефона';
 
   @override
   String get text_get_started => 'Начнем!';
@@ -1119,4 +1119,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get text_enter_vehicle_color => 'Введите цвет вашего автомобиля';
+
+  @override
+  String get text_login_subtitle =>
+      'Отправим код в SMS, чтобы подтвердить номер';
+
+  @override
+  String text_agree_terms_privacy(String terms, String privacy) {
+    return 'Продолжая, вы принимаете $terms и $privacy';
+  }
 }

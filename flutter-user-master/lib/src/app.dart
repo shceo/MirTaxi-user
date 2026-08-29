@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:tagyourtaxi_driver/l10n/app_localizations.dart';
 
 import 'core/services/functions.dart';
+import 'presentation/design/app_theme.dart';
 import 'presentation/views/loadingPage/loadingpage.dart';
 
 class MyApp extends StatelessWidget {
@@ -26,7 +27,13 @@ class MyApp extends StatelessWidget {
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Taxi user',
-            theme: ThemeData(),
+            theme: MtTheme.light(),
+            darkTheme: MtTheme.dark(),
+            // Тёмная тема готова, но пока принудительно светлая: остальные
+            // экраны ещё используют старые захардкоженные цвета и в тёмной
+            // читаться не будут. Переключим на ThemeMode.system, когда экраны
+            // переедут на токены.
+            themeMode: ThemeMode.light,
             locale: locale ?? const Locale('en'),
             supportedLocales: AppLocalizations.supportedLocales,
             localizationsDelegates: const [

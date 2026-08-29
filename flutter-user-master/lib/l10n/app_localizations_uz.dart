@@ -34,7 +34,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get text_login => 'Kirish';
 
   @override
-  String get text_phone_number => 'Telefon raqam';
+  String get text_phone_number => 'Telefon raqami';
 
   @override
   String get text_get_started => 'Boshlaymiz!';
@@ -1122,4 +1122,13 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get text_enter_vehicle_color => 'Avtomobilingiz Rangini Kiriting';
+
+  @override
+  String get text_login_subtitle =>
+      'Raqamni tasdiqlash uchun SMS orqali kod yuboramiz';
+
+  @override
+  String text_agree_terms_privacy(String terms, String privacy) {
+    return 'Davom etish orqali siz $terms va $privacy shartlariga rozilik bildirasiz';
+  }
 }

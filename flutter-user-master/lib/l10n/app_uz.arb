@@ -7,7 +7,7 @@
   "text_next": "keyingisi",
   "text_your_ride": "Sizning  yurishingiz, so'rovingiz bo'yicha",
   "text_login": "Kirish",
-  "text_phone_number": "Telefon raqam",
+  "text_phone_number": "Telefon raqami",
   "text_get_started": "Boshlaymiz!",
   "text_fill_form": "Davom etish uchun formani to'ldiring.",
   "text_signup_social": "Davom etish uchun formani to'ldirib, ijtimoiy tarmoqlarda ro'yxatdan o'ting.",
@@ -354,5 +354,7 @@
   "spent_for_trip_request": "Sayohat So'rovi Uchun Sarflangan",
   "withdrawn_from_wallet": "Hamyondan yechib olish",
   "text_approval_waiting": "Tekshirish kutilmoqda",
-  "text_enter_vehicle_color": "Avtomobilingiz Rangini Kiriting"
+  "text_enter_vehicle_color": "Avtomobilingiz Rangini Kiriting",
+  "text_login_subtitle": "Raqamni tasdiqlash uchun SMS orqali kod yuboramiz",
+  "text_agree_terms_privacy": "Davom etish orqali siz {terms} va {privacy} shartlariga rozilik bildirasiz"
 }

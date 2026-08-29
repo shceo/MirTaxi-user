@@ -151,7 +151,7 @@ abstract class AppLocalizations {
   /// No description provided for @text_phone_number.
   ///
   /// In en, this message translates to:
-  /// **'phone number'**
+  /// **'Phone number'**
   String get text_phone_number;
 
   /// No description provided for @text_get_started.
@@ -2235,6 +2235,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter Your Vehicle Color'**
   String get text_enter_vehicle_color;
+
+  /// No description provided for @text_login_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll text you a code to confirm it\'s you'**
+  String get text_login_subtitle;
+
+  /// No description provided for @text_agree_terms_privacy.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to the {terms} and {privacy}'**
+  String text_agree_terms_privacy(String terms, String privacy);
 }
 
 class _AppLocalizationsDelegate

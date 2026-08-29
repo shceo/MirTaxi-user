@@ -34,7 +34,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get text_login => 'Login';
 
   @override
-  String get text_phone_number => 'phone number';
+  String get text_phone_number => 'Phone number';
 
   @override
   String get text_get_started => 'Let\'s Get Started!';
@@ -1102,4 +1102,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get text_enter_vehicle_color => 'Enter Your Vehicle Color';
+
+  @override
+  String get text_login_subtitle =>
+      'We\'ll text you a code to confirm it\'s you';
+
+  @override
+  String text_agree_terms_privacy(String terms, String privacy) {
+    return 'By continuing, you agree to the $terms and $privacy';
+  }
 }

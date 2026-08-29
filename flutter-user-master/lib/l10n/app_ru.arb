@@ -7,7 +7,7 @@
   "text_next": "Следующий",
   "text_your_ride": "Ваша поездка",
   "text_login": "Вход",
-  "text_phone_number": "номер телефона",
+  "text_phone_number": "Номер телефона",
   "text_get_started": "Начнем!",
   "text_fill_form": "Заполните данную форму, для продолжения.",
   "text_signup_social": "Для продолжения, можете использовать соц. сети",
@@ -354,5 +354,7 @@
   "referral_commission": "Referral Commission",
   "spent_for_trip_request": "Spent For Trip Request",
   "withdrawn_from_wallet": "Withdrawn From Wallet",
-  "text_enter_vehicle_color": "Введите цвет вашего автомобиля"
+  "text_enter_vehicle_color": "Введите цвет вашего автомобиля",
+  "text_login_subtitle": "Отправим код в SMS, чтобы подтвердить номер",
+  "text_agree_terms_privacy": "Продолжая, вы принимаете {terms} и {privacy}"
 }
