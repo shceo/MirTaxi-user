@@ -2373,6 +2373,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} min'**
   String text_minutes_short(int count);
+
+  /// No description provided for @text_location_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow location access'**
+  String get text_location_title;
+
+  /// No description provided for @text_location_why.
+  ///
+  /// In en, this message translates to:
+  /// **'We use it to show cars nearby and pick you up at the right spot'**
+  String get text_location_why;
+
+  /// No description provided for @text_location_reason_pickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect your pickup address'**
+  String get text_location_reason_pickup;
+
+  /// No description provided for @text_location_reason_cars.
+  ///
+  /// In en, this message translates to:
+  /// **'Show available cars around you'**
+  String get text_location_reason_cars;
+
+  /// No description provided for @text_no_recent_addresses.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent trips yet'**
+  String get text_no_recent_addresses;
+
+  /// No description provided for @text_no_recent_addresses_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a destination and your addresses will appear here'**
+  String get text_no_recent_addresses_hint;
 }
 
 class _AppLocalizationsDelegate

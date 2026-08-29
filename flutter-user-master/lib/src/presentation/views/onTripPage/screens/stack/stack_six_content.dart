@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tagyourtaxi_driver/src/presentation/design/tokens.dart';
 import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/app_state.dart';
@@ -294,7 +295,9 @@ class _AddressList extends StatelessWidget {
     final count = lastAddress.length > maxItems ? maxItems : lastAddress.length;
 
     if (count == 0) {
-      return const SizedBox(height: 280);
+      // Раньше здесь возвращалось 280 пикселей пустоты — под кнопкой «Куда
+      // едем?» зияла белая четверть экрана без единого слова.
+      return const _NoAddressesYet();
     }
 
     return Column(
@@ -479,6 +482,42 @@ class StackSixAutoFillList extends StatelessWidget {
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+
+/// Пустое состояние списка адресов.
+class _NoAddressesYet extends StatelessWidget {
+  const _NoAddressesYet();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: MtSpace.xxl, vertical: MtSpace.x4l),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.history_rounded,
+              size: 36, color: scheme.onSurfaceVariant),
+          const SizedBox(height: MtSpace.md),
+          Text(
+            context.l10n.text_no_recent_addresses,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: MtSpace.xs),
+          Text(
+            context.l10n.text_no_recent_addresses_hint,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall,
+          ),
+        ],
+      ),
     );
   }
 }

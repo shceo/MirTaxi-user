@@ -2,6 +2,7 @@
 // Запуск: flutter run -t lib/preview_main.dart
 // В прод-сборку не попадает, main.dart не трогает. Удалить после редизайна.
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:tagyourtaxi_driver/l10n/app_localizations.dart';
@@ -15,9 +16,17 @@ import 'src/presentation/views/login/otp_page.dart';
 import 'src/presentation/views/login/create_task_screen.dart';
 import 'src/presentation/views/login/select_task_screen.dart';
 import 'src/presentation/views/login/send_success_screen.dart';
+import 'src/presentation/views/onTripPage/map_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Карта читает водителей из Realtime Database, поэтому Firebase нужен и в
+  // превью. Конфиг сейчас заглушка: машины не подгрузятся, но экран отрисуется.
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase в превью не поднялся: $e');
+  }
   await CacheService.init();
 
   // Данные, которые в обычном потоке приезжают с предыдущих экранов.
@@ -67,6 +76,7 @@ class _PreviewIndex extends StatefulWidget {
     'Выбор услуги': (_) => const SelectTaskScreen(),
     'Форма заявки': (_) => const CreateTaskScreen(id: 2),
     'Заявка отправлена': (_) => const SendSuccessScreen(desc: ''),
+    'Карта': (_) => const Maps(),
   };
 
   @override

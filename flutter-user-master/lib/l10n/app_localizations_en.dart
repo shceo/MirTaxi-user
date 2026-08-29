@@ -1178,4 +1178,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String text_minutes_short(int count) {
     return '$count min';
   }
+
+  @override
+  String get text_location_title => 'Allow location access';
+
+  @override
+  String get text_location_why =>
+      'We use it to show cars nearby and pick you up at the right spot';
+
+  @override
+  String get text_location_reason_pickup => 'Detect your pickup address';
+
+  @override
+  String get text_location_reason_cars => 'Show available cars around you';
+
+  @override
+  String get text_no_recent_addresses => 'No recent trips yet';
+
+  @override
+  String get text_no_recent_addresses_hint =>
+      'Set a destination and your addresses will appear here';
 }

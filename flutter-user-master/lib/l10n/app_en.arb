@@ -394,5 +394,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "text_location_title": "Allow location access",
+  "text_location_why": "We use it to show cars nearby and pick you up at the right spot",
+  "text_location_reason_pickup": "Detect your pickup address",
+  "text_location_reason_cars": "Show available cars around you",
+  "text_no_recent_addresses": "No recent trips yet",
+  "text_no_recent_addresses_hint": "Set a destination and your addresses will appear here"
 }

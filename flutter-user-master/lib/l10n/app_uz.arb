@@ -377,5 +377,11 @@
   "text_map": "Xarita",
   "text_your_address": "Sizning manzilingiz",
   "text_address_not_found": "Manzil topilmadi",
-  "text_minutes_short": "{count} daq"
+  "text_minutes_short": "{count} daq",
+  "text_location_title": "Joylashuvga ruxsat bering",
+  "text_location_why": "Yaqin atrofdagi mashinalarni ko‘rsatish va aniq manzilga taksi yuborish uchun kerak",
+  "text_location_reason_pickup": "Yetib kelish manzilini aniqlaymiz",
+  "text_location_reason_cars": "Yaqindagi bo‘sh mashinalarni ko‘rsatamiz",
+  "text_no_recent_addresses": "Hozircha safarlar yo‘q",
+  "text_no_recent_addresses_hint": "Qayerga borishni belgilang, manzillar shu yerda chiqadi"
 }

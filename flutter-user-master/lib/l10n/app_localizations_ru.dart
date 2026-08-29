@@ -1194,4 +1194,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String text_minutes_short(int count) {
     return '$count мин';
   }
+
+  @override
+  String get text_location_title => 'Разрешите доступ к геолокации';
+
+  @override
+  String get text_location_why =>
+      'Она нужна, чтобы показать машины рядом и подать такси точно по адресу';
+
+  @override
+  String get text_location_reason_pickup => 'Определим адрес подачи';
+
+  @override
+  String get text_location_reason_cars => 'Покажем свободные машины рядом';
+
+  @override
+  String get text_no_recent_addresses => 'Поездок пока нет';
+
+  @override
+  String get text_no_recent_addresses_hint =>
+      'Укажите, куда едете, и адреса появятся здесь';
 }

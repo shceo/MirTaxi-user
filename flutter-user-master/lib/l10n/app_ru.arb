@@ -377,5 +377,11 @@
   "text_map": "Карта",
   "text_your_address": "Ваш адрес",
   "text_address_not_found": "Адрес не найден",
-  "text_minutes_short": "{count} мин"
+  "text_minutes_short": "{count} мин",
+  "text_location_title": "Разрешите доступ к геолокации",
+  "text_location_why": "Она нужна, чтобы показать машины рядом и подать такси точно по адресу",
+  "text_location_reason_pickup": "Определим адрес подачи",
+  "text_location_reason_cars": "Покажем свободные машины рядом",
+  "text_no_recent_addresses": "Поездок пока нет",
+  "text_no_recent_addresses_hint": "Укажите, куда едете, и адреса появятся здесь"
 }

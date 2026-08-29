@@ -1198,4 +1198,25 @@ class AppLocalizationsUz extends AppLocalizations {
   String text_minutes_short(int count) {
     return '$count daq';
   }
+
+  @override
+  String get text_location_title => 'Joylashuvga ruxsat bering';
+
+  @override
+  String get text_location_why =>
+      'Yaqin atrofdagi mashinalarni ko‘rsatish va aniq manzilga taksi yuborish uchun kerak';
+
+  @override
+  String get text_location_reason_pickup => 'Yetib kelish manzilini aniqlaymiz';
+
+  @override
+  String get text_location_reason_cars =>
+      'Yaqindagi bo‘sh mashinalarni ko‘rsatamiz';
+
+  @override
+  String get text_no_recent_addresses => 'Hozircha safarlar yo‘q';
+
+  @override
+  String get text_no_recent_addresses_hint =>
+      'Qayerga borishni belgilang, manzillar shu yerda chiqadi';
 }

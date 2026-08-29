@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/src/core/services/app_state.dart';
 import 'package:tagyourtaxi_driver/src/core/services/functions.dart';
 import 'package:tagyourtaxi_driver/src/data/models/address_list.dart';
-import 'package:tagyourtaxi_driver/src/presentation/styles/styles.dart';
 import 'package:tagyourtaxi_driver/src/l10n/l10n.dart';
-import 'package:yandex_mapkit/yandex_mapkit.dart';
+import 'package:tagyourtaxi_driver/src/presentation/design/tokens.dart';
 
+/// Шапка карты с адресом подачи.
+///
+/// Было: блок с градиентом из белого в прозрачный, из-за которого подпись
+/// «Ваш адрес» и строка адреса выглядели незакреплёнными и налезали на кнопку
+/// меню. Плюс размеры считались от ширины экрана.
 class StackThreeWidget extends StatelessWidget {
   final int bottom;
   final bool pickaddress;
@@ -23,158 +26,121 @@ class StackThreeWidget extends StatelessWidget {
     required this.pickup,
   });
 
+  AddressList? get _pickup {
+    final matches = addressList.where((e) => e.id == 'pickup');
+    return matches.isEmpty ? null : matches.first;
+  }
+
+  bool get _isFavourite {
+    final address = _pickup?.address;
+    if (address == null) return false;
+    return favAddress.any((e) => e['pick_address'] == address);
+  }
+
   @override
   Widget build(BuildContext context) {
-    var media = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final pickupAddress = _pickup?.address;
+    final editing = pickaddress && bottom == 1;
+
     return Positioned(
       top: 0,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 400),
-        width: media.width * 1,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-          color: (bottom == 0) ? null : page,
-        ),
-        padding:
-            EdgeInsets.only(top: MediaQuery.of(context).padding.top + 12.5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            InkWell(
-              onTap: () => changePosition(),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 400),
-                margin: EdgeInsets.only(
-                    left: media.width * 0.05,
-                    right: media.width * 0.05,
-                    bottom: media.width * 0.05),
-                padding: EdgeInsets.fromLTRB(media.width * 0.03,
-                    media.width * 0.01, media.width * 0.03, media.width * 0.01),
-                width: (bottom == 0) ? media.width * 0.75 : media.width * 0.9,
+      left: 0,
+      right: 0,
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          // Слева оставлено место под кнопку меню, которая лежит отдельным
+          // слоем в map_page.
+          padding: const EdgeInsets.fromLTRB(
+              MtSize.control + MtSpace.lg, MtSpace.sm, MtSpace.lg, 0),
+          child: Material(
+            color: scheme.surface,
+            borderRadius: MtRadius.brLg,
+            elevation: 0,
+            child: InkWell(
+              onTap: changePosition,
+              borderRadius: MtRadius.brLg,
+              child: Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color.fromRGBO(255, 255, 255, 1),
-                      Color.fromRGBO(255, 255, 255, 0.2),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(media.width * 0.02),
+                  borderRadius: MtRadius.brLg,
+                  border: Border.all(color: scheme.outlineVariant),
+                  boxShadow: MtShadow.card(
+                      theme.brightness == Brightness.dark),
                 ),
-                alignment: Alignment.center,
-                child: Column(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: MtSpace.lg, vertical: MtSpace.md),
+                child: Row(
                   children: [
-                    Text(
-                      context.l10n.text_your_address,
-                      style: GoogleFonts.roboto(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: textColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(width: media.width * 0.02),
-                        (pickaddress == true && bottom == 1)
-                            ? Expanded(
-                                child: TextField(
-                                  autofocus: true,
-                                  decoration: InputDecoration(
-                                    contentPadding: (languageDirection == 'rtl')
-                                        ? EdgeInsets.only(
-                                            bottom: media.width * 0.035)
-                                        : EdgeInsets.only(
-                                            bottom: media.width * 0.047),
-                                    hintText: context.l10n.text_4lettersforautofill,
-                                    hintStyle: GoogleFonts.roboto(
-                                        fontSize: media.width * twelve,
-                                        color: hintColor),
-                                    border: InputBorder.none,
-                                  ),
-                                  maxLines: 1,
-                                  onChanged: addDirections,
-                                ),
-                              )
-                            : Expanded(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(
-                                      width: media.width * 0.55,
-                                      child: Text(
-                                        (addressList
-                                                .where((element) =>
-                                                    element.id == 'pickup')
-                                                .isNotEmpty)
-                                            ? addressList
-                                                .firstWhere(
-                                                  (element) =>
-                                                      element.id == 'pickup',
-                                                  orElse: () => AddressList(
-                                                    id: '',
-                                                    address: '',
-                                                    latlng:
-                                                        const Point(
-                                                            latitude: 0.0,
-                                                            longitude: 0.0),
-                                                  ),
-                                                )
-                                                .address
-                                            : context.l10n.text_4lettersforautofill,
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: textColor,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    if (addressList
-                                            .where((element) =>
-                                                element.id == 'pickup')
-                                            .isNotEmpty &&
-                                        favAddress.length < 4)
-                                      InkWell(
-                                        onTap: () => pickup(),
-                                        child: Icon(
-                                          Icons.favorite_outline,
-                                          size: media.width * 0.05,
-                                          color: favAddress
-                                                  .where(
-                                                    (element) =>
-                                                        element[
-                                                            'pick_address'] ==
-                                                        addressList
-                                                            .firstWhere(
-                                                                (element) =>
-                                                                    element
-                                                                        .id ==
-                                                                    'pickup')
-                                                            .address,
-                                                  )
-                                                  .isEmpty
-                                              ? Colors.black
-                                              : buttonColor,
-                                        ),
-                                      ),
-                                  ],
-                                ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            context.l10n.text_your_address,
+                            style: theme.textTheme.labelMedium,
+                          ),
+                          const SizedBox(height: MtSpace.xs),
+                          if (editing)
+                            TextField(
+                              autofocus: true,
+                              maxLines: 1,
+                              onChanged: addDirections,
+                              style: theme.textTheme.bodyLarge,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                filled: false,
+                                contentPadding: EdgeInsets.zero,
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                hintText:
+                                    context.l10n.text_4lettersforautofill,
+                                hintStyle: theme.textTheme.bodyLarge
+                                    ?.copyWith(color: scheme.onSurfaceVariant),
                               ),
-                      ],
+                            )
+                          else
+                            Text(
+                              pickupAddress ??
+                                  context.l10n.text_4lettersforautofill,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: pickupAddress == null
+                                    ? scheme.onSurfaceVariant
+                                    : scheme.onSurface,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
+                    if (!editing && pickupAddress != null && favAddress.length < 4)
+                      IconButton(
+                        onPressed: pickup,
+                        icon: Icon(
+                          _isFavourite
+                              ? Icons.favorite
+                              : Icons.favorite_outline,
+                          color: _isFavourite
+                              ? MtColors.brand500
+                              : scheme.onSurfaceVariant,
+                          size: MtSize.icon,
+                        ),
+                        tooltip: context.l10n.text_saveaddressas,
+                        constraints: const BoxConstraints(
+                          minWidth: MtSize.minTouch,
+                          minHeight: MtSize.minTouch,
+                        ),
+                      ),
                   ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
